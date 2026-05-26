@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satoshi Terminal — Charts</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090d;--bg1:#0c0f16;--bg2:#111520;--bg3:#171c28;
+  --b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.1);
+  --tx:#d0d8e8;--tx2:#7a8599;--tx3:#3d4a62;
+  --gr:#00cc7a;--rd:#f03e4d;--yl:#f5c518;--pu:#9b6fff;--gold:#f7931a;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size:12px;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:10px;padding:7px 16px;background:var(--bg1);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:200;flex-wrap:wrap}
+.logo{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.16em;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:p 2s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+.px-big{font-size:20px;font-weight:700}
+.chg{font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px}
+.up{color:var(--gr);background:rgba(0,204,122,.1)}.dn{color:var(--rd);background:rgba(240,62,77,.1)}.nt{color:var(--yl);background:rgba(245,197,24,.1)}
+.tb-stats{display:flex;gap:14px;overflow:hidden;flex:1}
+.ts{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.tsl{font-size:8px;letter-spacing:.09em;color:var(--tx3);text-transform:uppercase}
+.tsv{font-size:10px;font-weight:500;color:var(--tx)}
+.pill{display:flex;align-items:center;gap:3px;padding:2px 8px;background:var(--bg3);border:1px solid var(--b);border-radius:3px;font-size:9px;color:var(--tx3)}
+.dot{width:5px;height:5px;border-radius:50%}
+.dot-live{background:var(--gr);animation:p 1.5s infinite}
+.rbtn{background:none;border:1px solid var(--b2);border-radius:3px;color:var(--tx2);font-family:var(--mono);font-size:9px;padding:3px 10px;cursor:pointer}
+.rbtn:hover{color:var(--tx)}
+.spin{display:inline-block;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.content{padding:10px 16px}
+.gmb{margin-bottom:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.ccard{background:var(--bg1);border:1px solid var(--b);border-radius:4px;overflow:hidden}
+.cc-head{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-bottom:1px solid var(--b);flex-wrap:wrap;gap:6px}
+.cc-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
+.cc-sub{font-size:8px;color:var(--tx3);margin-top:2px}
+.legend-inline{display:flex;gap:10px;align-items:center}
+.li{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--tx2)}
+.ll{width:16px;height:2px;border-radius:1px;flex-shrink:0}
+iframe{border:none;display:block}
+.cycle-card{background:var(--bg1);border:1px solid var(--b);border-radius:4px;padding:10px 13px;margin-bottom:8px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--tx2)}
+.leg-l{width:18px;height:2px;border-radius:1px;flex-shrink:0}
+.footer{padding:5px 16px;background:var(--bg1);border-top:1px solid var(--b);display:flex;justify-content:space-between;font-size:9px;color:var(--tx3);flex-wrap:wrap;gap:4px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+@media(max-width:700px){.g2{grid-template-columns:1fr}.tb-stats{display:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><span class="pulse"></span>SATOSHI TERMINAL</div>
+  <div style="display:flex;align-items:baseline;gap:8px;padding:0 12px;border-left:1px solid var(--b);border-right:1px solid var(--b)">
+    <span class="px-big" id="px" style="color:var(--tx)">—</span>
+    <span class="chg nt" id="pxc">—</span>
+  </div>
+  <div class="tb-stats">
+    <div class="ts"><span class="tsl">24H H/L</span><span class="tsv" id="phl">—</span></div>
+    <div class="ts"><span class="tsl">Volumen</span><span class="tsv" id="pvol">—</span></div>
+    <div class="ts"><span class="tsl">Mkt Cap</span><span class="tsv" id="pmcap">—</span></div>
+    <div class="ts"><span class="tsl">ATH</span><span class="tsv" id="path">—</span></div>
+    <div class="ts"><span class="tsl">F&G</span><span class="tsv" id="pfg">—</span></div>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+    <div class="pill"><span class="dot dot-live"></span><span>TV EN VIVO</span></div>
+    <button class="rbtn" id="rb" onclick="refreshPrice()">↻ PRECIO</button>
+    <span style="font-size:9px;color:var(--tx3)" id="clk">—</span>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- DIARIO -->
+<div class="ccard gmb">
+  <div class="cc-head">
+    <div>
+      <div class="cc-title">BITCOIN / USD — DIARIO · EMA 21 / 50 / 200 · RSI (14)</div>
+      <div class="cc-sub">TradingView · Binance · Velas reales · Zoom con scroll</div>
+    </div>
+    <div class="legend-inline">
+      <div class="li"><div class="ll" style="background:#ffffff"></div>EMA 21</div>
+      <div class="li"><div class="ll" style="background:#00cc7a"></div>EMA 50</div>
+      <div class="li"><div class="ll" style="background:#f03e4d"></div>EMA 200</div>
+    </div>
+  </div>
+  <!-- TradingView Advanced Chart Widget — usando iframe con URL que incluye indicadores preconfigurados -->
+  <iframe
+    id="tv-d"
+    src="https://www.tradingview.com/widgetembed/?frameElementId=tv-d&symbol=BINANCE%3ABTCUSDT&interval=D&hidesidetoolbar=0&hidetoptoolbar=0&symboledit=1&saveimage=0&toolbarbg=0c0f16&studies=MAExp%40tv-basicstudies%1FMAExp%40tv-basicstudies%1FMAExp%40tv-basicstudies%1FRSI%40tv-basicstudies&studies_overrides=%7B%22moving%20average%20exponential.plot.color%22%3A%22%23ffffff%22%2C%22moving%20average%20exponential.plot.linewidth%22%3A1.5%7D&overrides=%7B%22mainSeriesProperties.candleStyle.upColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.downColor%22%3A%22%23ef5350%22%2C%22mainSeriesProperties.candleStyle.borderUpColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.borderDownColor%22%3A%22%23ef5350%22%2C%22mainSeriesProperties.candleStyle.wickUpColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.wickDownColor%22%3A%22%23ef5350%22%2C%22paneProperties.background%22%3A%22%230c0f16%22%2C%22paneProperties.vertGridProperties.color%22%3A%22rgba(255%2C255%2C255%2C0.03)%22%2C%22paneProperties.horzGridProperties.color%22%3A%22rgba(255%2C255%2C255%2C0.03)%22%7D&theme=dark&style=1&timezone=Etc%2FUTC&locale=es&utm_source=ernih.github.io&utm_medium=widget_new&utm_campaign=chart"
+    style="width:100%;height:500px;background:#0c0f16"
+    allowtransparency="true"
+    allowfullscreen=""
+    scrolling="no">
+  </iframe>
+</div>
+
+<!-- SEMANAL + MENSUAL -->
+<div class="g2">
+  <div class="ccard">
+    <div class="cc-head">
+      <div>
+        <div class="cc-title">SEMANAL · EMA 21 / 50 / 200</div>
+        <div class="cc-sub">TradingView · Binance</div>
+      </div>
+    </div>
+    <iframe
+      src="https://www.tradingview.com/widgetembed/?frameElementId=tv-w&symbol=BINANCE%3ABTCUSDT&interval=W&hidesidetoolbar=1&hidetoptoolbar=0&symboledit=0&saveimage=0&toolbarbg=0c0f16&studies=MAExp%40tv-basicstudies%1FMAExp%40tv-basicstudies%1FMAExp%40tv-basicstudies%1FRSI%40tv-basicstudies&overrides=%7B%22mainSeriesProperties.candleStyle.upColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.downColor%22%3A%22%23ef5350%22%2C%22mainSeriesProperties.candleStyle.borderUpColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.borderDownColor%22%3A%22%23ef5350%22%2C%22mainSeriesProperties.candleStyle.wickUpColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.wickDownColor%22%3A%22%23ef5350%22%2C%22paneProperties.background%22%3A%22%230c0f16%22%2C%22paneProperties.vertGridProperties.color%22%3A%22rgba(255%2C255%2C255%2C0.03)%22%2C%22paneProperties.horzGridProperties.color%22%3A%22rgba(255%2C255%2C255%2C0.03)%22%7D&theme=dark&style=1&timezone=Etc%2FUTC&locale=es&utm_source=ernih.github.io"
+      style="width:100%;height:300px;background:#0c0f16"
+      allowtransparency="true" allowfullscreen="" scrolling="no">
+    </iframe>
+  </div>
+  <div class="ccard">
+    <div class="cc-head">
+      <div>
+        <div class="cc-title">MENSUAL · EMA 21 / 50 / 200</div>
+        <div class="cc-sub">TradingView · Binance</div>
+      </div>
+    </div>
+    <iframe
+      src="https://www.tradingview.com/widgetembed/?frameElementId=tv-m&symbol=BINANCE%3ABTCUSDT&interval=M&hidesidetoolbar=1&hidetoptoolbar=0&symboledit=0&saveimage=0&toolbarbg=0c0f16&studies=MAExp%40tv-basicstudies%1FMAExp%40tv-basicstudies%1FMAExp%40tv-basicstudies%1FRSI%40tv-basicstudies&overrides=%7B%22mainSeriesProperties.candleStyle.upColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.downColor%22%3A%22%23ef5350%22%2C%22mainSeriesProperties.candleStyle.borderUpColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.borderDownColor%22%3A%22%23ef5350%22%2C%22mainSeriesProperties.candleStyle.wickUpColor%22%3A%22%2326a69a%22%2C%22mainSeriesProperties.candleStyle.wickDownColor%22%3A%22%23ef5350%22%2C%22paneProperties.background%22%3A%22%230c0f16%22%2C%22paneProperties.vertGridProperties.color%22%3A%22rgba(255%2C255%2C255%2C0.03)%22%2C%22paneProperties.horzGridProperties.color%22%3A%22rgba(255%2C255%2C255%2C0.03)%22%7D&theme=dark&style=1&timezone=Etc%2FUTC&locale=es&utm_source=ernih.github.io"
+      style="width:100%;height:300px;background:#0c0f16"
+      allowtransparency="true" allowfullscreen="" scrolling="no">
+    </iframe>
+  </div>
+</div>
+
+<!-- NOTA SOBRE COLORES -->
+<div style="background:var(--bg2);border:1px solid var(--b);border-left:2px solid var(--yl);border-radius:4px;padding:8px 13px;margin-bottom:8px;font-size:9px;color:var(--tx2)">
+  ⚠ <strong style="color:var(--yl)">NOTA:</strong> El widget gratuito de TradingView no permite fijar colores diferentes por cada EMA desde código. Las EMAs cargan con colores por defecto de TradingView. Para cambiarlos a blanco/verde/rojo: click derecho sobre cada EMA en el gráfico → Configuración → Color.
+</div>
+
+<!-- CICLO CHART -->
+<div class="cycle-card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+    <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)">CICLOS DE BITCOIN — INDEXADO AL HALVING · ESCALA LOG</div>
+    <span style="font-size:9px;color:var(--tx2)" id="cycle-lbl">—</span>
+  </div>
+  <div style="position:relative;width:100%;height:240px">
+    <canvas id="cycle-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-l" style="background:rgba(240,62,77,.7)"></div>Ciclo 1 (2012–2016)</div>
+    <div class="leg-item"><div class="leg-l" style="background:rgba(245,197,24,.7)"></div>Ciclo 2 (2016–2020)</div>
+    <div class="leg-item"><div class="leg-l" style="background:rgba(0,204,122,.8)"></div>Ciclo 3 (2020–2024)</div>
+    <div class="leg-item"><div class="leg-l" style="background:rgba(74,143,255,.95)"></div>Ciclo 4 actual (2024–)</div>
+    <div class="leg-item"><div style="width:8px;height:8px;border-radius:50%;background:white;flex-shrink:0"></div>Posición actual</div>
+  </div>
+</div>
+</div>
+
+<div class="footer">
+  <span>SATOSHI TERMINAL — CHARTS</span>
+  <span id="ft">—</span>
+  <span>GRÁFICOS: TRADINGVIEW WIDGET · PRECIO: COINGECKO · AUTO-SYNC 60S</span>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
+const N=(n,d=0)=>n==null||isNaN(n)?'—':new Intl.NumberFormat('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const fK=n=>{if(!n)return'—';const a=Math.abs(n),s=n<0?'-':'';return a>=1e9?s+'$'+(a/1e9).toFixed(2)+'B':a>=1e6?s+'$'+(a/1e6).toFixed(1)+'M':s+'$'+N(a)};
+const fP=(n,d=2)=>n==null?'—':(n>0?'+':'')+n.toFixed(d)+'%';
+
+setInterval(()=>{
+  const t=new Date();
+  set('clk',t.toISOString().slice(11,19)+' UTC');
+  set('ft',t.toLocaleDateString('es-ES',{weekday:'short',month:'short',day:'numeric',year:'numeric'}));
+},1000);
+
+async function refreshPrice(){
+  const rb=$('rb');if(rb)rb.innerHTML='<span class="spin">↻</span>';
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true&include_24hr_high=true&include_24hr_low=true');
+    if(r.ok){
+      const j=await r.json();const b=j.bitcoin;
+      const el=$('px');el.textContent='$'+N(b.usd);el.style.color=b.usd_24h_change>0?'#00cc7a':b.usd_24h_change<0?'#f03e4d':'#f5c518';
+      const pc=$('pxc');pc.textContent=fP(b.usd_24h_change)+' (24H)';pc.className='chg '+(b.usd_24h_change>0?'up':b.usd_24h_change<0?'dn':'nt');
+      set('phl','$'+N(b.usd_24h_high)+' / $'+N(b.usd_24h_low));
+      set('pvol',fK(b.usd_24h_vol));set('pmcap',fK(b.usd_market_cap));
+      set('path','$126.198 (-'+Math.abs(((b.usd/126198)-1)*100).toFixed(1)+'%)');
+      buildCycle(Math.floor((new Date()-new Date('2024-04-19'))/86400000),b.usd);
+    }
+  }catch(e){}
+  try{
+    const r=await fetch('https://api.coinmarketcap.com/data-api/v3/fear-greed/latest');
+    if(r.ok){const j=await r.json();if(j.data){const fe=$('pfg');fe.textContent=j.data.value+' — '+j.data.value_classification+' (CMC)';fe.style.color=j.data.value>70?'#f03e4d':j.data.value<30?'#00cc7a':'#f5c518';}}
+  }catch(e){
+    try{const r=await fetch('https://api.alternative.me/fng/?limit=1&format=json');if(r.ok){const j=await r.json();const fe=$('pfg');fe.textContent=j.data[0].value+' — '+j.data[0].value_classification+' (alt.me)';fe.style.color=parseInt(j.data[0].value)>70?'#f03e4d':parseInt(j.data[0].value)<30?'#00cc7a':'#f5c518';}}catch(e2){}
+  }
+  if(rb)rb.innerHTML='↻ PRECIO';
+}
+
+function buildCycle(dhv,price){
+  const canvas=$('cycle-canvas');if(!canvas)return;
+  const wrap=canvas.parentElement;
+  const dpr=window.devicePixelRatio||1;
+  const W=wrap.clientWidth,H=wrap.clientHeight;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const P={t:10,r:56,b:26,l:6},CW=W-P.l-P.r,CH=H-P.t-P.b;
+  ctx.fillStyle='#0c0f16';ctx.fillRect(0,0,W,H);
+  const DAYS=1100,halvP=63000,normNow=(price/halvP)*100;
+  const LMN=Math.log(90),LMX=Math.log(11000);
+  const toY=v=>P.t+CH-(Math.log(Math.max(v,1))-LMN)/(LMX-LMN)*CH;
+  const toX=d=>P.l+(d/DAYS)*CW;
+  [100,200,500,1000,2000,5000,10000].forEach(v=>{
+    const y=toY(v);
+    ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+CW,y);ctx.stroke();
+    ctx.fillStyle='#3d4a62';ctx.font='8px JetBrains Mono';ctx.textAlign='left';
+    ctx.fillText(v+'%',W-P.r+4,y+3);
+  });
+  [0,200,400,600,800,1000].forEach(d=>{
+    const x=toX(d);
+    ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,P.t+CH);ctx.stroke();
+    ctx.fillStyle='#3d4a62';ctx.font='8px JetBrains Mono';ctx.textAlign='center';
+    ctx.fillText('D'+d,x,H-4);
+  });
+  [{c:'rgba(240,62,77,0.65)',maxD:420,maxM:100,exp:2.8},
+   {c:'rgba(245,197,24,0.65)',maxD:520,maxM:30,exp:2.5},
+   {c:'rgba(0,204,122,0.75)',maxD:550,maxM:7.8,exp:2.2}
+  ].forEach(c=>{
+    ctx.strokeStyle=c.c;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+    ctx.beginPath();let f=true;
+    for(let d=0;d<=c.maxD;d+=2){
+      const v=Math.max(100,100*(1+(c.maxM-1)*Math.pow(d/c.maxD,c.exp)));
+      f?(ctx.moveTo(toX(d),toY(v)),f=false):ctx.lineTo(toX(d),toY(v));
+    }
+    ctx.stroke();ctx.setLineDash([]);
+  });
+  ctx.strokeStyle='rgba(74,143,255,0.95)';ctx.lineWidth=2.5;
+  ctx.beginPath();let f4=true;
+  for(let d=0;d<=dhv;d+=2){
+    const v=Math.max(90,100*(1+(normNow/100-1)*Math.pow(d/Math.max(dhv,1),1.05)));
+    f4?(ctx.moveTo(toX(d),toY(v)),f4=false):ctx.lineTo(toX(d),toY(v));
+  }
+  ctx.stroke();
+  ctx.beginPath();ctx.moveTo(toX(0),toY(100));
+  for(let d=0;d<=dhv;d+=2){const v=Math.max(90,100*(1+(normNow/100-1)*Math.pow(d/Math.max(dhv,1),1.05)));ctx.lineTo(toX(d),toY(v));}
+  ctx.lineTo(toX(dhv),toY(100));ctx.closePath();ctx.fillStyle='rgba(74,143,255,0.06)';ctx.fill();
+  const xN=toX(dhv);
+  ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(xN,P.t);ctx.lineTo(xN,P.t+CH);ctx.stroke();ctx.setLineDash([]);
+  const curV=Math.round(normNow);
+  ctx.beginPath();ctx.arc(toX(dhv),toY(curV),5,0,Math.PI*2);
+  ctx.fillStyle='white';ctx.fill();ctx.strokeStyle='rgba(74,143,255,0.8)';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#d0d8e8';ctx.font='bold 9px JetBrains Mono';ctx.textAlign='left';
+  ctx.fillText('Día '+dhv+' · '+curV+'%',toX(dhv)+8,toY(curV)+3);
+  set('cycle-lbl','Ciclo 4 · Día '+dhv+' · +'+((price/halvP-1)*100).toFixed(0)+'% desde halving');
+}
+
+setInterval(refreshPrice,60000);
+refreshPrice();
+</script>
+</body>
+</html>
