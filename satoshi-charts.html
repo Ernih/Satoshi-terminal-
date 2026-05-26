@@ -1,10 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Satoshi Terminal — Charts</title>
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
@@ -17,8 +17,6 @@
   --mono:'JetBrains Mono',monospace;
 }
 html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size:12px;min-height:100vh}
-
-/* TOPBAR */
 .topbar{display:flex;align-items:center;gap:10px;padding:7px 16px;background:var(--bg1);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:200;flex-wrap:wrap}
 .logo{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.16em;display:flex;align-items:center;gap:6px;flex-shrink:0}
 .pulse{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:p 2s infinite}
@@ -37,65 +35,41 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
 .rbtn:hover{color:var(--tx)}
 .spin{display:inline-block;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* CONTENT */
 .content{padding:10px 16px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .gmb{margin-bottom:8px}
-
-/* CHART CARDS */
 .ccard{background:var(--bg1);border:1px solid var(--b);border-radius:4px;padding:10px 13px}
 .cc-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px;flex-wrap:wrap}
 .cc-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
 .cc-price{font-size:13px;font-weight:700;color:var(--tx)}
-
-/* EMA info bar */
 .ema-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px}
 .ema-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--tx2)}
 .ema-dot{width:18px;height:2px;border-radius:1px;flex-shrink:0}
-.ema-val{font-weight:600;font-family:var(--mono)}
-
-/* Chart containers */
+.ema-val{font-weight:600}
 .chart-wrap{position:relative;width:100%}
+.chart-box{width:100%;background:var(--bg2);border-radius:3px;overflow:hidden}
 .chart-main{width:100%;height:320px}
-.chart-main-sm{width:100%;height:200px}
+.chart-sm{width:100%;height:200px}
 .chart-rsi{width:100%;height:80px;border-top:1px solid var(--b);margin-top:2px}
 .chart-rsi-sm{width:100%;height:60px;border-top:1px solid var(--b);margin-top:2px}
-
-/* RSI header */
 .rsi-head{display:flex;align-items:center;gap:8px;padding:3px 0 1px;font-size:8px;color:var(--tx3);letter-spacing:.08em}
 .rsi-num{font-weight:700;color:var(--pu);font-size:10px}
 .rsi-sig{font-size:8px;padding:1px 5px;border-radius:2px}
-
-/* Legend */
 .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
 .leg-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--tx2)}
-.leg-candle-b{width:8px;height:11px;background:var(--bull);border-radius:1px;flex-shrink:0}
-.leg-candle-s{width:8px;height:11px;background:var(--bear);border-radius:1px;flex-shrink:0}
-.leg-line{width:18px;height:2px;border-radius:1px;flex-shrink:0}
-
-/* Loading */
-.loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;color:var(--tx3);letter-spacing:.1em;z-index:10;pointer-events:none}
-
-/* Cycle */
+.leg-c{width:8px;height:11px;border-radius:1px;flex-shrink:0}
+.leg-l{width:18px;height:2px;border-radius:1px;flex-shrink:0}
+.loading-box{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--tx3);font-size:10px;letter-spacing:.1em;gap:6px}
+.loading-spinner{width:24px;height:24px;border:2px solid var(--b2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
 .cycle-card{background:var(--bg1);border:1px solid var(--b);border-radius:4px;padding:10px 13px;margin-bottom:8px}
-
-/* Footer */
 .footer{padding:5px 16px;background:var(--bg1);border-top:1px solid var(--b);display:flex;justify-content:space-between;font-size:9px;color:var(--tx3);letter-spacing:.07em;flex-wrap:wrap;gap:4px}
-
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
-
-@media(max-width:700px){
-  .g2{grid-template-columns:1fr}
-  .chart-main{height:240px}
-  .tb-stats{display:none}
-}
+@media(max-width:700px){.g2{grid-template-columns:1fr}.chart-main{height:240px}.tb-stats{display:none}}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo"><span class="pulse"></span>SATOSHI TERMINAL</div>
   <div style="display:flex;align-items:baseline;gap:8px;padding:0 12px;border-left:1px solid var(--b);border-right:1px solid var(--b)">
@@ -110,7 +84,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
     <div class="ts"><span class="tsl">F&G</span><span class="tsv" id="pfg">—</span></div>
   </div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-    <div class="pill"><span class="dot dot-dead" id="dot-data"></span><span id="ptxt">CONECTANDO</span></div>
+    <div class="pill"><span class="dot dot-dead" id="dot-data"></span><span id="ptxt">CARGANDO</span></div>
     <button class="rbtn" id="rb" onclick="loadAll()">↻ ACTUALIZAR</button>
     <span style="font-size:9px;color:var(--tx3)" id="clk">—</span>
   </div>
@@ -118,15 +92,16 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
 
 <div class="content">
 
-<!-- ═══ DIARIO (PRINCIPAL) ═══ -->
+<!-- DIARIO -->
 <div class="ccard gmb">
   <div class="cc-head">
     <div>
-      <div class="cc-title">BITCOIN / USDT — DIARIO · BINANCE · EMA 21 / 50 / 200</div>
+      <div class="cc-title">BITCOIN — DIARIO · EMA 21 / 50 / 200 + RSI (14)</div>
       <div class="ema-bar">
         <div class="ema-item"><div class="ema-dot" style="background:#fff"></div>EMA 21: <span class="ema-val" id="v21d">—</span></div>
         <div class="ema-item"><div class="ema-dot" style="background:var(--gr)"></div>EMA 50: <span class="ema-val" id="v50d">—</span></div>
         <div class="ema-item"><div class="ema-dot" style="background:var(--rd)"></div>EMA 200: <span class="ema-val" id="v200d">—</span></div>
+        <div class="ema-item"><div class="ema-dot" style="background:var(--pu)"></div>RSI: <span class="ema-val" id="rsi-d-val" style="color:var(--pu)">—</span></div>
       </div>
     </div>
     <div style="text-align:right">
@@ -134,30 +109,31 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
       <span class="chg nt" id="chart-d-chg" style="margin-top:2px;display:inline-block">—</span>
     </div>
   </div>
-  <div class="chart-wrap">
-    <div class="chart-main" id="chart-d"></div>
-    <div class="loading" id="load-d">CARGANDO DATOS BINANCE...</div>
+  <div class="chart-box">
+    <div class="chart-main" id="wrap-d">
+      <div class="loading-box"><div class="loading-spinner"></div>CARGANDO VELAS OHLC...</div>
+    </div>
   </div>
   <div class="rsi-head">
     <span>RSI (14)</span>
-    <span class="rsi-num" id="rsi-d-val">—</span>
+    <span class="rsi-num" id="rsi-d-num">—</span>
     <span class="rsi-sig" id="rsi-d-sig"></span>
   </div>
-  <div class="chart-rsi" id="rsi-d"></div>
+  <div class="chart-box">
+    <div class="chart-rsi" id="wrap-rsi-d"></div>
+  </div>
   <div class="legend" style="margin-top:8px">
-    <div class="leg-item"><div class="leg-candle-b"></div>Vela alcista</div>
-    <div class="leg-item"><div class="leg-candle-s"></div>Vela bajista</div>
-    <div class="leg-item"><div class="leg-line" style="background:#fff"></div>EMA 21</div>
-    <div class="leg-item"><div class="leg-line" style="background:var(--gr)"></div>EMA 50</div>
-    <div class="leg-item"><div class="leg-line" style="background:var(--rd)"></div>EMA 200</div>
-    <div class="leg-item"><div class="leg-line" style="background:var(--pu)"></div>RSI (14)</div>
+    <div class="leg-item"><div class="leg-c" style="background:#26a69a"></div>Vela alcista</div>
+    <div class="leg-item"><div class="leg-c" style="background:#ef5350"></div>Vela bajista</div>
+    <div class="leg-item"><div class="leg-l" style="background:#fff"></div>EMA 21</div>
+    <div class="leg-item"><div class="leg-l" style="background:var(--gr)"></div>EMA 50</div>
+    <div class="leg-item"><div class="leg-l" style="background:var(--rd)"></div>EMA 200</div>
+    <div class="leg-item"><div class="leg-l" style="background:var(--pu)"></div>RSI 14</div>
   </div>
 </div>
 
-<!-- ═══ SEMANAL + MENSUAL ═══ -->
+<!-- SEMANAL + MENSUAL -->
 <div class="g2">
-
-  <!-- SEMANAL -->
   <div class="ccard" style="margin-bottom:0">
     <div class="cc-head">
       <div>
@@ -169,23 +145,19 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
         </div>
       </div>
     </div>
-    <div class="chart-wrap">
-      <div class="chart-main-sm" id="chart-w"></div>
-      <div class="loading" id="load-w">CARGANDO...</div>
+    <div class="chart-box">
+      <div class="chart-sm" id="wrap-w">
+        <div class="loading-box"><div class="loading-spinner"></div>CARGANDO...</div>
+      </div>
     </div>
-    <div class="rsi-head">
-      <span>RSI (14)</span>
-      <span class="rsi-num" id="rsi-w-val">—</span>
-    </div>
-    <div class="chart-rsi-sm" id="rsi-w"></div>
+    <div class="rsi-head"><span>RSI (14)</span><span class="rsi-num" id="rsi-w-num">—</span></div>
+    <div class="chart-box"><div class="chart-rsi-sm" id="wrap-rsi-w"></div></div>
     <div class="legend" style="margin-top:6px">
-      <div class="leg-item"><div class="leg-line" style="background:#fff"></div>EMA 21</div>
-      <div class="leg-item"><div class="leg-line" style="background:var(--gr)"></div>EMA 50</div>
-      <div class="leg-item"><div class="leg-line" style="background:var(--rd)"></div>EMA 200</div>
+      <div class="leg-item"><div class="leg-l" style="background:#fff"></div>EMA 21</div>
+      <div class="leg-item"><div class="leg-l" style="background:var(--gr)"></div>EMA 50</div>
+      <div class="leg-item"><div class="leg-l" style="background:var(--rd)"></div>EMA 200</div>
     </div>
   </div>
-
-  <!-- MENSUAL -->
   <div class="ccard" style="margin-bottom:0">
     <div class="cc-head">
       <div>
@@ -197,37 +169,35 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
         </div>
       </div>
     </div>
-    <div class="chart-wrap">
-      <div class="chart-main-sm" id="chart-m"></div>
-      <div class="loading" id="load-m">CARGANDO...</div>
+    <div class="chart-box">
+      <div class="chart-sm" id="wrap-m">
+        <div class="loading-box"><div class="loading-spinner"></div>CARGANDO...</div>
+      </div>
     </div>
-    <div class="rsi-head">
-      <span>RSI (14)</span>
-      <span class="rsi-num" id="rsi-m-val">—</span>
-    </div>
-    <div class="chart-rsi-sm" id="rsi-m"></div>
+    <div class="rsi-head"><span>RSI (14)</span><span class="rsi-num" id="rsi-m-num">—</span></div>
+    <div class="chart-box"><div class="chart-rsi-sm" id="wrap-rsi-m"></div></div>
     <div class="legend" style="margin-top:6px">
-      <div class="leg-item"><div class="leg-line" style="background:#fff"></div>EMA 21</div>
-      <div class="leg-item"><div class="leg-line" style="background:var(--gr)"></div>EMA 50</div>
-      <div class="leg-item"><div class="leg-line" style="background:var(--rd)"></div>EMA 200</div>
+      <div class="leg-item"><div class="leg-l" style="background:#fff"></div>EMA 21</div>
+      <div class="leg-item"><div class="leg-l" style="background:var(--gr)"></div>EMA 50</div>
+      <div class="leg-item"><div class="leg-l" style="background:var(--rd)"></div>EMA 200</div>
     </div>
   </div>
 </div>
 
-<!-- ═══ CICLO CHART (LightweightCharts) ═══ -->
+<!-- CICLOS -->
 <div class="cycle-card">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
     <div class="cc-title">CICLOS DE BITCOIN — INDEXADO AL HALVING · ESCALA LOGARÍTMICA</div>
     <span style="font-size:9px;color:var(--tx2)" id="cycle-lbl">—</span>
   </div>
-  <div style="position:relative;width:100%;height:240px" id="chart-cycle">
-    <canvas id="cycle-canvas" style="width:100%;height:100%"></canvas>
+  <div style="position:relative;width:100%;height:240px">
+    <canvas id="cycle-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
   </div>
   <div class="legend" style="margin-top:8px">
-    <div class="leg-item"><div class="leg-line" style="background:rgba(240,62,77,.7)"></div>Ciclo 1 (2012–2016)</div>
-    <div class="leg-item"><div class="leg-line" style="background:rgba(245,197,24,.7)"></div>Ciclo 2 (2016–2020)</div>
-    <div class="leg-item"><div class="leg-line" style="background:rgba(0,204,122,.8)"></div>Ciclo 3 (2020–2024)</div>
-    <div class="leg-item"><div class="leg-line" style="background:rgba(74,143,255,.95)"></div>Ciclo 4 actual (2024–)</div>
+    <div class="leg-item"><div class="leg-l" style="background:rgba(240,62,77,.7)"></div>Ciclo 1 (2012–2016)</div>
+    <div class="leg-item"><div class="leg-l" style="background:rgba(245,197,24,.7)"></div>Ciclo 2 (2016–2020)</div>
+    <div class="leg-item"><div class="leg-l" style="background:rgba(0,204,122,.8)"></div>Ciclo 3 (2020–2024)</div>
+    <div class="leg-item"><div class="leg-l" style="background:rgba(74,143,255,.95)"></div>Ciclo 4 actual (2024–)</div>
     <div class="leg-item"><div style="width:8px;height:8px;border-radius:50%;background:white;flex-shrink:0"></div>Posición actual</div>
   </div>
 </div>
@@ -235,15 +205,41 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
 </div><!-- /content -->
 
 <div class="footer">
-  <span>SATOSHI TERMINAL — CHARTS · BINANCE API + LIGHTWEIGHT CHARTS</span>
+  <span>SATOSHI TERMINAL — CHARTS</span>
   <span id="ft">—</span>
-  <span>VELAS REALES · EMA CALCULADAS · AUTO-SYNC 60S</span>
+  <span>COINGECKO OHLC · LIGHTWEIGHT CHARTS · AUTO-SYNC 60S</span>
 </div>
 
 <script>
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
+// Load Lightweight Charts from multiple CDNs
+// ══════════════════════════════════════════
+function loadScript(src){
+  return new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src=src;s.onload=resolve;s.onerror=reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function loadLWC(){
+  const cdns=[
+    'https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js',
+    'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.3/lightweight-charts.standalone.production.js',
+  ];
+  for(const cdn of cdns){
+    try{
+      await loadScript(cdn);
+      if(typeof LightweightCharts!=='undefined')return true;
+    }catch(e){console.warn('CDN failed:',cdn)}
+  }
+  return false;
+}
+
+// ══════════════════════════════════════════
 // UTILS
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 const $=id=>document.getElementById(id);
 const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
 const N=(n,d=0)=>n==null||isNaN(n)?'—':new Intl.NumberFormat('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
@@ -256,14 +252,19 @@ setInterval(()=>{
   set('ft',t.toLocaleDateString('es-ES',{weekday:'short',month:'short',day:'numeric',year:'numeric'}));
 },1000);
 
-function setDot(st){
+function setDot(st,txt){
   const d=$('dot-data');if(d)d.className='dot dot-'+st;
-  const t=$('ptxt');if(t)t.textContent=st==='live'?'BINANCE EN VIVO':st==='warn'?'PARCIAL':'ERROR';
+  const t=$('ptxt');if(t)t.textContent=txt||(st==='live'?'EN VIVO':st==='warn'?'PARCIAL':'ERROR');
 }
 
-// ══════════════════════════════════════════════
+function showErr(wrapId,msg){
+  const el=$(wrapId);
+  if(el)el.innerHTML=`<div class="loading-box" style="color:var(--rd)">${msg}</div>`;
+}
+
+// ══════════════════════════════════════════
 // EMA & RSI
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 function calcEMA(closes,n){
   const k=2/(n+1),res=new Array(closes.length).fill(null);
   if(closes.length<n)return res;
@@ -289,328 +290,57 @@ function calcRSI(closes,n=14){
   return res;
 }
 
-// ══════════════════════════════════════════════
-// FETCH BINANCE KLINES
-// Binance: [openTime,open,high,low,close,volume,...]
-// ══════════════════════════════════════════════
-async function fetchKlines(interval,limit){
-  const url=`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${limit}`;
+// ══════════════════════════════════════════
+// FETCH DATA
+// ══════════════════════════════════════════
+async function fetchOHLC(days){
+  // CoinGecko OHLC — real candles, CORS allowed
   try{
-    const r=await fetch(url);
+    const r=await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=${days}`);
     if(!r.ok)throw new Error('HTTP '+r.status);
-    return await r.json();
-  }catch(e){
-    console.warn('Binance klines failed:',e.message);
-    // fallback: Binance US
-    try{
-      const r2=await fetch(`https://api.binance.us/api/v3/klines?symbol=BTCUSD&interval=${interval}&limit=${limit}`);
-      if(!r2.ok)throw new Error();
-      return await r2.json();
-    }catch(e2){return null}
-  }
+    const raw=await r.json();
+    return raw.map(k=>({time:Math.floor(k[0]/1000),open:k[1],high:k[2],low:k[3],close:k[4]}));
+  }catch(e){console.warn('OHLC failed days='+days,e.message);return null}
 }
 
-// ══════════════════════════════════════════════
-// LIGHTWEIGHT CHARTS CONFIG
-// ══════════════════════════════════════════════
-const CHART_OPTS={
-  layout:{background:{color:'#0c0f16'},textColor:'#3d4a62'},
-  grid:{vertLines:{color:'rgba(255,255,255,0.03)'},horzLines:{color:'rgba(255,255,255,0.03)'}},
-  crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.2)',labelBackgroundColor:'#1c2335'},horzLine:{color:'rgba(255,255,255,0.2)',labelBackgroundColor:'#1c2335'}},
-  rightPriceScale:{borderColor:'rgba(255,255,255,0.06)',textColor:'#3d4a62'},
-  timeScale:{borderColor:'rgba(255,255,255,0.06)',timeVisible:true,secondsVisible:false},
-  handleScroll:true,
-  handleScale:true,
-};
-
-const RSI_OPTS={
-  layout:{background:{color:'#0c0f16'},textColor:'#3d4a62'},
-  grid:{vertLines:{color:'rgba(255,255,255,0.02)'},horzLines:{color:'rgba(255,255,255,0.02)'}},
-  crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.15)',labelBackgroundColor:'#1c2335'},horzLine:{color:'rgba(255,255,255,0.15)',labelBackgroundColor:'#1c2335'}},
-  rightPriceScale:{borderColor:'rgba(255,255,255,0.04)',textColor:'#3d4a62',scaleMargins:{top:0.1,bottom:0.1}},
-  timeScale:{visible:false,borderColor:'rgba(255,255,255,0.04)'},
-  handleScroll:false,
-  handleScale:false,
-};
-
-// Active charts registry
-const CHARTS={};
-
-function destroyChart(key){
-  if(CHARTS[key]){CHARTS[key].remove();delete CHARTS[key]}
+async function fetchDaily(days){
+  try{
+    const r=await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}&interval=daily`);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    return(j.prices||[]).map(p=>({time:Math.floor(p[0]/1000),close:p[1]}));
+  }catch(e){console.warn('market_chart failed',e.message);return null}
 }
 
-// ══════════════════════════════════════════════
-// BUILD PRICE + EMA + RSI CHARTS
-// ══════════════════════════════════════════════
-function buildChart(containerId,rsiId,klines,ema21Id,ema50Id,ema200Id,rsiValId,rsiSigId){
-  if(!klines||klines.length<22){
-    const ld=$('load-'+containerId.replace('chart-',''));
-    if(ld)ld.textContent='Sin datos suficientes';
-    return;
+function toWeekly(daily){
+  if(!daily||daily.length<14)return null;
+  const out=[];
+  for(let i=0;i<daily.length;i+=7){
+    const chunk=daily.slice(i,i+7);
+    if(chunk.length<3)continue;
+    const closes=chunk.map(d=>d.close);
+    out.push({time:chunk[0].time,open:closes[0],high:Math.max(...closes),low:Math.min(...closes),close:closes[closes.length-1]});
   }
-
-  // Hide loading
-  const ld=$('load-'+containerId.replace('chart-',''));
-  if(ld)ld.style.display='none';
-
-  // Parse klines → [time, open, high, low, close]
-  const candles=klines.map(k=>({
-    time:Math.floor(k[0]/1000), // unix seconds
-    open:parseFloat(k[1]),
-    high:parseFloat(k[2]),
-    low:parseFloat(k[3]),
-    close:parseFloat(k[4]),
-  }));
-
-  const closes=candles.map(c=>c.close);
-  const times=candles.map(c=>c.time);
-
-  const e21=calcEMA(closes,21);
-  const e50=calcEMA(closes,50);
-  const e200=calcEMA(closes,200);
-  const r14=calcRSI(closes,14);
-
-  // Last values for display
-  const last=closes[closes.length-1];
-  const le21=e21.filter(v=>v!=null).pop();
-  const le50=e50.filter(v=>v!=null).pop();
-  const le200=e200.filter(v=>v!=null).pop();
-  const lr14=r14.filter(v=>v!=null).pop();
-
-  if(ema21Id)set(ema21Id,'$'+N(le21));
-  if(ema50Id)set(ema50Id,'$'+N(le50));
-  if(ema200Id)set(ema200Id,'$'+N(le200));
-  if(rsiValId){
-    $(rsiValId).textContent=lr14?lr14.toFixed(1):'—';
-    $(rsiValId).style.color=lr14>70?'#f03e4d':lr14<30?'#00cc7a':'#9b6fff';
-  }
-  if(rsiSigId){
-    const sig=lr14>70?'SOBRECOMPRADO':lr14<30?'SOBREVENDIDO':'NEUTRAL';
-    const sigEl=$(rsiSigId);
-    if(sigEl){
-      sigEl.textContent=sig;
-      sigEl.style.color=lr14>70?'#f03e4d':lr14<30?'#00cc7a':'#7a8599';
-      sigEl.style.background=lr14>70?'rgba(240,62,77,.1)':lr14<30?'rgba(0,204,122,.1)':'transparent';
-    }
-  }
-
-  // Destroy previous
-  destroyChart(containerId);
-  destroyChart(rsiId);
-
-  // Create price chart
-  const priceEl=$(containerId);
-  if(!priceEl)return;
-  const chart=LightweightCharts.createChart(priceEl,{
-    ...CHART_OPTS,
-    width:priceEl.clientWidth,
-    height:priceEl.clientHeight,
-  });
-  CHARTS[containerId]=chart;
-
-  // Candlestick series
-  const candleSeries=chart.addCandlestickSeries({
-    upColor:'#26a69a',downColor:'#ef5350',
-    borderUpColor:'#26a69a',borderDownColor:'#ef5350',
-    wickUpColor:'#26a69a',wickDownColor:'#ef5350',
-  });
-  candleSeries.setData(candles);
-
-  // EMA 21 — white
-  const ema21Series=chart.addLineSeries({color:'rgba(255,255,255,0.85)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,title:'EMA21'});
-  ema21Series.setData(times.map((t,i)=>e21[i]!=null?{time:t,value:e21[i]}:null).filter(Boolean));
-
-  // EMA 50 — green
-  const ema50Series=chart.addLineSeries({color:'rgba(0,204,122,0.9)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,title:'EMA50'});
-  ema50Series.setData(times.map((t,i)=>e50[i]!=null?{time:t,value:e50[i]}:null).filter(Boolean));
-
-  // EMA 200 — red
-  const ema200Series=chart.addLineSeries({color:'rgba(240,62,77,0.95)',lineWidth:2,priceLineVisible:false,lastValueVisible:true,title:'EMA200'});
-  ema200Series.setData(times.map((t,i)=>e200[i]!=null?{time:t,value:e200[i]}:null).filter(Boolean));
-
-  chart.timeScale().fitContent();
-
-  // RSI chart
-  const rsiEl=$(rsiId);
-  if(!rsiEl)return;
-  const rsiChart=LightweightCharts.createChart(rsiEl,{
-    ...RSI_OPTS,
-    width:rsiEl.clientWidth,
-    height:rsiEl.clientHeight,
-  });
-  CHARTS[rsiId]=rsiChart;
-
-  // RSI line
-  const rsiSeries=rsiChart.addLineSeries({
-    color:'rgba(155,111,255,0.9)',
-    lineWidth:1.5,
-    priceLineVisible:false,
-    lastValueVisible:true,
-    title:'RSI',
-    autoscaleInfoProvider:()=>({priceRange:{minValue:0,maxValue:100}}),
-  });
-  rsiSeries.setData(times.map((t,i)=>r14[i]!=null?{time:t,value:r14[i]}:null).filter(Boolean));
-
-  // Overbought/oversold lines
-  const ob=rsiChart.addLineSeries({color:'rgba(240,62,77,0.4)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
-  ob.setData([{time:times[0],value:70},{time:times[times.length-1],value:70}]);
-  const os=rsiChart.addLineSeries({color:'rgba(0,204,122,0.4)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
-  os.setData([{time:times[0],value:30},{time:times[times.length-1],value:30}]);
-  const mid=rsiChart.addLineSeries({color:'rgba(255,255,255,0.06)',lineWidth:1,priceLineVisible:false,lastValueVisible:false});
-  mid.setData([{time:times[0],value:50},{time:times[times.length-1],value:50}]);
-
-  rsiChart.timeScale().fitContent();
-
-  // Sync crosshairs between price and RSI
-  chart.subscribeCrosshairMove(param=>{
-    if(param.time){
-      rsiChart.setCrosshairPosition(param.point?param.point.x:0,{time:param.time},rsiSeries);
-    }
-  });
-
-  // Resize observer
-  const ro=new ResizeObserver(()=>{
-    chart.applyOptions({width:priceEl.clientWidth,height:priceEl.clientHeight});
-    rsiChart.applyOptions({width:rsiEl.clientWidth,height:rsiEl.clientHeight});
-  });
-  ro.observe(priceEl);
+  return out.length>10?out:null;
 }
 
-// ══════════════════════════════════════════════
-// CYCLE CHART (Canvas 2D — no librería)
-// ══════════════════════════════════════════════
-function buildCycleChart(dhv,price){
-  const canvas=$('cycle-canvas');
-  if(!canvas)return;
-  const wrap=$('chart-cycle');
-  canvas.width=wrap.clientWidth;
-  canvas.height=wrap.clientHeight;
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height;
-  const PAD={t:10,r:50,b:30,l:10};
-  const CW=W-PAD.l-PAD.r,CH=H-PAD.t-PAD.b;
-
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#0c0f16';ctx.fillRect(0,0,W,H);
-
-  // Days 0→1100
-  const DAYS=1100;
-  const halvP=63000;
-  const normNow=(price/halvP)*100;
-
-  // Cycle data (% from halving price)
-  function cycleVal(day,maxDay,maxMult,exp){
-    if(day>maxDay)return null;
-    return Math.max(100,Math.round(100*(1+(maxMult-1)*Math.pow(day/maxDay,exp))));
+function toMonthly(daily){
+  if(!daily||daily.length<30)return null;
+  const out=[];
+  for(let i=0;i<daily.length;i+=30){
+    const chunk=daily.slice(i,i+30);
+    if(chunk.length<10)continue;
+    const closes=chunk.map(d=>d.close);
+    out.push({time:chunk[0].time,open:closes[0],high:Math.max(...closes),low:Math.min(...closes),close:closes[closes.length-1]});
   }
-
-  const cycles=[
-    {color:'rgba(240,62,77,0.65)',data:d=>cycleVal(d,420,100,2.8)},
-    {color:'rgba(245,197,24,0.65)',data:d=>cycleVal(d,520,30,2.5)},
-    {color:'rgba(0,204,122,0.75)',data:d=>cycleVal(d,550,7.8,2.2)},
-  ];
-
-  // Log scale: y = log(val)/log(maxVal) * CH
-  const LOG_MIN=Math.log(90);
-  const LOG_MAX=Math.log(10500);
-  const toY=v=>PAD.t+CH-(Math.log(Math.max(v,1))-LOG_MIN)/(LOG_MAX-LOG_MIN)*CH;
-  const toX=d=>PAD.l+d/DAYS*CW;
-
-  // Grid lines
-  ctx.strokeStyle='rgba(255,255,255,0.03)';ctx.lineWidth=1;
-  [100,200,500,1000,2000,5000,10000].forEach(v=>{
-    const y=toY(v);
-    ctx.beginPath();ctx.moveTo(PAD.l,y);ctx.lineTo(PAD.l+CW,y);ctx.stroke();
-    ctx.fillStyle='#3d4a62';ctx.font='8px JetBrains Mono';ctx.textAlign='right';
-    ctx.fillText(v+'%',W-4,y+3);
-  });
-
-  // Day grid
-  [0,200,400,600,800,1000].forEach(d=>{
-    const x=toX(d);
-    ctx.strokeStyle='rgba(255,255,255,0.03)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(x,PAD.t);ctx.lineTo(x,PAD.t+CH);ctx.stroke();
-    ctx.fillStyle='#3d4a62';ctx.font='8px JetBrains Mono';ctx.textAlign='center';
-    ctx.fillText('D'+d,x,H-6);
-  });
-
-  // Draw historical cycles
-  cycles.forEach(c=>{
-    ctx.strokeStyle=c.color;ctx.lineWidth=1.5;
-    ctx.setLineDash([5,4]);
-    ctx.beginPath();let first=true;
-    for(let d=0;d<=DAYS;d+=2){
-      const v=c.data(d);if(v==null)break;
-      const x=toX(d),y=toY(v);
-      first?(ctx.moveTo(x,y),first=false):ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-    ctx.setLineDash([]);
-  });
-
-  // Ciclo 4 actual — trayectoria real
-  ctx.strokeStyle='rgba(74,143,255,0.95)';ctx.lineWidth:2.5;
-  ctx.lineWidth=2.5;ctx.setLineDash([]);
-  ctx.beginPath();
-  let first4=true;
-  for(let d=0;d<=dhv;d+=2){
-    const pct=d/Math.max(dhv,1);
-    const v=Math.max(90,Math.round(100*(1+(normNow/100-1)*Math.pow(pct,1.05))));
-    const x=toX(d),y=toY(v);
-    first4?(ctx.moveTo(x,y),first4=false):ctx.lineTo(x,y);
-  }
-  ctx.stroke();
-
-  // Fill under cycle 4
-  ctx.beginPath();
-  ctx.moveTo(toX(0),toY(100));
-  for(let d=0;d<=dhv;d+=2){
-    const pct=d/Math.max(dhv,1);
-    const v=Math.max(90,Math.round(100*(1+(normNow/100-1)*Math.pow(pct,1.05))));
-    ctx.lineTo(toX(d),toY(v));
-  }
-  ctx.lineTo(toX(dhv),toY(100));
-  ctx.closePath();
-  ctx.fillStyle='rgba(74,143,255,0.06)';
-  ctx.fill();
-
-  // Línea vertical día actual
-  const xNow=toX(dhv);
-  ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=1;
-  ctx.setLineDash([3,3]);
-  ctx.beginPath();ctx.moveTo(xNow,PAD.t);ctx.lineTo(xNow,PAD.t+CH);ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Punto actual (círculo blanco)
-  const curV=Math.round(normNow);
-  const xCur=toX(dhv),yCur=toY(curV);
-  ctx.beginPath();ctx.arc(xCur,yCur,5,0,Math.PI*2);
-  ctx.fillStyle='white';ctx.fill();
-  ctx.strokeStyle='rgba(74,143,255,0.8)';ctx.lineWidth=2;ctx.stroke();
-
-  // Label punto actual
-  ctx.fillStyle='#d0d8e8';ctx.font='bold 9px JetBrains Mono';ctx.textAlign='left';
-  ctx.fillText('Día '+dhv+' · '+curV+'%',xCur+8,yCur+3);
-
-  set('cycle-lbl','Ciclo 4 · Día '+dhv+' · +'+((price/halvP-1)*100).toFixed(0)+'% desde halving ($63K)');
-
-  // Resize
-  window.addEventListener('resize',()=>{
-    canvas.width=wrap.clientWidth;
-    canvas.height=wrap.clientHeight;
-    buildCycleChart(dhv,price);
-  },{once:true});
+  return out.length>5?out:null;
 }
 
-// ══════════════════════════════════════════════
-// FETCH COINGECKO (topbar)
-// ══════════════════════════════════════════════
-async function fetchCG(){
+async function fetchPriceInfo(){
   try{
     const r=await fetch('https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false');
     if(!r.ok)throw new Error();
-    return (await r.json()).market_data;
+    return(await r.json()).market_data;
   }catch(e){
     try{
       const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true');
@@ -633,26 +363,249 @@ async function fetchFG(){
   return null;
 }
 
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
+// BUILD CHART
+// ══════════════════════════════════════════
+const ACTIVE={};
+
+function destroyChart(key){
+  if(ACTIVE[key]){try{ACTIVE[key].remove()}catch(e){}delete ACTIVE[key]}
+}
+
+let COPTS,ROPTS;
+function initOpts(){
+  COPTS={
+    layout:{background:{color:'#0c0f16'},textColor:'#3d4a62'},
+    grid:{vertLines:{color:'rgba(255,255,255,0.025)'},horzLines:{color:'rgba(255,255,255,0.025)'}},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.2)',labelBackgroundColor:'#1c2335'},horzLine:{color:'rgba(255,255,255,0.2)',labelBackgroundColor:'#1c2335'}},
+    rightPriceScale:{borderColor:'rgba(255,255,255,0.05)',textColor:'#3d4a62'},
+    timeScale:{borderColor:'rgba(255,255,255,0.05)',timeVisible:true,secondsVisible:false},
+    handleScroll:true,handleScale:true,
+  };
+  ROPTS={
+    layout:{background:{color:'#0c0f16'},textColor:'#3d4a62'},
+    grid:{vertLines:{color:'rgba(255,255,255,0.015)'},horzLines:{color:'rgba(255,255,255,0.015)'}},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.15)',labelBackgroundColor:'#1c2335'},horzLine:{color:'rgba(255,255,255,0.15)',labelBackgroundColor:'#1c2335'}},
+    rightPriceScale:{borderColor:'rgba(255,255,255,0.03)',textColor:'#3d4a62',scaleMargins:{top:0.05,bottom:0.05}},
+    timeScale:{visible:false},
+    handleScroll:false,handleScale:false,
+  };
+}
+
+function buildChart(wrapId,rsiWrapId,candles,e21Id,e50Id,e200Id,rsiNumId,rsiSigId){
+  if(!candles||candles.length<22){
+    showErr(wrapId,'Sin datos suficientes');return;
+  }
+
+  // Clear wrapper
+  const wrapEl=$(wrapId);
+  if(!wrapEl)return;
+  wrapEl.innerHTML='';
+
+  const rsiEl=$(rsiWrapId);
+  if(rsiEl)rsiEl.innerHTML='';
+
+  const closes=candles.map(c=>c.close);
+  const times=candles.map(c=>c.time);
+  const e21=calcEMA(closes,21);
+  const e50=calcEMA(closes,50);
+  const e200=calcEMA(closes,200);
+  const r14=calcRSI(closes,14);
+
+  const le21=e21.filter(Boolean).pop();
+  const le50=e50.filter(Boolean).pop();
+  const le200=e200.filter(Boolean).pop();
+  const lr14=r14.filter(Boolean).pop();
+
+  if(e21Id)set(e21Id,'$'+N(le21));
+  if(e50Id)set(e50Id,'$'+N(le50));
+  if(e200Id)set(e200Id,'$'+N(le200));
+
+  if(rsiNumId){
+    $(rsiNumId).textContent=lr14?lr14.toFixed(1):'—';
+    $(rsiNumId).style.color=lr14>70?'#f03e4d':lr14<30?'#00cc7a':'#9b6fff';
+  }
+  if(rsiSigId){
+    const sig=lr14>70?'SOBRECOMPRADO':lr14<30?'SOBREVENDIDO':'NEUTRAL';
+    const el=$(rsiSigId);
+    if(el){
+      el.textContent=sig;
+      el.style.color=lr14>70?'#f03e4d':lr14<30?'#00cc7a':'#7a8599';
+      el.style.background=lr14>70?'rgba(240,62,77,.1)':lr14<30?'rgba(0,204,122,.1)':'transparent';
+    }
+  }
+
+  // Price chart
+  destroyChart(wrapId);
+  const chart=LightweightCharts.createChart(wrapEl,{
+    ...COPTS,
+    width:wrapEl.clientWidth,
+    height:wrapEl.clientHeight,
+  });
+  ACTIVE[wrapId]=chart;
+
+  const cs=chart.addCandlestickSeries({
+    upColor:'#26a69a',downColor:'#ef5350',
+    borderUpColor:'#26a69a',borderDownColor:'#ef5350',
+    wickUpColor:'#26a69a',wickDownColor:'#ef5350',
+  });
+  cs.setData(candles);
+
+  const s21=chart.addLineSeries({color:'rgba(255,255,255,0.85)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,title:'EMA21'});
+  s21.setData(times.map((t,i)=>e21[i]!=null?{time:t,value:e21[i]}:null).filter(Boolean));
+
+  const s50=chart.addLineSeries({color:'rgba(0,204,122,0.9)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,title:'EMA50'});
+  s50.setData(times.map((t,i)=>e50[i]!=null?{time:t,value:e50[i]}:null).filter(Boolean));
+
+  const s200=chart.addLineSeries({color:'rgba(240,62,77,0.95)',lineWidth:2,priceLineVisible:false,lastValueVisible:true,title:'EMA200'});
+  s200.setData(times.map((t,i)=>e200[i]!=null?{time:t,value:e200[i]}:null).filter(Boolean));
+
+  chart.timeScale().fitContent();
+
+  // RSI chart
+  if(rsiEl){
+    destroyChart(rsiWrapId);
+    const rc=LightweightCharts.createChart(rsiEl,{
+      ...ROPTS,
+      width:rsiEl.clientWidth,
+      height:rsiEl.clientHeight,
+    });
+    ACTIVE[rsiWrapId]=rc;
+
+    const rs=rc.addLineSeries({
+      color:'rgba(155,111,255,0.9)',lineWidth:1.5,
+      priceLineVisible:false,lastValueVisible:true,title:'RSI',
+      autoscaleInfoProvider:()=>({priceRange:{minValue:0,maxValue:100}}),
+    });
+    rs.setData(times.map((t,i)=>r14[i]!=null?{time:t,value:r14[i]}:null).filter(Boolean));
+
+    const ob=rc.addLineSeries({color:'rgba(240,62,77,0.4)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+    ob.setData([{time:times[0],value:70},{time:times[times.length-1],value:70}]);
+    const os=rc.addLineSeries({color:'rgba(0,204,122,0.4)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
+    os.setData([{time:times[0],value:30},{time:times[times.length-1],value:30}]);
+
+    rc.timeScale().fitContent();
+
+    // Sync crosshair
+    chart.subscribeCrosshairMove(p=>{if(p.time)rc.setCrosshairPosition(0,{time:p.time},rs)});
+  }
+
+  // Resize
+  const ro=new ResizeObserver(()=>{
+    if(ACTIVE[wrapId])ACTIVE[wrapId].applyOptions({width:wrapEl.clientWidth,height:wrapEl.clientHeight});
+    if(ACTIVE[rsiWrapId]&&rsiEl)ACTIVE[rsiWrapId].applyOptions({width:rsiEl.clientWidth,height:rsiEl.clientHeight});
+  });
+  ro.observe(wrapEl);
+}
+
+// ══════════════════════════════════════════
+// CYCLE CHART (Canvas 2D)
+// ══════════════════════════════════════════
+function buildCycle(dhv,price){
+  const canvas=$('cycle-canvas');
+  if(!canvas)return;
+  const wrap=canvas.parentElement;
+  const dpr=window.devicePixelRatio||1;
+  const W=wrap.clientWidth,H=wrap.clientHeight;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const P={t:10,r:58,b:28,l:8};
+  const CW=W-P.l-P.r,CH=H-P.t-P.b;
+  ctx.fillStyle='#0c0f16';ctx.fillRect(0,0,W,H);
+
+  const DAYS=1100;const halvP=63000;
+  const normNow=(price/halvP)*100;
+  const LOG_MIN=Math.log(90),LOG_MAX=Math.log(11000);
+  const toY=v=>P.t+CH-(Math.log(Math.max(v,1))-LOG_MIN)/(LOG_MAX-LOG_MIN)*CH;
+  const toX=d=>P.l+(d/DAYS)*CW;
+
+  // Grid
+  [100,200,500,1000,2000,5000,10000].forEach(v=>{
+    const y=toY(v);
+    ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+CW,y);ctx.stroke();
+    ctx.fillStyle='#3d4a62';ctx.font='8px JetBrains Mono';ctx.textAlign='right';
+    ctx.fillText(v+'%',W-P.r+52,y+3);
+  });
+  [0,200,400,600,800,1000].forEach(d=>{
+    const x=toX(d);
+    ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,P.t);ctx.lineTo(x,P.t+CH);ctx.stroke();
+    ctx.fillStyle='#3d4a62';ctx.font='8px JetBrains Mono';ctx.textAlign='center';
+    ctx.fillText('D'+d,x,H-5);
+  });
+
+  // Historical cycles
+  [{c:'rgba(240,62,77,0.65)',maxD:420,maxM:100,exp:2.8},
+   {c:'rgba(245,197,24,0.65)',maxD:520,maxM:30,exp:2.5},
+   {c:'rgba(0,204,122,0.75)',maxD:550,maxM:7.8,exp:2.2}
+  ].forEach(c=>{
+    ctx.strokeStyle=c.c;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+    ctx.beginPath();let first=true;
+    for(let d=0;d<=DAYS;d+=2){
+      if(d>c.maxD)break;
+      const v=Math.max(100,100*(1+(c.maxM-1)*Math.pow(d/c.maxD,c.exp)));
+      first?(ctx.moveTo(toX(d),toY(v)),first=false):ctx.lineTo(toX(d),toY(v));
+    }
+    ctx.stroke();ctx.setLineDash([]);
+  });
+
+  // Cycle 4
+  ctx.strokeStyle='rgba(74,143,255,0.95)';ctx.lineWidth=2.5;ctx.setLineDash([]);
+  ctx.beginPath();let f4=true;
+  for(let d=0;d<=dhv;d+=2){
+    const pct=d/Math.max(dhv,1);
+    const v=Math.max(90,100*(1+(normNow/100-1)*Math.pow(pct,1.05)));
+    f4?(ctx.moveTo(toX(d),toY(v)),f4=false):ctx.lineTo(toX(d),toY(v));
+  }
+  ctx.stroke();
+
+  // Fill
+  ctx.beginPath();ctx.moveTo(toX(0),toY(100));
+  for(let d=0;d<=dhv;d+=2){
+    const pct=d/Math.max(dhv,1);
+    const v=Math.max(90,100*(1+(normNow/100-1)*Math.pow(pct,1.05)));
+    ctx.lineTo(toX(d),toY(v));
+  }
+  ctx.lineTo(toX(dhv),toY(100));ctx.closePath();
+  ctx.fillStyle='rgba(74,143,255,0.06)';ctx.fill();
+
+  // Vertical line
+  const xN=toX(dhv);
+  ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(xN,P.t);ctx.lineTo(xN,P.t+CH);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Current dot
+  const curV=Math.round(normNow);
+  ctx.beginPath();ctx.arc(toX(dhv),toY(curV),5,0,Math.PI*2);
+  ctx.fillStyle='white';ctx.fill();
+  ctx.strokeStyle='rgba(74,143,255,0.8)';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#d0d8e8';ctx.font='bold 9px JetBrains Mono';ctx.textAlign='left';
+  ctx.fillText('Día '+dhv+' · '+curV+'%',toX(dhv)+8,toY(curV)+3);
+
+  set('cycle-lbl','Ciclo 4 · Día '+dhv+' · +'+((price/halvP-1)*100).toFixed(0)+'% desde halving ($63K)');
+}
+
+// ══════════════════════════════════════════
 // MAIN LOAD
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════
 let loading=false;
-
 async function loadAll(){
-  if(loading)return;
-  loading=true;
+  if(loading)return;loading=true;
   const rb=$('rb');if(rb)rb.innerHTML='<span class="spin">↻</span>';
+  setDot('warn','CARGANDO...');
 
-  // Parallel: price info + F&G + all klines
-  const [md,fg,klD,klW,klM]=await Promise.all([
-    fetchCG(),
+  const[md,fg,ohlcD,daily5y]=await Promise.all([
+    fetchPriceInfo(),
     fetchFG(),
-    fetchKlines('1d',250),   // Diario: 250 velas (~10 meses) — suficiente para EMA200
-    fetchKlines('1w',200),   // Semanal: 200 semanas (~4 años)
-    fetchKlines('1M',100),   // Mensual: 100 meses (~8 años)
+    fetchOHLC(365),
+    fetchDaily(1825),
   ]);
 
-  // Topbar
   if(md){
     const price=md.current_price.usd;
     const chg24=md.price_change_percentage_24h||0;
@@ -661,40 +614,55 @@ async function loadAll(){
     $('chart-d-px').textContent='$'+N(price);
     const cdc=$('chart-d-chg');cdc.textContent=fP(chg24)+' 24H';cdc.className='chg '+(chg24>0?'up':chg24<0?'dn':'nt');
     set('phl','$'+N(md.high_24h.usd)+' / $'+N(md.low_24h.usd));
-    set('pvol',fK(md.total_volume.usd));
-    set('pmcap',fK(md.market_cap.usd));
+    set('pvol',fK(md.total_volume.usd));set('pmcap',fK(md.market_cap.usd));
     set('path','$'+N(md.ath.usd)+' ('+fP(md.ath_change_percentage.usd,1)+')');
-    // Cycle
-    const halvDate=new Date('2024-04-19');
-    const dhv=Math.floor((new Date()-halvDate)/86400000);
-    buildCycleChart(dhv,price);
+    const dhv=Math.floor((new Date()-new Date('2024-04-19'))/86400000);
+    buildCycle(dhv,price);
   }
 
   if(fg){
-    const fgEl=$('pfg');
-    fgEl.textContent=fg.v+' — '+fg.l+' ('+fg.src+')';
-    fgEl.style.color=fg.v>70?'#f03e4d':fg.v<30?'#00cc7a':'#f5c518';
+    const fe=$('pfg');fe.textContent=fg.v+' — '+fg.l+' ('+fg.src+')';
+    fe.style.color=fg.v>70?'#f03e4d':fg.v<30?'#00cc7a':'#f5c518';
   }
 
-  // Charts
-  if(klD){
-    setDot('live');
-    buildChart('chart-d','rsi-d',klD,'v21d','v50d','v200d','rsi-d-val','rsi-d-sig');
-  }else{setDot('dead')}
+  if(ohlcD&&ohlcD.length>22){
+    setDot('live','EN VIVO');
+    buildChart('wrap-d','wrap-rsi-d',ohlcD,'v21d','v50d','v200d','rsi-d-num','rsi-d-sig');
+  }else{
+    setDot('dead','ERROR');
+    showErr('wrap-d','Error cargando datos');
+  }
 
-  if(klW) buildChart('chart-w','rsi-w',klW,'v21w','v50w','v200w','rsi-w-val',null);
-  else{const ld=$('load-w');if(ld)ld.textContent='Sin datos Binance'}
-
-  if(klM) buildChart('chart-m','rsi-m',klM,'v21m','v50m','v200m','rsi-m-val',null);
-  else{const ld=$('load-m');if(ld)ld.textContent='Sin datos Binance'}
+  if(daily5y&&daily5y.length>50){
+    const wk=toWeekly(daily5y);
+    const mo=toMonthly(daily5y);
+    if(wk)buildChart('wrap-w','wrap-rsi-w',wk,'v21w','v50w','v200w','rsi-w-num',null);
+    else showErr('wrap-w','Sin datos semanales');
+    if(mo)buildChart('wrap-m','wrap-rsi-m',mo,'v21m','v50m','v200m','rsi-m-num',null);
+    else showErr('wrap-m','Sin datos mensuales');
+  }else{
+    showErr('wrap-w','Sin datos');showErr('wrap-m','Sin datos');
+  }
 
   if(rb)rb.innerHTML='↻ ACTUALIZAR';
   loading=false;
 }
 
-// Auto-refresh 60s
-setInterval(loadAll,60000);
-loadAll();
+// ══════════════════════════════════════════
+// INIT — load library first, then data
+// ══════════════════════════════════════════
+(async()=>{
+  setDot('warn','CARGANDO LIBRERÍA...');
+  const ok=await loadLWC();
+  if(!ok){
+    setDot('dead','ERROR LIBRERÍA');
+    ['wrap-d','wrap-w','wrap-m'].forEach(id=>showErr(id,'Error cargando librería de gráficos.<br>Verifica tu conexión a internet.'));
+    return;
+  }
+  initOpts();
+  setInterval(loadAll,60000);
+  loadAll();
+})();
 </script>
 </body>
 </html>
