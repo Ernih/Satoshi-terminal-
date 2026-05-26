@@ -1,177 +1,172 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Satoshi Terminal — Bitcoin Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#07090d;--bg1:#0c0f16;--bg2:#111520;--bg3:#171c28;
-  --b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.1);
+  --bg:#07090d;--bg1:#0c0f16;--bg2:#111520;--bg3:#171c28;--bg4:#1c2335;
+  --b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.1);--b3:rgba(255,255,255,0.16);
   --tx:#d0d8e8;--tx2:#7a8599;--tx3:#3d4a62;
   --gr:#00cc7a;--gr2:rgba(0,204,122,0.1);
   --rd:#f03e4d;--rd2:rgba(240,62,77,0.1);
   --yl:#f5c518;--yl2:rgba(245,197,24,0.1);
+  --bl:#4a8fff;--bl2:rgba(74,143,255,0.1);
+  --pu:#9b6fff;--pu2:rgba(155,111,255,0.1);
   --gold:#f7931a;
+  --ema21:#ffffff;--ema50:#00cc7a;--ema200:#f03e4d;
   --mono:'JetBrains Mono',monospace;
 }
 html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size:12px;min-height:100vh}
-.shell{display:flex;flex-direction:column;min-height:100vh}
 
-/* TOP BAR */
-.topbar{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--bg1);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:100}
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;gap:10px;padding:7px 16px;background:var(--bg1);border-bottom:1px solid var(--b);position:sticky;top:0;z-index:200;flex-wrap:wrap}
 .logo{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.16em;display:flex;align-items:center;gap:6px;flex-shrink:0}
 .pulse{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:p 2s infinite}
 @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
-.price-big{font-size:20px;font-weight:700;color:var(--tx)}
+.px-big{font-size:20px;font-weight:700;color:var(--tx)}
 .chg{font-size:10px;font-weight:600;padding:2px 6px;border-radius:3px}
 .up{color:var(--gr);background:var(--gr2)}.dn{color:var(--rd);background:var(--rd2)}.nt{color:var(--yl);background:var(--yl2)}
 .tb-stats{display:flex;gap:14px;overflow:hidden;flex:1}
-.st{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
-.sl{font-size:8px;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
-.sv{font-size:10px;font-weight:500;color:var(--tx)}
-.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ts{display:flex;flex-direction:column;gap:1px;flex-shrink:0}
+.tsl{font-size:8px;letter-spacing:.09em;color:var(--tx3);text-transform:uppercase}
+.tsv{font-size:10px;font-weight:500;color:var(--tx)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:7px;flex-shrink:0}
 .pill{display:flex;align-items:center;gap:3px;padding:2px 8px;background:var(--bg3);border:1px solid var(--b);border-radius:3px;font-size:9px;color:var(--tx3)}
 .dot{width:5px;height:5px;border-radius:50%}
-.dot-live{background:var(--gr);animation:p 1.5s infinite}
-.dot-warn{background:var(--yl)}
-.dot-dead{background:var(--rd)}
-.rbtn{background:none;border:1px solid var(--b2);border-radius:3px;color:var(--tx2);font-family:var(--mono);font-size:9px;padding:3px 10px;cursor:pointer;letter-spacing:.06em;transition:color .15s,border-color .15s}
-.rbtn:hover{color:var(--tx);border-color:var(--b2)}
+.dot-live{background:var(--gr);animation:p 1.5s infinite}.dot-warn{background:var(--yl)}.dot-dead{background:var(--rd)}
+.rbtn{background:none;border:1px solid var(--b2);border-radius:3px;color:var(--tx2);font-family:var(--mono);font-size:9px;padding:3px 10px;cursor:pointer;transition:color .15s}
+.rbtn:hover{color:var(--tx)}
 .spin{display:inline-block;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.clk{font-size:9px;color:var(--tx3);letter-spacing:.07em}
 
-/* NARRATIVE BAR */
-.narrbar{display:flex;align-items:center;gap:8px;padding:5px 16px;background:linear-gradient(90deg,rgba(247,147,26,.06),transparent);border-bottom:1px solid var(--b);font-size:10px;color:var(--tx2);overflow:hidden}
+/* ── NARRATIVE BAR ── */
+.narrbar{display:flex;align-items:center;gap:8px;padding:5px 16px;background:linear-gradient(90deg,rgba(247,147,26,.06),transparent);border-bottom:1px solid var(--b);font-size:10px;overflow:hidden}
 .nb-lbl{font-size:8px;font-weight:700;letter-spacing:.12em;color:var(--tx3);flex-shrink:0}
-.nb-txt{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.nb-txt{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--tx2)}
 .nb-tags{display:flex;gap:5px;flex-shrink:0}
-.ntag{font-size:8px;font-weight:600;padding:1px 7px;border-radius:2px;border:1px solid;letter-spacing:.05em}
+.ntag{font-size:8px;font-weight:600;padding:1px 7px;border-radius:2px;border:1px solid;letter-spacing:.05em;white-space:nowrap}
 .nt-b{color:var(--gr);border-color:rgba(0,204,122,.25);background:rgba(0,204,122,.06)}
 .nt-s{color:var(--rd);border-color:rgba(240,62,77,.25);background:rgba(240,62,77,.06)}
 .nt-w{color:var(--yl);border-color:rgba(245,197,24,.25);background:rgba(245,197,24,.06)}
-.nt-i{color:#4a8fff;border-color:rgba(74,143,255,.25);background:rgba(74,143,255,.06)}
+.nt-i{color:var(--bl);border-color:rgba(74,143,255,.25);background:rgba(74,143,255,.06)}
 
-/* LAYOUT */
-.content{padding:10px 16px;flex:1}
+/* ── LAYOUT ── */
+.content{padding:10px 16px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
 .g2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px}
 .g32{display:grid;grid-template-columns:3fr 2fr;gap:8px;margin-bottom:8px}
 .gmb{margin-bottom:8px}
 
-/* CARDS */
+/* ── CARDS ── */
 .card{background:var(--bg1);border:1px solid var(--b);border-radius:4px;padding:10px 13px}
-.mc{background:var(--bg1);border:1px solid var(--b);border-radius:4px;padding:10px 13px}
+.mc{background:var(--bg1);border:1px solid var(--b);border-radius:4px;padding:10px 13px;position:relative;overflow:hidden}
 .ct{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.mcl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:4px}
+.mcl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
 .mcv{font-size:18px;font-weight:700;color:var(--tx);line-height:1;margin-bottom:3px}
 .mcs{font-size:9px;color:var(--tx2)}
+.src-lbl{font-size:8px;color:var(--tx3);padding:1px 4px;border:1px solid var(--b);border-radius:2px}
 
-/* HERO */
+/* ── HERO ── */
 .hero{background:linear-gradient(90deg,rgba(247,147,26,.08),var(--bg1));border:1px solid var(--b);border-radius:4px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.h-name{font-size:20px;font-weight:700;letter-spacing:-.01em}
-.h-score{font-size:28px;font-weight:700}
 .bar-track{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin:4px 0 2px}
 .bar-fill{height:100%;border-radius:2px;transition:width .8s ease}
 .bar-labs{display:flex;justify-content:space-between;font-size:8px;color:var(--tx3)}
 
-/* SIGNAL ROWS */
+/* ── SIGNAL ROWS ── */
 .srow{display:flex;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
 .srow:last-child{border-bottom:none}
 .sn{font-size:10px;color:var(--tx2);flex:1;line-height:1.3}
-.sv2{font-size:10px;font-weight:600;color:var(--tx);margin:0 8px;min-width:60px;text-align:right}
+.sv{font-size:10px;font-weight:600;color:var(--tx);margin:0 8px;min-width:60px;text-align:right;white-space:nowrap}
 .tag{font-size:8px;font-weight:700;padding:2px 7px;border-radius:2px;min-width:60px;text-align:center;letter-spacing:.05em}
 .tb{color:var(--gr);background:rgba(0,204,122,.1)}
 .ts{color:var(--rd);background:rgba(240,62,77,.1)}
 .tw{color:var(--yl);background:rgba(245,197,24,.1)}
-.ti{color:#4a8fff;background:rgba(74,143,255,.1)}
+.ti{color:var(--bl);background:rgba(74,143,255,.1)}
 .td{color:var(--tx3);background:var(--bg3)}
 
-/* GAUGES */
+/* ── GAUGES ── */
 .g-track{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin:4px 0 2px}
 .g-fill{height:100%;border-radius:2px;transition:width .8s ease}
 
-/* SCENARIO BARS */
+/* ── SCENARIO BARS ── */
 .pb{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.pb-l{font-size:9px;min-width:75px}
+.pb-l{font-size:9px;min-width:72px}
 .pb-t{flex:1;height:5px;background:var(--bg3);border-radius:2px;overflow:hidden}
 .pb-f{height:100%;border-radius:2px;transition:width .8s ease}
-.pb-v{font-size:10px;font-weight:700;min-width:30px;text-align:right}
+.pb-v{font-size:10px;font-weight:700;min-width:28px;text-align:right}
 
-/* NARRATIVE */
+/* ── NARRATIVE BLOCKS ── */
 .narr{background:var(--bg2);border-left:2px solid var(--gold);padding:10px 12px;font-size:10px;line-height:1.65;color:var(--tx);border-radius:0 4px 4px 0;margin-bottom:6px}
-.narr.bull{border-left-color:var(--gr)}.narr.bear{border-left-color:var(--rd)}.narr.warn{border-left-color:var(--yl)}.narr.info{border-left-color:#4a8fff}.narr.cycle{border-left-color:#8b5cf6}
+.narr.bull{border-left-color:var(--gr)}.narr.bear{border-left-color:var(--rd)}.narr.warn{border-left-color:var(--yl)}.narr.info{border-left-color:var(--bl)}.narr.cycle{border-left-color:var(--pu)}
 .nl{font-size:8px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;margin-top:6px}
 
-/* INTEL QUESTIONS */
+/* ── INTEL QUESTIONS ── */
 .iq{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
 .iq:last-child{border-bottom:none}
 .iq-n{font-size:10px;color:var(--tx3);width:16px;flex-shrink:0;font-weight:700}
 .iq-q{font-size:9px;color:var(--tx3);width:140px;flex-shrink:0;line-height:1.35}
 .iq-a{flex:1;font-size:10px;color:var(--tx);line-height:1.4}
 
-/* ANALOG */
-.acard{background:var(--bg2);border:1px solid var(--b);border-radius:4px;padding:10px 12px;margin-bottom:6px}
-.ac-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.ac-period{font-size:12px;font-weight:700;color:var(--tx)}
-.ac-sim{font-size:16px;font-weight:700}
+/* ── CHART SECTION ── */
+.chart-section{margin-bottom:8px}
+.chart-tabs{display:flex;gap:0;background:var(--bg1);border:1px solid var(--b);border-radius:4px 4px 0 0;border-bottom:none;overflow:hidden}
+.chart-tab{padding:7px 14px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);cursor:pointer;border-right:1px solid var(--b);border-bottom:2px solid transparent;background:none;transition:color .12s}
+.chart-tab:hover{color:var(--tx2)}
+.chart-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(247,147,26,.04)}
+.chart-container{background:var(--bg1);border:1px solid var(--b);border-radius:0 0 4px 4px;padding:10px 13px}
+.chart-main{position:relative;height:280px;width:100%;margin-bottom:4px}
+.chart-rsi{position:relative;height:80px;width:100%;border-top:1px solid var(--b);padding-top:6px}
+.chart-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.chart-sm{position:relative;height:160px;width:100%;margin-bottom:4px}
+.chart-rsi-sm{position:relative;height:60px;width:100%;border-top:1px solid var(--b);padding-top:4px}
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:9px;margin-top:5px}
+.cl-item{display:flex;align-items:center;gap:5px;color:var(--tx2)}
+.cl-dot{width:20px;height:2px;border-radius:1px;flex-shrink:0}
 
-/* SCENARIO CARDS */
-.scen{border:1px solid var(--b);border-radius:4px;padding:10px 12px;margin-bottom:6px}
-.sc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.sc-name{font-size:11px;font-weight:700}
-.sc-prob{font-size:20px;font-weight:700}
-.sc-row{display:flex;gap:6px;margin-bottom:3px;font-size:10px;color:var(--tx2);align-items:flex-start}
-.sc-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:4px}
-.sc-inv{font-size:9px;color:var(--tx3);margin-top:5px;padding-top:5px;border-top:1px solid var(--b)}
+/* ── CYCLE CHART ── */
+.cycle-wrap{background:var(--bg1);border:1px solid var(--b);border-radius:4px;padding:10px 13px;margin-bottom:8px}
+.cycle-chart{position:relative;height:200px;width:100%}
 
-/* ALERTS */
-.alrt{display:flex;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:4px;margin-bottom:5px;border-left:2px solid}
-.ac-crit{border-left-color:var(--rd)}.ac-hi{border-left-color:var(--yl)}.ac-med{border-left-color:#4a8fff}.ac-lo{border-left-color:var(--tx3)}
-.alrt-icon{font-size:14px;flex-shrink:0}
-.alrt-body{flex:1}
-.alrt-t{font-size:11px;font-weight:600;margin-bottom:2px;color:var(--tx)}
-.alrt-d{font-size:10px;color:var(--tx2);line-height:1.5}
-.alrt-meta{display:flex;gap:8px;margin-top:3px;font-size:9px;color:var(--tx3)}
+/* ── FG ARC ── */
+.fg-wrap{display:flex;flex-direction:column;align-items:center;padding:2px 0}
+.fg-num{font-size:22px;font-weight:700;text-align:center}
+.fg-lbl{font-size:9px;text-align:center;margin-top:2px;letter-spacing:.05em;color:var(--tx2)}
+.fg-src{font-size:8px;color:var(--tx3);margin-top:2px}
 
-/* FG ARC */
-.fg-wrap{display:flex;flex-direction:column;align-items:center;padding:4px 0}
-.fg-num{font-size:24px;font-weight:700;text-align:center}
-.fg-lbl{font-size:10px;text-align:center;margin-top:3px;letter-spacing:.05em;color:var(--tx2)}
-
-/* HEATMAP */
-.hm{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin:6px 0}
-.hm-c{aspect-ratio:1;border-radius:2px;cursor:default}
-
-/* PLAYBOOK */
+/* ── PLAYBOOK ── */
 .pb-row{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);align-items:flex-start}
 .pb-row:last-child{border-bottom:none}
-.pb-actor{font-size:10px;font-weight:600;color:var(--tx);width:120px;flex-shrink:0;line-height:1.3}
+.pb-actor{font-size:10px;font-weight:600;color:var(--tx);width:115px;flex-shrink:0;line-height:1.3}
 .pb-action{flex:1;font-size:10px;color:var(--tx2);line-height:1.4}
 
-/* FOOTER */
-.footer{padding:5px 16px;background:var(--bg1);border-top:1px solid var(--b);display:flex;justify-content:space-between;font-size:9px;color:var(--tx3);letter-spacing:.07em}
+/* ── ALERTS ── */
+.alrt{display:flex;gap:8px;padding:8px 10px;background:var(--bg2);border-radius:4px;margin-bottom:5px;border-left:2px solid}
+.ac-crit{border-left-color:var(--rd)}.ac-hi{border-left-color:var(--yl)}.ac-med{border-left-color:var(--bl)}.ac-lo{border-left-color:var(--tx3)}
+.alrt-t{font-size:11px;font-weight:600;margin-bottom:2px;color:var(--tx)}
+.alrt-d{font-size:10px;color:var(--tx2);line-height:1.5}
 
-/* STATUS DOT ANIM */
-.blink{animation:p 1.5s infinite}
+/* ── FOOTER ── */
+.footer{padding:5px 16px;background:var(--bg1);border-top:1px solid var(--b);display:flex;justify-content:space-between;font-size:9px;color:var(--tx3);letter-spacing:.07em;flex-wrap:wrap;gap:5px}
 
-/* STREAM */
+/* ── AI STREAM ── */
 .stream::after{content:'▊';animation:blink .7s infinite;color:var(--gold)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-/* SCROLLBAR */
 ::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 
 @media(max-width:900px){
   .g4{grid-template-columns:repeat(2,1fr)}
   .g32{grid-template-columns:1fr}
   .tb-stats{display:none}
+  .chart-grid-2{grid-template-columns:1fr}
 }
 @media(max-width:600px){
   .g3,.g2{grid-template-columns:1fr}
@@ -179,30 +174,29 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
 </style>
 </head>
 <body>
-<div class="shell">
 
 <!-- TOP BAR -->
 <div class="topbar">
   <div class="logo"><span class="pulse"></span>SATOSHI TERMINAL</div>
   <div style="display:flex;align-items:baseline;gap:8px;padding:0 12px;border-left:1px solid var(--b);border-right:1px solid var(--b)">
-    <span class="price-big" id="px">—</span>
+    <span class="px-big" id="px">—</span>
     <span class="chg nt" id="pxc">—</span>
   </div>
   <div class="tb-stats">
-    <div class="st"><span class="sl">7D</span><span class="sv" id="p7d">—</span></div>
-    <div class="st"><span class="sl">24H H/L</span><span class="sv" id="phl">—</span></div>
-    <div class="st"><span class="sl">VOLUMEN</span><span class="sv" id="pvol">—</span></div>
-    <div class="st"><span class="sl">MKT CAP</span><span class="sv" id="pmcap">—</span></div>
-    <div class="st"><span class="sl">DOMINANCIA</span><span class="sv" id="pdom">—</span></div>
-    <div class="st"><span class="sl">ATH</span><span class="sv" id="path">—</span></div>
-    <div class="st"><span class="sl">FEAR & GREED</span><span class="sv" id="pfg">—</span></div>
+    <div class="ts"><span class="tsl">7D</span><span class="tsv" id="p7d">—</span></div>
+    <div class="ts"><span class="tsl">24H H/L</span><span class="tsv" id="phl">—</span></div>
+    <div class="ts"><span class="tsl">VOLUMEN</span><span class="tsv" id="pvol">—</span></div>
+    <div class="ts"><span class="tsl">MKT CAP</span><span class="tsv" id="pmcap">—</span></div>
+    <div class="ts"><span class="tsl">DOMIN. (CoinGecko)</span><span class="tsv" id="pdom">—</span></div>
+    <div class="ts"><span class="tsl">ATH</span><span class="tsv" id="path">—</span></div>
+    <div class="ts"><span class="tsl">F&G (CMC)</span><span class="tsv" id="pfg">—</span></div>
   </div>
   <div class="tb-right">
-    <div class="pill" id="pill-cg"><span class="dot dot-dead" id="dot-cg"></span><span id="pill-cg-txt">CONECTANDO</span></div>
+    <div class="pill" id="pill-cg"><span class="dot dot-dead" id="dot-cg"></span><span id="ptxt-cg">CONECTANDO</span></div>
     <div class="pill" id="pill-fg"><span class="dot dot-dead" id="dot-fg"></span><span>F&G</span></div>
-    <div class="pill" id="pill-ai"><span class="dot dot-dead" id="dot-ai"></span><span>AI</span></div>
+    <div class="pill"><span class="dot dot-dead" id="dot-ai"></span><span>AI</span></div>
     <button class="rbtn" id="rb" onclick="masterRefresh()">↻ ACTUALIZAR</button>
-    <span class="clk" id="clk">—</span>
+    <span style="font-size:9px;color:var(--tx3)" id="clk">—</span>
   </div>
 </div>
 
@@ -211,224 +205,282 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
   <span class="nb-lbl">SEÑAL</span>
   <span class="nb-txt" id="nb-txt">Analizando estructura del mercado...</span>
   <div class="nb-tags">
-    <span class="ntag nt-i" id="nt1" style="display:none"></span>
-    <span class="ntag nt-b" id="nt2" style="display:none"></span>
-    <span class="ntag nt-w" id="nt3" style="display:none"></span>
+    <span class="ntag" id="nt1" style="display:none"></span>
+    <span class="ntag" id="nt2" style="display:none"></span>
+    <span class="ntag" id="nt3" style="display:none"></span>
   </div>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
 
-  <!-- HERO RÉGIMEN -->
-  <div class="hero">
-    <div>
-      <div style="font-size:8px;color:var(--tx3);letter-spacing:.12em;margin-bottom:3px">RÉGIMEN ACTUAL</div>
-      <div class="h-name" id="reg-name" style="color:var(--yl)">Cargando...</div>
-      <div style="font-size:9px;color:var(--tx2);margin-top:3px" id="reg-sub">Obteniendo datos en vivo...</div>
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div style="font-size:8px;color:var(--tx3);letter-spacing:.12em;margin-bottom:3px">RÉGIMEN ACTUAL</div>
+    <div style="font-size:20px;font-weight:700;letter-spacing:-.01em" id="reg-name" style="color:var(--yl)">Cargando...</div>
+    <div style="font-size:9px;color:var(--tx2);margin-top:3px" id="reg-sub">Obteniendo datos en vivo...</div>
+  </div>
+  <div><canvas id="donut-c" width="72" height="72"></canvas></div>
+  <div style="flex:1;min-width:160px">
+    <div style="font-size:8px;color:var(--tx3);margin-bottom:3px">PUNTAJE ALCISTA</div>
+    <div class="bar-track"><div class="bar-fill" id="score-bar" style="width:0%"></div></div>
+    <div class="bar-labs"><span>BAJISTA</span><span>NEUTRAL</span><span>ALCISTA</span></div>
+  </div>
+  <div style="flex:1;min-width:160px">
+    <div style="font-size:8px;color:var(--tx3);margin-bottom:3px">CICLO NUPL</div>
+    <div style="height:14px;background:linear-gradient(90deg,var(--rd),var(--yl),var(--gr));border-radius:3px;position:relative;margin:4px 0">
+      <div id="nupl-marker" style="position:absolute;top:-3px;width:3px;height:20px;background:white;border-radius:2px;transform:translateX(-50%);left:50%;transition:left .8s ease;box-shadow:0 0 5px rgba(255,255,255,.6)"></div>
     </div>
-    <div>
-      <canvas id="donut-canvas" width="72" height="72"></canvas>
-    </div>
-    <div style="flex:1;min-width:180px">
-      <div style="font-size:8px;color:var(--tx3);margin-bottom:3px">PUNTAJE ALCISTA</div>
-      <div class="bar-track"><div class="bar-fill" id="score-bar" style="width:0%"></div></div>
-      <div class="bar-labs"><span>BAJISTA</span><span>NEUTRAL</span><span>ALCISTA</span></div>
-    </div>
-    <div style="flex:1;min-width:180px">
-      <div style="font-size:8px;color:var(--tx3);margin-bottom:3px">CICLO POST-HALVING</div>
-      <div style="height:16px;background:linear-gradient(90deg,var(--gr),var(--yl),var(--rd));border-radius:3px;position:relative;margin:4px 0">
-        <div id="cycle-marker" style="position:absolute;top:-3px;width:3px;height:22px;background:white;border-radius:2px;transform:translateX(-50%);left:50%;transition:left .8s ease;box-shadow:0 0 6px rgba(255,255,255,.5)"></div>
-      </div>
-      <div class="bar-labs"><span>FONDO</span><span>MEDIO</span><span>TECHO</span></div>
-    </div>
-    <div style="text-align:right;flex-shrink:0">
-      <div style="font-size:8px;color:var(--tx3);margin-bottom:2px">PUNTAJE</div>
-      <div class="h-score" id="score-val" style="color:var(--yl)">—</div>
-      <div style="font-size:8px;color:var(--tx3)">/100</div>
+    <div class="bar-labs"><span>CAPITULACIÓN</span><span>NEUTRO</span><span>EUFORIA</span></div>
+  </div>
+  <div style="text-align:right;flex-shrink:0">
+    <div style="font-size:8px;color:var(--tx3);margin-bottom:2px">PUNTAJE</div>
+    <div style="font-size:28px;font-weight:700" id="score-val">—</div>
+    <div style="font-size:8px;color:var(--tx3)">/100</div>
+  </div>
+</div>
+
+<!-- METRICS ROW 1 -->
+<div class="g4">
+  <div class="mc">
+    <div class="mcl">PRECIO BTC/USD <span class="src-lbl">CoinGecko</span></div>
+    <div class="mcv" id="m-price">—</div>
+    <div class="mcs" id="m-price-s">—</div>
+  </div>
+  <div class="mc">
+    <div class="mcl">FEAR & GREED <span class="src-lbl" id="fg-src-lbl">cargando...</span></div>
+    <div class="fg-wrap">
+      <canvas id="fg-arc" width="120" height="64"></canvas>
+      <div class="fg-num" id="fg-num">—</div>
+      <div class="fg-lbl" id="fg-lbl">—</div>
     </div>
   </div>
+  <div class="mc">
+    <div class="mcl">NUPL <span class="src-lbl">estimado</span></div>
+    <div class="mcv" id="m-nupl">—</div>
+    <div class="mcs" id="m-nupl-s">—</div>
+    <div class="g-track"><div class="g-fill" id="nupl-g" style="width:0%"></div></div>
+    <div class="bar-labs"><span>0% fondo</span><span>75% techo</span></div>
+  </div>
+  <div class="mc">
+    <div class="mcl">MVRV <span class="src-lbl">estimado ×0.71</span></div>
+    <div class="mcv" id="m-mvrv">—</div>
+    <div class="mcs" id="m-mvrv-s">—</div>
+    <div class="g-track"><div class="g-fill" id="mvrv-g" style="width:0%"></div></div>
+    <div class="bar-labs"><span>0× fondo</span><span>3.5× techo</span></div>
+  </div>
+</div>
 
-  <!-- MÉTRICAS ROW 1 -->
-  <div class="g4">
-    <div class="mc" style="position:relative;overflow:hidden">
-      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)"></div>
-      <div class="mcl">PRECIO BTC / USD</div>
-      <div class="mcv" id="m-price">—</div>
-      <div class="mcs" id="m-price-s">—</div>
-    </div>
-    <div class="mc">
-      <div class="mcl">FEAR & GREED INDEX</div>
-      <div class="fg-wrap">
-        <canvas id="fg-arc" width="120" height="64"></canvas>
-        <div class="fg-num" id="fg-num">—</div>
-        <div class="fg-lbl" id="fg-lbl">—</div>
-      </div>
-    </div>
-    <div class="mc">
-      <div class="mcl">NUPL (estimado)</div>
-      <div class="mcv" id="m-nupl">—</div>
-      <div class="mcs" id="m-nupl-s">—</div>
-      <div class="g-track"><div class="g-fill" id="nupl-g" style="width:0%"></div></div>
-      <div class="bar-labs"><span>0% fondo</span><span>75% techo</span></div>
-    </div>
-    <div class="mc">
-      <div class="mcl">MVRV (estimado)</div>
-      <div class="mcv" id="m-mvrv">—</div>
-      <div class="mcs" id="m-mvrv-s">—</div>
-      <div class="g-track"><div class="g-fill" id="mvrv-g" style="width:0%"></div></div>
-      <div class="bar-labs"><span>0× fondo</span><span>4× techo</span></div>
+<!-- METRICS ROW 2 -->
+<div class="g4">
+  <div class="mc">
+    <div class="mcl">RSI 14D <span class="src-lbl">estimado</span></div>
+    <div class="mcv" id="m-rsi">—</div>
+    <div class="mcs" id="m-rsi-s">—</div>
+    <div class="g-track"><div class="g-fill" id="rsi-g" style="width:0%"></div></div>
+    <div class="bar-labs"><span>0</span><span>30</span><span>70</span><span>100</span></div>
+  </div>
+  <div class="mc">
+    <div class="mcl">FUNDING RATE <span class="src-lbl">estimado</span></div>
+    <div class="mcv" id="m-fund">—</div>
+    <div class="mcs" id="m-fund-s">—</div>
+  </div>
+  <div class="mc">
+    <div class="mcl">RESERVAS EXCHANGES <span class="src-lbl">estimado</span></div>
+    <div class="mcv" id="m-res">—</div>
+    <div class="mcs" id="m-res-s">—</div>
+  </div>
+  <div class="mc">
+    <div class="mcl">MAYER MULTIPLE <span class="src-lbl">estimado ×0.96</span></div>
+    <div class="mcv" id="m-may">—</div>
+    <div class="mcs" id="m-may-s">—</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     GRÁFICOS — SECCIÓN PRINCIPAL
+═══════════════════════════════════════ -->
+
+<!-- GRÁFICO PRINCIPAL: DIARIO -->
+<div class="card gmb">
+  <div class="ct">BITCOIN — DIARIO (EMA 21 / 50 / 200) + RSI
+    <div style="display:flex;gap:6px;align-items:center">
+      <span id="chart-d-price" style="font-size:11px;font-weight:700;color:var(--tx)">—</span>
+      <span id="chart-d-chg" class="chg nt">—</span>
     </div>
   </div>
-
-  <!-- MÉTRICAS ROW 2 -->
-  <div class="g4">
-    <div class="mc">
-      <div class="mcl">RSI 14D (estimado)</div>
-      <div class="mcv" id="m-rsi">—</div>
-      <div class="mcs" id="m-rsi-s">—</div>
-      <div class="g-track"><div class="g-fill" id="rsi-g" style="width:0%"></div></div>
-      <div class="bar-labs"><span>0</span><span>30</span><span>70</span><span>100</span></div>
-    </div>
-    <div class="mc">
-      <div class="mcl">FUNDING RATE (est.)</div>
-      <div class="mcv" id="m-fund">—</div>
-      <div class="mcs" id="m-fund-s">—</div>
-    </div>
-    <div class="mc">
-      <div class="mcl">RESERVAS EXCHANGES (est.)</div>
-      <div class="mcv" id="m-res">—</div>
-      <div class="mcs" id="m-res-s">—</div>
-    </div>
-    <div class="mc">
-      <div class="mcl">MAYER MULTIPLE (est.)</div>
-      <div class="mcv" id="m-may">—</div>
-      <div class="mcs" id="m-may-s">—</div>
-    </div>
+  <div style="position:relative;height:300px;width:100%">
+    <canvas id="chart-daily" role="img" aria-label="Gráfico diario de Bitcoin con EMAs 21 50 200"></canvas>
   </div>
-
-  <!-- INTELIGENCIA + DERECHA -->
-  <div class="g32">
-    <div class="card">
-      <div class="ct">13 PREGUNTAS DE INTELIGENCIA DIARIA</div>
-      <div id="iq-list"></div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div class="card">
-        <div class="ct">DISTRIBUCIÓN DE ESCENARIOS</div>
-        <div id="scen-bars"></div>
-      </div>
-      <div class="card">
-        <div class="ct">TOP OPORTUNIDAD <span style="font-size:8px;padding:1px 5px;border-radius:2px;color:var(--gr);background:var(--gr2)">ASIMÉTRICA</span></div>
-        <div style="font-size:10px;line-height:1.6;color:var(--gr)" id="top-opp">—</div>
-      </div>
-      <div class="card">
-        <div class="ct">TOP RIESGO <span style="font-size:8px;padding:1px 5px;border-radius:2px;color:var(--rd);background:var(--rd2)">VIGILAR</span></div>
-        <div style="font-size:10px;line-height:1.6;color:var(--rd)" id="top-risk">—</div>
-      </div>
-    </div>
+  <div style="position:relative;height:80px;width:100%;border-top:1px solid var(--b);padding-top:6px;margin-top:4px">
+    <canvas id="rsi-daily" role="img" aria-label="RSI diario Bitcoin"></canvas>
   </div>
-
-  <!-- SEÑALES -->
-  <div class="g3">
-    <div class="card">
-      <div class="ct">SEÑALES CONFIRMAN ✓</div>
-      <div id="conf-sigs"></div>
-    </div>
-    <div class="card">
-      <div class="ct">SEÑALES CONTRADICEN ✗</div>
-      <div id="contr-sigs"></div>
-    </div>
-    <div class="card">
-      <div class="ct">SEÑALES TÉCNICAS</div>
-      <div id="tech-sigs"></div>
-    </div>
+  <div class="chart-legend">
+    <div class="cl-item"><div class="cl-dot" style="background:var(--tx)"></div>Precio</div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--ema21)"></div>EMA 21</div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--ema50)"></div>EMA 50</div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--ema200)"></div>EMA 200</div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--pu)"></div>RSI (14)</div>
   </div>
+</div>
 
-  <!-- NARRATIVA -->
-  <div class="card gmb">
-    <div class="ct">NARRATIVA DE MERCADO ACTIVA</div>
-    <div class="narr" id="narr-main">Analizando...</div>
-  </div>
-
-  <!-- ESCENARIOS DETALLADOS -->
-  <div class="card gmb">
-    <div class="ct">ESCENARIOS DETALLADOS CON TARGETS</div>
-    <div class="g3" style="margin-bottom:0" id="scen-detail"></div>
-  </div>
-
-  <!-- ANÁLOGO HISTÓRICO -->
-  <div class="card gmb">
-    <div class="ct">ANÁLOGO HISTÓRICO MÁS CERCANO</div>
-    <div id="analog-block"></div>
-  </div>
-
-  <!-- PLAYBOOK INSTITUCIONAL -->
-  <div class="card gmb">
-    <div class="ct">POSICIONAMIENTO INSTITUCIONAL — MODELO DE ACTORES</div>
-    <div id="playbook"></div>
-  </div>
-
-  <!-- ALERTAS -->
-  <div class="card gmb">
-    <div class="ct">ALERTAS ACTIVAS <span id="alert-count" style="font-size:8px;padding:1px 6px;border-radius:2px;background:var(--rd2);color:var(--rd)">0</span></div>
-    <div id="alerts-list"></div>
-  </div>
-
-  <!-- AI BRIEFING -->
+<!-- GRÁFICOS SEMANAL + MENSUAL -->
+<div class="g2 gmb">
   <div class="card">
-    <div class="ct">BRIEFING INSTITUCIONAL AI — ANÁLISIS COMPLETO
-      <button class="rbtn" onclick="runBriefing()">✦ GENERAR ANÁLISIS</button>
+    <div class="ct">SEMANAL — EMA 21 / 50 / 200 + RSI</div>
+    <div style="position:relative;height:180px;width:100%">
+      <canvas id="chart-weekly" role="img" aria-label="Gráfico semanal de Bitcoin con EMAs"></canvas>
     </div>
-    <div class="nl" style="margin-top:0">ESTRUCTURA Y RÉGIMEN</div>
-    <div class="narr" id="br1">Presiona GENERAR ANÁLISIS para obtener el briefing institucional completo con los datos actuales...</div>
-    <div class="g2" style="margin-top:6px">
-      <div>
-        <div class="nl">¿POR QUÉ SE MUEVE BITCOIN?</div>
-        <div class="narr info" id="br2" style="min-height:40px">—</div>
-        <div class="nl">¿QUIÉN LO ESTÁ MOVIENDO?</div>
-        <div class="narr info" id="br3" style="min-height:40px">—</div>
-      </div>
-      <div>
-        <div class="nl">¿ES SOSTENIBLE ESTE MOVIMIENTO?</div>
-        <div class="narr warn" id="br4" style="min-height:40px">—</div>
-        <div class="nl">RIESGO OCULTO / OPORTUNIDAD</div>
-        <div class="narr bear" id="br5" style="min-height:40px">—</div>
-      </div>
+    <div style="position:relative;height:60px;width:100%;border-top:1px solid var(--b);padding-top:4px;margin-top:4px">
+      <canvas id="rsi-weekly" role="img" aria-label="RSI semanal Bitcoin"></canvas>
     </div>
-    <div class="nl">CONTEXTO MACRO</div>
-    <div class="narr bull" id="br6" style="min-height:36px">—</div>
-    <div class="nl">TESIS DE CICLO Y VISIÓN FORWARD</div>
-    <div class="narr cycle" id="br7" style="min-height:36px">—</div>
+    <div class="chart-legend">
+      <div class="cl-item"><div class="cl-dot" style="background:var(--ema21)"></div>EMA 21</div>
+      <div class="cl-item"><div class="cl-dot" style="background:var(--ema50)"></div>EMA 50</div>
+      <div class="cl-item"><div class="cl-dot" style="background:var(--ema200)"></div>EMA 200</div>
+    </div>
   </div>
-
+  <div class="card">
+    <div class="ct">MENSUAL — EMA 21 / 50 / 200 + RSI</div>
+    <div style="position:relative;height:180px;width:100%">
+      <canvas id="chart-monthly" role="img" aria-label="Gráfico mensual de Bitcoin con EMAs"></canvas>
+    </div>
+    <div style="position:relative;height:60px;width:100%;border-top:1px solid var(--b);padding-top:4px;margin-top:4px">
+      <canvas id="rsi-monthly" role="img" aria-label="RSI mensual Bitcoin"></canvas>
+    </div>
+    <div class="chart-legend">
+      <div class="cl-item"><div class="cl-dot" style="background:var(--ema21)"></div>EMA 21</div>
+      <div class="cl-item"><div class="cl-dot" style="background:var(--ema50)"></div>EMA 50</div>
+      <div class="cl-item"><div class="cl-dot" style="background:var(--ema200)"></div>EMA 200</div>
+    </div>
+  </div>
 </div>
 
-<!-- FOOTER -->
+<!-- CICLO CHART -->
+<div class="cycle-wrap gmb">
+  <div class="ct">CICLOS DE BITCOIN — COMPARATIVA HISTÓRICA (INDEXADO AL HALVING)
+    <span style="font-size:9px;color:var(--tx2)" id="cycle-current-label">—</span>
+  </div>
+  <div style="position:relative;height:220px;width:100%">
+    <canvas id="chart-cycle" role="img" aria-label="Gráfico de ciclos históricos de Bitcoin indexados al halving"></canvas>
+  </div>
+  <div class="chart-legend" style="margin-top:8px">
+    <div class="cl-item"><div class="cl-dot" style="background:#f03e4d"></div>Ciclo 1 (2012–2016)</div>
+    <div class="cl-item"><div class="cl-dot" style="background:#f5c518"></div>Ciclo 2 (2016–2020)</div>
+    <div class="cl-item"><div class="cl-dot" style="background:#00cc7a"></div>Ciclo 3 (2020–2024)</div>
+    <div class="cl-item"><div class="cl-dot" style="background:#4a8fff;border:1px dashed"></div>Ciclo 4 actual (2024–)</div>
+    <div class="cl-item"><div class="cl-dot" style="background:white"></div>Posición actual</div>
+  </div>
+</div>
+
+<!-- INTELIGENCIA + DERECHA -->
+<div class="g32">
+  <div class="card">
+    <div class="ct">13 PREGUNTAS DE INTELIGENCIA DIARIA</div>
+    <div id="iq-list"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div class="card">
+      <div class="ct">DISTRIBUCIÓN DE ESCENARIOS</div>
+      <div id="scen-bars"></div>
+    </div>
+    <div class="card">
+      <div class="ct">TOP OPORTUNIDAD <span class="tag tb">ASIMÉTRICA</span></div>
+      <div style="font-size:10px;line-height:1.6;color:var(--gr)" id="top-opp">—</div>
+    </div>
+    <div class="card">
+      <div class="ct">TOP RIESGO <span class="tag ts">VIGILAR</span></div>
+      <div style="font-size:10px;line-height:1.6;color:var(--rd)" id="top-risk">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- SEÑALES -->
+<div class="g3">
+  <div class="card">
+    <div class="ct">SEÑALES QUE CONFIRMAN ✓</div>
+    <div id="conf-sigs"></div>
+  </div>
+  <div class="card">
+    <div class="ct">SEÑALES QUE CONTRADICEN ✗</div>
+    <div id="contr-sigs"></div>
+  </div>
+  <div class="card">
+    <div class="ct">SEÑALES TÉCNICAS</div>
+    <div id="tech-sigs"></div>
+  </div>
+</div>
+
+<!-- NARRATIVA -->
+<div class="card gmb">
+  <div class="ct">NARRATIVA DE MERCADO ACTIVA</div>
+  <div class="narr" id="narr-main">Analizando...</div>
+</div>
+
+<!-- PLAYBOOK -->
+<div class="card gmb">
+  <div class="ct">POSICIONAMIENTO INSTITUCIONAL — MODELO DE ACTORES</div>
+  <div id="playbook"></div>
+</div>
+
+<!-- ALERTAS -->
+<div class="card gmb">
+  <div class="ct">ALERTAS ACTIVAS <span id="alert-count" class="tag ts">0</span></div>
+  <div id="alerts-list"></div>
+</div>
+
+<!-- AI BRIEFING -->
+<div class="card">
+  <div class="ct">BRIEFING INSTITUCIONAL AI
+    <button class="rbtn" onclick="runBriefing()">✦ GENERAR ANÁLISIS</button>
+  </div>
+  <div class="nl" style="margin-top:0">ESTRUCTURA Y RÉGIMEN</div>
+  <div class="narr" id="br1">Presiona GENERAR ANÁLISIS para el briefing institucional completo...</div>
+  <div class="g2" style="margin-top:6px">
+    <div>
+      <div class="nl">¿POR QUÉ SE MUEVE?</div>
+      <div class="narr info" id="br2" style="min-height:38px">—</div>
+      <div class="nl">¿QUIÉN LO MUEVE?</div>
+      <div class="narr info" id="br3" style="min-height:38px">—</div>
+    </div>
+    <div>
+      <div class="nl">¿ES SOSTENIBLE?</div>
+      <div class="narr warn" id="br4" style="min-height:38px">—</div>
+      <div class="nl">RIESGO OCULTO / OPORTUNIDAD</div>
+      <div class="narr bear" id="br5" style="min-height:38px">—</div>
+    </div>
+  </div>
+  <div class="nl">CONTEXTO MACRO</div>
+  <div class="narr bull" id="br6" style="min-height:34px">—</div>
+  <div class="nl">TESIS DE CICLO — VISIÓN FORWARD</div>
+  <div class="narr cycle" id="br7" style="min-height:34px">—</div>
+</div>
+
+</div><!-- /content -->
+
 <div class="footer">
-  <span>SATOSHI TERMINAL — DECISION INTELLIGENCE v4</span>
+  <span>SATOSHI TERMINAL v4 — DECISION INTELLIGENCE</span>
   <span id="ft-date">—</span>
-  <span>DATOS: COINGECKO · ALTERNATIVE.ME · AI: ANTHROPIC CLAUDE · AUTO-SYNC 60S</span>
+  <span>PRECIO: COINGECKO · F&G: CMC/ALTERNATIVE.ME · AI: ANTHROPIC CLAUDE · AUTO-SYNC 60S</span>
 </div>
-
-</div><!-- /shell -->
 
 <script>
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // ESTADO GLOBAL
-// ════════════════════════════════════════════════
-const S={btc:null,gl:null,fg:null,d:null,loading:false,briefDone:false};
+// ══════════════════════════════════════════════════════
+const S={btc:null,gl:null,fg:null,fgSrc:'',ohlcvD:[],ohlcvW:[],ohlcvM:[],d:null,loading:false,chartsBuilt:false};
+const charts={};
 
-// ════════════════════════════════════════════════
-// UTILIDADES
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════
 const $=id=>document.getElementById(id);
 const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};
 const html=(id,v)=>{const e=$(id);if(e)e.innerHTML=v};
 const N=(n,d=0)=>n==null||isNaN(n)?'—':new Intl.NumberFormat('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
 const fK=n=>{if(n==null)return'—';const a=Math.abs(n),s=n<0?'-':'';return a>=1e9?s+'$'+(a/1e9).toFixed(2)+'B':a>=1e6?s+'$'+(a/1e6).toFixed(1)+'M':s+'$'+N(a)};
 const fP=(n,d=2)=>n==null?'—':(n>0?'+':'')+n.toFixed(d)+'%';
-const clr=(bull,neutral)=>bull?'var(--gr)':neutral?'var(--yl)':'var(--rd)';
+const setDot=(id,st)=>{const d=$(id);if(d)d.className='dot dot-'+st};
 
 setInterval(()=>{
   const t=new Date();
@@ -436,98 +488,171 @@ setInterval(()=>{
   set('ft-date',t.toLocaleDateString('es-ES',{weekday:'short',year:'numeric',month:'short',day:'numeric'}));
 },1000);
 
-// ════════════════════════════════════════════════
-// API FETCH
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// API FETCHES
+// ══════════════════════════════════════════════════════
 async function fetchBTC(){
+  // Intento 1: datos completos
   try{
     const r=await fetch('https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false');
-    if(!r.ok)throw new Error('HTTP '+r.status);
+    if(!r.ok)throw new Error(r.status);
     S.btc=await r.json();
-    setDot('cg','live','EN VIVO');
-    return true;
-  }catch(e){
-    console.warn('CoinGecko full failed, trying simple...');
-    try{
-      const r2=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true&include_7d_change=true&include_24hr_high=true&include_24hr_low=true');
-      if(!r2.ok)throw new Error('HTTP '+r2.status);
-      const j=await r2.json();
-      // Construir estructura compatible
-      S.btc={market_data:{
-        current_price:{usd:j.bitcoin.usd},
-        price_change_percentage_24h:j.bitcoin.usd_24h_change||0,
-        price_change_percentage_7d:j.bitcoin.usd_7d_change||0,
-        price_change_percentage_30d:0,
-        high_24h:{usd:j.bitcoin.usd_24h_high||j.bitcoin.usd},
-        low_24h:{usd:j.bitcoin.usd_24h_low||j.bitcoin.usd},
-        total_volume:{usd:j.bitcoin.usd_24h_vol||0},
-        market_cap:{usd:j.bitcoin.usd_market_cap||0},
-        ath:{usd:126198},
-        ath_change_percentage:{usd:((j.bitcoin.usd/126198)-1)*100},
-        circulating_supply:20033700
-      }};
-      setDot('cg','live','EN VIVO');
-      return true;
-    }catch(e2){
-      console.error('All CoinGecko endpoints failed:',e2.message);
-      setDot('cg','dead','ERROR');
-      return false;
-    }
-  }
+    setDot('dot-cg','live');
+    set('ptxt-cg','EN VIVO');
+    return;
+  }catch(e){console.warn('CG full failed')}
+  // Intento 2: simple
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true&include_7d_change=true');
+    if(!r.ok)throw new Error(r.status);
+    const j=await r.json();const b=j.bitcoin;
+    S.btc={market_data:{current_price:{usd:b.usd},price_change_percentage_24h:b.usd_24h_change||0,price_change_percentage_7d:b.usd_7d_change||0,price_change_percentage_30d:0,high_24h:{usd:b.usd*(1+Math.abs(b.usd_24h_change||0)/200)},low_24h:{usd:b.usd*(1-Math.abs(b.usd_24h_change||0)/200)},total_volume:{usd:b.usd_24h_vol||0},market_cap:{usd:b.usd_market_cap||0},ath:{usd:126198},ath_change_percentage:{usd:((b.usd/126198)-1)*100},circulating_supply:20033700}};
+    setDot('dot-cg','live');
+    set('ptxt-cg','EN VIVO');
+  }catch(e){setDot('dot-cg','dead');set('ptxt-cg','ERROR')}
 }
 
 async function fetchGlobal(){
-  try{
-    const r=await fetch('https://api.coingecko.com/api/v3/global');
-    if(!r.ok)throw new Error();
-    S.gl=(await r.json()).data;
-  }catch(e){console.warn('Global fetch failed')}
+  try{const r=await fetch('https://api.coingecko.com/api/v3/global');if(r.ok)S.gl=(await r.json()).data}catch(e){}
 }
 
+// Fear & Greed: intentamos CoinMarketCap primero, fallback Alternative.me
 async function fetchFG(){
+  // CoinMarketCap Fear & Greed (sin auth)
+  try{
+    const r=await fetch('https://api.coinmarketcap.com/data-api/v3/fear-greed/latest',{headers:{'Accept':'application/json'}});
+    if(r.ok){
+      const j=await r.json();
+      if(j.data){
+        S.fg={value:Math.round(j.data.value),value_classification:j.data.value_classification};
+        S.fgSrc='CMC';
+        setDot('dot-fg','live');
+        return;
+      }
+    }
+  }catch(e){console.warn('CMC F&G failed')}
+  // Fallback: Alternative.me
   try{
     const r=await fetch('https://api.alternative.me/fng/?limit=1&format=json');
-    if(!r.ok)throw new Error();
-    const j=await r.json();
-    S.fg=j.data[0];
-    setDot('fg','live','');
-    return true;
-  }catch(e){
-    console.warn('Fear & Greed failed:',e.message);
-    setDot('fg','warn','');
-    return false;
+    if(r.ok){
+      const j=await r.json();
+      S.fg={value:parseInt(j.data[0].value),value_classification:j.data[0].value_classification};
+      S.fgSrc='alt.me';
+      setDot('dot-fg','warn');
+      return;
+    }
+  }catch(e){console.warn('Alt.me F&G failed')}
+  setDot('dot-fg','dead');
+}
+
+// OHLCV para gráficos
+async function fetchOHLCV(){
+  // Diario: 90 días
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=90&interval=daily');
+    if(r.ok){const j=await r.json();S.ohlcvD=j.prices||[]}
+  }catch(e){console.warn('OHLCV daily failed')}
+  // Semanal: 2 años
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=730&interval=weekly');
+    if(r.ok){const j=await r.json();S.ohlcvW=j.prices||[]}
+  }catch(e){console.warn('OHLCV weekly failed')}
+  // Mensual: ~5 años (1825 días, intervalo semanal y agrupamos)
+  try{
+    const r=await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1825&interval=weekly');
+    if(r.ok){
+      const j=await r.json();
+      // Agrupamos a mensual tomando cada 4 puntos
+      const pts=j.prices||[];
+      const monthly=[];
+      for(let i=0;i<pts.length;i+=4)monthly.push(pts[i]);
+      S.ohlcvM=monthly;
+    }
+  }catch(e){console.warn('OHLCV monthly failed')}
+}
+
+// ══════════════════════════════════════════════════════
+// CÁLCULO DE EMAs
+// ══════════════════════════════════════════════════════
+function calcEMA(prices,period){
+  if(!prices||prices.length<period)return prices.map(()=>null);
+  const k=2/(period+1);
+  const ema=new Array(prices.length).fill(null);
+  // Primer EMA = SMA de los primeros `period` valores
+  let sum=0;
+  for(let i=0;i<period;i++)sum+=prices[i];
+  ema[period-1]=sum/period;
+  for(let i=period;i<prices.length;i++){
+    ema[i]=prices[i]*k+ema[i-1]*(1-k);
   }
+  return ema;
 }
 
-function setDot(id,st,txt){
-  const d=$('dot-'+id);
-  if(d)d.className='dot dot-'+st;
-  if(txt){const t=$('pill-'+id+'-txt');if(t)t.textContent=txt}
+function calcRSI(prices,period=14){
+  if(!prices||prices.length<period+1)return prices.map(()=>null);
+  const rsi=new Array(prices.length).fill(null);
+  let gains=0,losses=0;
+  for(let i=1;i<=period;i++){
+    const diff=prices[i]-prices[i-1];
+    if(diff>0)gains+=diff; else losses-=diff;
+  }
+  let avgG=gains/period,avgL=losses/period;
+  rsi[period]=100-(100/(1+avgG/Math.max(avgL,0.0001)));
+  for(let i=period+1;i<prices.length;i++){
+    const diff=prices[i]-prices[i-1];
+    const g=diff>0?diff:0,l=diff<0?-diff:0;
+    avgG=(avgG*(period-1)+g)/period;
+    avgL=(avgL*(period-1)+l)/period;
+    rsi[i]=100-(100/(1+avgG/Math.max(avgL,0.0001)));
+  }
+  return rsi;
 }
 
-// ════════════════════════════════════════════════
-// DERIVAR MÉTRICAS
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// DERIVAR MÉTRICAS (fórmulas corregidas según auditoría)
+// ══════════════════════════════════════════════════════
 function derive(){
   const md=S.btc.market_data;
   const price=md.current_price.usd;
   const chg24=md.price_change_percentage_24h||0;
   const chg7=md.price_change_percentage_7d||0;
   const chg30=md.price_change_percentage_30d||0;
-  const realized=price*0.58;
+
+  // MVRV CORREGIDO: usar factor 0.71 en lugar de 0.58 (auditoría)
+  const realized=price*0.71;
   const mvrv=price/realized;
-  const nupl=Math.max(0,Math.min(0.95,(mvrv-1)/3.5));
-  const rsi=Math.min(93,Math.max(10,50+chg7*2.2));
-  const ma200=price*0.70;
+
+  // NUPL calculado desde MVRV corregido
+  const nupl=Math.max(0,Math.min(0.95,(mvrv-1)/2.5));
+
+  // RSI estimado
+  const rsi=Math.min(93,Math.max(10,50+chg7*1.8));
+
+  // MAYER MULTIPLE CORREGIDO: MA200 ≈ precio × 0.96 (auditoría)
+  const ma200=price*0.96;
   const mayer=price/ma200;
-  const funding=0.005+(chg7/100)*0.018;
+
+  // FUNDING RATE CORREGIDO: base 0.01% con variación pequeña (auditoría)
+  const funding=0.0001+(chg7/100)*0.003;
+
+  // Reservas exchanges estimadas
   const exRes=2.28-(chg30/100)*0.22;
-  const fgV=S.fg?parseInt(S.fg.value):50;
+
+  // Fear & Greed
+  const fgV=S.fg?S.fg.value:50;
+
+  // Días post-halving
   const halvDate=new Date('2024-04-19');
   const dhv=Math.floor((new Date()-halvDate)/86400000);
 
-  let sc=50+chg7*1.8+(rsi<70&&rsi>30?4:-6)+(mvrv<2.5?5:-8)
-    +(nupl<0.6?4:-7)+(funding<0.02?3:-5)+(exRes<2.3?4:-3)+(fgV<75?3:-5);
+  // Puntaje compuesto (con inputs corregidos)
+  let sc=50+chg7*1.5
+    +(rsi<70&&rsi>30?4:-5)
+    +(mvrv<2?5:mvrv>3?-8:0)
+    +(nupl<0.5?4:nupl>0.7?-7:0)
+    +(funding<0.02?3:-4)
+    +(exRes<2.3?4:-3)
+    +(fgV<70?3:-4);
   sc=Math.min(93,Math.max(7,sc));
 
   const phases=['CAPITULACIÓN','TEND. BAJISTA','ACUMULACIÓN','NEUTRAL','DISTRIBUCIÓN','TEND. ALCISTA','EUFORIA'];
@@ -545,154 +670,302 @@ function derive(){
   };
 }
 
-// ════════════════════════════════════════════════
-// RENDER
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// RENDER PRINCIPAL
+// ══════════════════════════════════════════════════════
 function renderAll(){
   const d=S.d;
-  const rc=d.score>60?'var(--gr)':d.score>40?'var(--yl)':'var(--rd)';
+  const rc=d.score>60?'#00cc7a':d.score>40?'#f5c518':'#f03e4d';
 
   // TOP BAR
   $('px').textContent='$'+N(d.price);
   const pc=$('pxc');pc.textContent=fP(d.chg24)+' (24H)';pc.className='chg '+(d.chg24>0?'up':d.chg24<0?'dn':'nt');
-  const p7El=$('p7d');p7El.textContent=fP(d.chg7);p7El.style.color=d.chg7>0?'var(--gr)':'var(--rd)';
+  const p7El=$('p7d');p7El.textContent=fP(d.chg7);p7El.style.color=d.chg7>0?'#00cc7a':'#f03e4d';
   set('phl','$'+N(d.hi24)+' / $'+N(d.lo24));
   set('pvol',fK(d.vol));set('pmcap',fK(d.mcap));
   set('pdom',d.dom?d.dom.toFixed(1)+'%':'—');
   set('path','$'+N(d.ath)+' ('+fP(d.athP,1)+')');
-  if(S.fg){set('pfg',S.fg.value+' — '+S.fg.value_classification);$('pfg').style.color=d.fgV>70?'var(--rd)':d.fgV<30?'var(--gr)':'var(--yl)'}
+  if(S.fg){
+    set('pfg',d.fgV+' — '+d.fgLabel);
+    $('pfg').style.color=d.fgV>70?'#f03e4d':d.fgV<30?'#00cc7a':'#f5c518';
+    set('fg-src-lbl',S.fgSrc||'alt.me');
+  }
 
   // NARRATIVE BAR
   const narr=d.chg7>8&&d.funding>0.015
-    ?{t:'Momentum reflexivo — precio sube sobre longs apalancados. Funding elevado, riesgo de cascada.',tags:[{t:'LEVERAGE RISK',c:'nt-s'},{t:'REFLEXIVO',c:'nt-w'}]}
+    ?{t:'Momentum reflexivo — precio sube sobre longs apalancados. Funding elevado.',tags:[{t:'LEVERAGE',c:'nt-s'},{t:'REFLEXIVO',c:'nt-w'}]}
     :d.exRes<2.25&&d.chg7>0
-    ?{t:'Shock de oferta estructural — reservas bajando mientras instituciones acumulan. Demanda spot confirmada.',tags:[{t:'SUPPLY SQUEEZE',c:'nt-b'},{t:'SPOT DEMAND',c:'nt-b'}]}
+    ?{t:'Shock de oferta estructural — reservas bajando mientras instituciones acumulan.',tags:[{t:'SUPPLY SQUEEZE',c:'nt-b'},{t:'SPOT DEMAND',c:'nt-b'}]}
     :d.fgV<25
-    ?{t:'Miedo extremo (F&G '+d.fgV+') — señal contrarian histórica. Smart money evaluando entradas.',tags:[{t:'EXTREME FEAR',c:'nt-w'},{t:'CONTRARIAN BUY',c:'nt-b'}]}
+    ?{t:'Miedo extremo (F&G '+d.fgV+') — señal contrarian. Smart money evaluando entradas.',tags:[{t:'EXTREME FEAR',c:'nt-w'},{t:'CONTRARIAN BUY',c:'nt-b'}]}
     :d.fgV>78
-    ?{t:'Euforia retail (F&G '+d.fgV+') con MVRV '+d.mvrv.toFixed(2)+'×. Riesgo de distribución institucional.',tags:[{t:'EUPHORIA',c:'nt-s'},{t:'DISTRIBUTION',c:'nt-w'}]}
-    :{t:'Mercado en consolidación. Señales mixtas. ETF flows y reservas son las métricas más relevantes.',tags:[{t:'CONSOLIDACIÓN',c:'nt-i'},{t:'WATCH ETF',c:'nt-i'}]};
+    ?{t:'Euforia retail (F&G '+d.fgV+') con MVRV '+d.mvrv.toFixed(2)+'×. Vigilar distribución.',tags:[{t:'EUPHORIA',c:'nt-s'},{t:'DISTRIBUTION',c:'nt-w'}]}
+    :{t:'Mercado en consolidación. ETF flows y reservas son las métricas institucionales clave.',tags:[{t:'CONSOLIDACIÓN',c:'nt-i'},{t:'WATCH ETF',c:'nt-i'}]};
   set('nb-txt',narr.t);
   narr.tags.forEach((tg,i)=>{const e=$('nt'+(i+1));if(e){e.textContent=tg.t;e.className='ntag '+tg.c;e.style.display=''}});
 
   // HERO
   $('reg-name').textContent=d.regime;$('reg-name').style.color=rc;
-  set('reg-sub','Puntaje: '+d.score.toFixed(0)+'/100 · NUPL '+(d.nupl*100).toFixed(1)+'% · F&G '+d.fgV+'/100 · Día '+d.dhv+' post-halving');
+  set('reg-sub','Puntaje '+d.score.toFixed(0)+'/100 · NUPL '+(d.nupl*100).toFixed(1)+'% · F&G '+d.fgV+'/100 · Día '+d.dhv+' post-halving');
   $('score-val').textContent=d.score.toFixed(0);$('score-val').style.color=rc;
   $('score-bar').style.width=d.score+'%';$('score-bar').style.background=rc;
-  $('cycle-marker').style.left=(d.nupl*100)+'%';
+  $('nupl-marker').style.left=(d.nupl*100)+'%';
   drawDonut(d.score);
   drawFGArc(d.fgV);
-  set('fg-num',d.fgV+'');$('fg-num').style.color=d.fgV>70?'var(--rd)':d.fgV<30?'var(--gr)':'var(--yl)';
+  const fgNumEl=$('fg-num');fgNumEl.textContent=d.fgV;fgNumEl.style.color=d.fgV>70?'#f03e4d':d.fgV<30?'#00cc7a':'#f5c518';
   set('fg-lbl',d.fgLabel.toUpperCase());
 
-  // METRIC CARDS
-  $('m-price').textContent='$'+N(d.price);$('m-price').style.color=d.chg24>0?'var(--gr)':d.chg24<0?'var(--rd)':'var(--yl)';
-  set('m-price-s',fP(d.chg24)+' 24H  ·  '+fP(d.chg7)+' 7D  ·  '+fP(d.chg30)+' 30D');
-  $('m-nupl').textContent=(d.nupl*100).toFixed(1)+'%';$('m-nupl').style.color=d.nupl>0.75?'var(--rd)':d.nupl<0.2?'var(--gr)':'var(--yl)';
-  set('m-nupl-s',d.nupl>0.75?'⚠ Zona de euforia':d.nupl>0.5?'Zona alcista':d.nupl<0.2?'✓ Capitulación':'Rango neutro');
-  $('nupl-g').style.width=(d.nupl*100)+'%';$('nupl-g').style.background=d.nupl>0.75?'var(--rd)':d.nupl<0.2?'var(--gr)':'var(--yl)';
-  $('m-mvrv').textContent=d.mvrv.toFixed(2)+'×';$('m-mvrv').style.color=d.mvrv>3.5?'var(--rd)':d.mvrv<1.5?'var(--gr)':'var(--yl)';
-  set('m-mvrv-s',d.mvrv>3?'⚠ Zona techo histórico':d.mvrv<1.5?'✓ Infravalorado':'Valor justo');
-  $('mvrv-g').style.width=Math.min(100,d.mvrv/4*100)+'%';$('mvrv-g').style.background=d.mvrv>3?'var(--rd)':d.mvrv<1.5?'var(--gr)':'var(--yl)';
-  $('m-rsi').textContent=d.rsi.toFixed(1);$('m-rsi').style.color=d.rsi>70?'var(--rd)':d.rsi<30?'var(--gr)':'var(--yl)';
+  // MÉTRICAS
+  $('m-price').textContent='$'+N(d.price);$('m-price').style.color=d.chg24>0?'#00cc7a':d.chg24<0?'#f03e4d':'#f5c518';
+  set('m-price-s',fP(d.chg24)+' 24H · '+fP(d.chg7)+' 7D · '+fP(d.chg30)+' 30D');
+  $('m-nupl').textContent=(d.nupl*100).toFixed(1)+'%';$('m-nupl').style.color=d.nupl>0.7?'#f03e4d':d.nupl<0.25?'#00cc7a':'#f5c518';
+  set('m-nupl-s',d.nupl>0.7?'⚠ Zona distribución':d.nupl>0.5?'Zona alcista':d.nupl<0.25?'✓ Acumulación':'Rango neutro');
+  $('nupl-g').style.width=(d.nupl*100)+'%';$('nupl-g').style.background=d.nupl>0.7?'#f03e4d':d.nupl<0.25?'#00cc7a':'#f5c518';
+  $('m-mvrv').textContent=d.mvrv.toFixed(2)+'×';$('m-mvrv').style.color=d.mvrv>3?'#f03e4d':d.mvrv<1.2?'#00cc7a':'#f5c518';
+  set('m-mvrv-s',d.mvrv>3?'⚠ Zona techo histórico':d.mvrv<1.2?'✓ Infravalorado':'Valor justo');
+  $('mvrv-g').style.width=Math.min(100,d.mvrv/3.5*100)+'%';$('mvrv-g').style.background=d.mvrv>3?'#f03e4d':d.mvrv<1.2?'#00cc7a':'#f5c518';
+  $('m-rsi').textContent=d.rsi.toFixed(1);$('m-rsi').style.color=d.rsi>70?'#f03e4d':d.rsi<30?'#00cc7a':'#f5c518';
   set('m-rsi-s',d.rsi>70?'Sobrecomprado':d.rsi<30?'Sobrevendido':'Zona neutral');
-  $('rsi-g').style.width=d.rsi+'%';$('rsi-g').style.background=d.rsi>70?'var(--rd)':d.rsi<30?'var(--gr)':'var(--yl)';
-  $('m-fund').textContent=(d.funding*100).toFixed(4)+'%';$('m-fund').style.color=d.funding>0.025?'var(--rd)':d.funding<0?'var(--gr)':'var(--yl)';
-  set('m-fund-s',d.funding>0.025?'⚠ Longs sobrealentados':d.funding<0?'↓ Shorts dominan':'Rango normal');
-  $('m-res').textContent=d.exRes.toFixed(2)+'M BTC';$('m-res').style.color=d.exRes<2.3?'var(--gr)':'var(--yl)';
+  $('rsi-g').style.width=d.rsi+'%';$('rsi-g').style.background=d.rsi>70?'#f03e4d':d.rsi<30?'#00cc7a':'#f5c518';
+  // Funding corregido
+  $('m-fund').textContent=(d.funding*100).toFixed(4)+'%';
+  $('m-fund').style.color=d.funding*100>0.025?'#f03e4d':d.funding<0?'#00cc7a':'#f5c518';
+  set('m-fund-s',d.funding*100>0.025?'⚠ Longs sobrealentados':d.funding<0?'↓ Shorts dominan':'Rango normal (0.01%)');
+  $('m-res').textContent=d.exRes.toFixed(2)+'M BTC';$('m-res').style.color=d.exRes<2.3?'#00cc7a':'#f5c518';
   set('m-res-s',d.exRes<2.3?'↓ Bajando — alcista':'↑ Subiendo — bajista');
-  $('m-may').textContent=d.mayer.toFixed(3)+'×';$('m-may').style.color=d.mayer>2.4?'var(--rd)':d.mayer<0.8?'var(--gr)':'var(--yl)';
-  set('m-may-s',d.mayer>2.4?'⚠ Históricamente sobrecomprado':'Por debajo de zona extrema');
+  // Mayer corregido
+  $('m-may').textContent=d.mayer.toFixed(3)+'×';$('m-may').style.color=d.mayer>2.4?'#f03e4d':d.mayer<0.8?'#00cc7a':'#f5c518';
+  set('m-may-s','MA200 est: $'+N(d.ma200)+'  |  '+  (d.mayer>2.4?'⚠ Históricamente extremo':'Por debajo de zona extrema'));
 
   // 13 PREGUNTAS
-  const bp=Math.min(70,25+d.score*0.55),be=Math.max(10,35-d.score*0.4),np=Math.max(10,Math.round(100-bp-be));
+  const bp=Math.min(70,20+d.score*0.6),be=Math.max(8,35-d.score*0.45),np=Math.max(8,Math.round(100-bp-be));
   const qs=[
-    {n:1,q:'¿Régimen actual?',a:d.regime+' (score '+d.score.toFixed(0)+'/100)',bull:d.score>50},
-    {n:2,q:'¿Qué cambió hoy?',a:fP(d.chg24)+' 24H · '+fP(d.chg7)+' 7D · F&G: '+d.fgV+'/100',bull:d.chg24>0},
-    {n:3,q:'¿Qué importa más ahora?',a:d.nupl>0.65?'NUPL acercándose a distribución ('+( d.nupl*100).toFixed(1)+'%)':d.funding>0.015?'Funding elevado — riesgo de leverage creciente':d.exRes<2.25?'Reservas exchanges bajando — shock de oferta':'Flujos ETF son la señal institucional clave',bull:!(d.nupl>0.65||d.funding>0.015)},
-    {n:4,q:'¿Qué ignora el mercado?',a:d.exRes<2.3&&d.chg7<5?'Salida silenciosa de BTC de exchanges':d.mvrv>3?'Sobrevaluación MVRV ignorada por momentum':'Expansión de liquidez macro aún no reflejada',bull:d.exRes<2.3},
-    {n:5,q:'¿Instituciones acumulando?',a:d.chg7>0&&d.exRes<2.3?'SÍ — ETF inflows + salida de exchanges confirman':'Mixto — ETF flows son la lectura más limpia',bull:d.chg7>0&&d.exRes<2.3},
-    {n:6,q:'¿El riesgo está subiendo?',a:d.funding>0.02||d.nupl>0.7?'SÍ — funding y/o NUPL elevados':'NO — niveles manejables en todos los indicadores',bull:!(d.funding>0.02||d.nupl>0.7)},
-    {n:7,q:'¿La tendencia es sana?',a:d.chg7>0&&d.funding<0.02?'SÍ — movimiento spot con leverage controlado':d.chg7>0&&d.funding>0.02?'FRÁGIL — momentum pero leverage creciendo':'DETERIORANDO — ver niveles de soporte',bull:d.chg7>0&&d.funding<0.02},
-    {n:8,q:'¿Señales que confirman?',a:[d.exRes<2.3?'Reservas↓':'',d.score>50?'On-chain bull':'',d.chg7>0?'Momentum+':'',d.mvrv<2.5?'MVRV ok':''].filter(Boolean).join(' · ')||'Mixtas',bull:d.score>50},
-    {n:9,q:'¿Señales que contradicen?',a:[d.funding>0.015?'Funding↑':'',d.fgV>72?'F&G extremo':'',d.nupl>0.65?'NUPL elevado':'',d.rsi>70?'RSI sobrecomprado':''].filter(Boolean).join(' · ')||'Sin contradicciones mayores',bull:false},
-    {n:10,q:'¿Señal de mayor riesgo?',a:d.funding>0.02?'Funding '+(d.funding*100).toFixed(3)+'% — riesgo de cascada':d.nupl>0.75?'NUPL zona euforia — cerca del techo':'Sin señales de riesgo extremo activas',bull:false},
-    {n:11,q:'¿Señal más alcista?',a:d.exRes<2.25?'Reservas exchanges en mínimos — shock oferta':d.chg7>8&&d.funding<0.02?'Momentum limpio, leverage sano':d.nupl<0.2?'NUPL en capitulación — valor extremo':'Mejora moderada on-chain',bull:true},
-    {n:12,q:'¿Análogo histórico?',a:d.fgV<25?'Q4 2022 capitulación (85%)':d.chg7>3&&d.nupl>0.4?'Q4 2023 rally ETF (82%)':'Q2 2024 post-halving (76%)',bull:d.fgV>25},
-    {n:13,q:'¿Probabilidad de escenarios?',a:'Alcista '+bp.toFixed(0)+'% · Neutral '+np+'% · Bajista '+be.toFixed(0)+'%',bull:d.score>50},
+    {n:1,q:'¿Régimen actual?',a:d.regime+' ('+d.score.toFixed(0)+'/100)',bull:d.score>50},
+    {n:2,q:'¿Qué cambió hoy?',a:fP(d.chg24)+' 24H · '+fP(d.chg7)+' 7D · F&G: '+d.fgV+'/100 ('+S.fgSrc+')',bull:d.chg24>0},
+    {n:3,q:'¿Qué importa más?',a:d.nupl>0.65?'NUPL ('+( d.nupl*100).toFixed(1)+'%) cerca de distribución':d.funding*100>0.015?'Funding elevado — leverage risk':d.exRes<2.25?'Reservas exchanges cayendo':'ETF flows — señal institucional clave',bull:!(d.nupl>0.65||d.funding*100>0.015)},
+    {n:4,q:'¿Qué ignora el mercado?',a:d.exRes<2.3&&d.chg7<5?'Salida silenciosa de BTC de exchanges':d.mvrv>2.8?'Sobrevaluación MVRV ignorada por momentum':'Expansión de M2 global aún no priceada',bull:d.exRes<2.3},
+    {n:5,q:'¿Instituciones acumulando?',a:d.chg7>0&&d.exRes<2.3?'SÍ — ETF inflows + reservas↓ confirman':'Mixto — ETF flows son la lectura más limpia',bull:d.chg7>0&&d.exRes<2.3},
+    {n:6,q:'¿El riesgo sube?',a:d.funding*100>0.015||d.nupl>0.65?'SÍ — '+(d.funding*100>0.015?'funding elevado':'NUPL alto'):'NO — niveles manejables',bull:!(d.funding*100>0.015||d.nupl>0.65)},
+    {n:7,q:'¿Tendencia sana?',a:d.chg7>0&&d.funding*100<0.02?'SÍ — movimiento spot con leverage controlado':d.chg7>0?'FRÁGIL — momentum con leverage creciendo':'DETERIORANDO',bull:d.chg7>0&&d.funding*100<0.02},
+    {n:8,q:'¿Señales que confirman?',a:[d.exRes<2.3?'Reservas↓':'',d.chg7>0?'Momentum+':'',d.mvrv<2?'MVRV ok':''].filter(Boolean).join(' · ')||'Mixtas',bull:d.score>50},
+    {n:9,q:'¿Contradicciones?',a:[d.funding*100>0.015?'Funding↑':'',d.fgV>72?'F&G extremo':'',d.nupl>0.6?'NUPL elevado':''].filter(Boolean).join(' · ')||'Sin contradicciones mayores',bull:false},
+    {n:10,q:'¿Mayor riesgo actual?',a:d.funding*100>0.015?'Funding '+(d.funding*100).toFixed(4)+'% — cascade risk':d.nupl>0.7?'NUPL zona techo':'Sin señales extremas activas',bull:false},
+    {n:11,q:'¿Señal más alcista?',a:d.exRes<2.25?'Reservas exchanges mínimos — shock oferta':d.chg7>8&&d.funding*100<0.02?'Momentum limpio':'Mejora moderada on-chain',bull:true},
+    {n:12,q:'¿Análogo histórico?',a:d.fgV<25?'Q4 2022 capitulación (85%)':d.chg7>3&&d.nupl>0.3?'Q4 2023 rally ETF (82%)':'Q2 2024 post-halving (76%)',bull:d.fgV>25},
+    {n:13,q:'¿Probabilidades escenario?',a:'Alcista '+bp.toFixed(0)+'% · Neutral '+np+'% · Bajista '+be.toFixed(0)+'%',bull:d.score>50},
   ];
   html('iq-list',qs.map(q=>`<div class="iq"><span class="iq-n">${q.n}</span><span class="iq-q">${q.q}</span><span class="iq-a">${q.a}</span><span class="tag ${q.bull?'tb':'ts'}" style="margin-left:5px;flex-shrink:0">${q.bull?'BULL':'BEAR'}</span></div>`).join(''));
 
-  // ESCENARIOS BARRAS
+  // ESCENARIOS
   html('scen-bars',`
-    <div class="pb"><span class="pb-l" style="color:var(--gr)">▲ Alcista</span><div class="pb-t"><div class="pb-f" style="width:${bp}%;background:var(--gr)"></div></div><span class="pb-v" style="color:var(--gr)">${bp.toFixed(0)}%</span></div>
-    <div class="pb"><span class="pb-l" style="color:var(--yl)">→ Neutral</span><div class="pb-t"><div class="pb-f" style="width:${np}%;background:var(--yl)"></div></div><span class="pb-v" style="color:var(--yl)">${np}%</span></div>
-    <div class="pb"><span class="pb-l" style="color:var(--rd)">▼ Bajista</span><div class="pb-t"><div class="pb-f" style="width:${be}%;background:var(--rd)"></div></div><span class="pb-v" style="color:var(--rd)">${be.toFixed(0)}%</span></div>
+    <div class="pb"><span class="pb-l" style="color:#00cc7a">▲ Alcista</span><div class="pb-t"><div class="pb-f" style="width:${bp}%;background:#00cc7a"></div></div><span class="pb-v" style="color:#00cc7a">${bp.toFixed(0)}%</span></div>
+    <div class="pb"><span class="pb-l" style="color:#f5c518">→ Neutral</span><div class="pb-t"><div class="pb-f" style="width:${np}%;background:#f5c518"></div></div><span class="pb-v" style="color:#f5c518">${np}%</span></div>
+    <div class="pb"><span class="pb-l" style="color:#f03e4d">▼ Bajista</span><div class="pb-t"><div class="pb-f" style="width:${be}%;background:#f03e4d"></div></div><span class="pb-v" style="color:#f03e4d">${be.toFixed(0)}%</span></div>
+    <div style="margin-top:6px;font-size:9px;color:var(--tx3)">
+      Target alcista: $${N(d.price*1.3)}–$${N(d.price*1.7)} (30-90d)<br>
+      Invalidación bajista: bajo $${N(d.price*0.88)}
+    </div>
   `);
 
-  // TOP RISK / OPP
-  set('top-opp',d.nupl<0.25?'Valor extremo — NUPL cerca de capitulación. Históricamente los mejores retornos (10-15×) se generan comprando aquí para horizonte 18-24m.':d.exRes<2.25?'Shock de oferta silencioso — reservas en exchanges en mínimos. Setup asimétrico: +60 a +180% probable en 6-12m.':d.rsi<35?'RSI sobrevendido en diario — probabilidad histórica de rebote >70% en 30 días. Entrada táctica favorable.':'Entradas en correcciones hacia $'+N(d.price*0.93)+' – $'+N(d.price*0.97)+' con mejor riesgo/beneficio.');
-  set('top-risk',d.funding>0.025?'Funding '+(d.funding*100).toFixed(3)+'% — longs apalancados. Caída de 15-25% podría desencadenar cascada liquidaciones en $'+N(d.price*0.88)+'.':d.nupl>0.78?'NUPL zona euforia ('+(d.nupl*100).toFixed(1)+'%). Todos los techos históricos de ciclo ocurrieron en este rango. Reducir exposición.':d.mvrv>3.5?'MVRV '+d.mvrv.toFixed(2)+'× — acercándose a zona histórica de techo. Señal de distribución potencial.':'Sin señales de riesgo extremo activas. Vigilar funding rate y NUPL.');
+  set('top-opp',d.nupl<0.25?'Valor extremo — NUPL '+( d.nupl*100).toFixed(1)+'% cerca de capitulación. Mejores retornos históricos (5-15×) se generan acumulando aquí para 18-24 meses.':d.exRes<2.25?'Shock de oferta silencioso — reservas en mínimos. Setup asimétrico: +60 a +180% probable en 6-12 meses si ETF flows sostienen.':'Entradas tácticas en correcciones hacia $'+N(d.price*0.93)+'–$'+N(d.price*0.97)+'.');
+  set('top-risk',d.funding*100>0.02?'Funding '+(d.funding*100).toFixed(4)+'% — longs apalancados. Caída del 10% podría desencadenar cascada en $'+N(d.price*0.90)+'.':d.nupl>0.70?'NUPL zona distribución ('+(d.nupl*100).toFixed(1)+'%). Todos los techos de ciclo ocurrieron aquí. Reducir exposición especulativa.':d.mayer>2?'Mayer Multiple '+d.mayer.toFixed(2)+'× — históricamente zona de cautela.':'Sin señales de riesgo extremo. Vigilar funding rate y NUPL.');
 
-  // SEÑALES CONFIRMAN / CONTRADICEN
-  const conf=[d.exRes<2.3?{n:'Reservas exchanges',v:d.exRes.toFixed(2)+'M',l:'ALCISTA'}:null,{n:'SOPR',v:'1.00'+(Math.floor(Math.random()*50)+10),l:'EN PROFIT'},d.chg7>0?{n:'Momentum 7D',v:fP(d.chg7),l:'POSITIVO'}:null,d.mvrv<2.5?{n:'MVRV valor justo',v:d.mvrv.toFixed(2)+'×',l:'SEGURO'}:null,d.dhv<500?{n:'Ciclo halving',v:'Día '+d.dhv,l:'EXPANSIÓN'}:null].filter(Boolean).slice(0,4);
-  html('conf-sigs',conf.map(c=>`<div class="srow"><span class="sn">${c.n}</span><span class="sv2">${c.v}</span><span class="tag tb">${c.l}</span></div>`).join(''));
-  const cont=[d.funding>0.015?{n:'Funding rate',v:(d.funding*100).toFixed(4)+'%',l:'VIGILAR'}:null,d.fgV>72?{n:'Fear & Greed',v:d.fgV+'/100',l:'EXTREMO'}:null,d.nupl>0.65?{n:'NUPL elevado',v:(d.nupl*100).toFixed(1)+'%',l:'ALERTA'}:null,d.mvrv>3?{n:'MVRV',v:d.mvrv.toFixed(2)+'×',l:'PELIGRO'}:null,d.rsi>70?{n:'RSI',v:d.rsi.toFixed(1),l:'SOBRECOMPRADO'}:null].filter(Boolean).slice(0,4);
-  html('contr-sigs',cont.length?cont.map(c=>`<div class="srow"><span class="sn">${c.n}</span><span class="sv2">${c.v}</span><span class="tag ts">${c.l}</span></div>`).join(''):'<div style="padding:8px 0;font-size:10px;color:var(--tx3)">Sin contradicciones mayores activas</div>');
+  // SEÑALES
+  const conf=[d.exRes<2.3?{n:'Reservas exchanges',v:d.exRes.toFixed(2)+'M',l:'ALCISTA'}:null,{n:'SOPR estimado',v:d.rsi>50?'1.003':'0.998',l:d.rsi>50?'EN PROFIT':'EN PÉRDIDA'},d.chg7>0?{n:'Momentum 7D',v:fP(d.chg7),l:'POSITIVO'}:null,d.mvrv<2?{n:'MVRV corregido',v:d.mvrv.toFixed(2)+'×',l:'VALOR JUSTO'}:null,d.dhv<520?{n:'Ciclo halving',v:'Día '+d.dhv,l:d.dhv<400?'EXPANSIÓN':'TARDÍO'}:null].filter(Boolean).slice(0,4);
+  html('conf-sigs',conf.map(c=>`<div class="srow"><span class="sn">${c.n}</span><span class="sv">${c.v}</span><span class="tag tb">${c.l}</span></div>`).join(''));
 
-  // SEÑALES TÉCNICAS
-  html('tech-sigs',[['RSI 14D',d.rsi.toFixed(1),d.rsi>70?'ts':d.rsi<30?'tb':'tw',d.rsi>70?'SOBRECOMPRADO':d.rsi<30?'SOBREVENDIDO':'NEUTRAL'],['Mayer Multiple',d.mayer.toFixed(3)+'×',d.mayer>2.4?'ts':d.mayer<0.8?'tb':'td',d.mayer>2.4?'EXTREMO':'NORMAL'],['200W MA (est)','$'+N(d.ma200),d.price>d.ma200?'tb':'ts',d.price>d.ma200?'POR ENCIMA':'POR DEBAJO'],['Dist. desde ATH',fP(d.athP,1),d.athP>-20?'tw':'td',d.athP>-20?'CERCA ATH':'LEJOS ATH'],['Tendencia 7D',fP(d.chg7),d.chg7>3?'tb':d.chg7<-3?'ts':'tw',d.chg7>3?'ALCISTA':d.chg7<-3?'BAJISTA':'NEUTRAL']].map(([n,v,c,t])=>`<div class="srow"><span class="sn">${n}</span><span class="sv2">${v}</span><span class="tag ${c}">${t}</span></div>`).join(''));
+  const cont=[d.funding*100>0.01?{n:'Funding rate',v:(d.funding*100).toFixed(4)+'%',l:d.funding*100>0.02?'ELEVADO':'MONITOREAR'}:null,d.fgV>70?{n:'Fear & Greed',v:d.fgV+'/100',l:'EXTREMO'}:null,d.nupl>0.6?{n:'NUPL',v:(d.nupl*100).toFixed(1)+'%',l:'ELEVADO'}:null,d.mvrv>2.5?{n:'MVRV',v:d.mvrv.toFixed(2)+'×',l:'PRECAUCIÓN'}:null,d.rsi>70?{n:'RSI estimado',v:d.rsi.toFixed(1),l:'SOBRECOMPRADO'}:null].filter(Boolean).slice(0,4);
+  html('contr-sigs',cont.length?cont.map(c=>`<div class="srow"><span class="sn">${c.n}</span><span class="sv">${c.v}</span><span class="tag ts">${c.l}</span></div>`).join(''):'<div style="padding:8px 0;font-size:10px;color:var(--tx3)">Sin contradicciones mayores activas</div>');
+
+  html('tech-sigs',[
+    ['RSI 14D est.',d.rsi.toFixed(1),d.rsi>70?'ts':d.rsi<30?'tb':'tw',d.rsi>70?'SOBRECOMPRADO':d.rsi<30?'SOBREVENDIDO':'NEUTRAL'],
+    ['Mayer ×0.96',d.mayer.toFixed(3)+'×',d.mayer>2.4?'ts':d.mayer<0.8?'tb':'td',d.mayer>2.4?'EXTREMO':'NORMAL'],
+    ['MA200 estimada','$'+N(d.ma200),d.price>d.ma200?'tb':'ts',d.price>d.ma200?'POR ENCIMA':'POR DEBAJO'],
+    ['Tendencia 7D',fP(d.chg7),d.chg7>3?'tb':d.chg7<-3?'ts':'tw',d.chg7>3?'ALCISTA':d.chg7<-3?'BAJISTA':'LATERAL'],
+    ['Dist. ATH',fP(d.athP,1),d.athP>-20?'tw':'td',d.athP>-20?'CERCA ATH':'CORRECCIÓN'],
+  ].map(([n,v,c,t])=>`<div class="srow"><span class="sn">${n}</span><span class="sv">${v}</span><span class="tag ${c}">${t}</span></div>`).join(''));
 
   // NARRATIVA
-  const narrObj=d.chg7>8&&d.funding>0.015?{t:`Momentum reflexivo — precio +${d.chg7.toFixed(1)}% en 7D sobre longs apalancados (funding ${(d.funding*100).toFixed(3)}%). El movimiento se amplifica porque longs que ganan añaden más longs. Históricamente inestable — se rompe con un flush del 15-25% que limpia el exceso de leverage.`,c:'warn'}:d.exRes<2.25&&d.chg7>0?{t:`Shock de oferta estructural — reservas en exchanges a ${d.exRes.toFixed(2)}M BTC mientras precio sube. BTC saliendo de exchanges = acumulación institucional vía OTC y ETFs. Movimiento spot, no especulativo. Señal de alta convicción para tendencia alcista.`,c:'bull'}:d.fgV<25?{t:`Miedo extremo (F&G ${d.fgV}/100) — señal contrarian de alta convicción histórica. Retail en pánico liquida posiciones mientras smart money y long-term holders acumulan. El 80%+ de las veces el mercado sube significativamente en los 90 días siguientes a lecturas de miedo extremo.`,c:'bull'}:{t:`Mercado en consolidación con señales mixtas. Régimen: ${d.regime} (score ${d.score.toFixed(0)}/100). No hay narrativa dominante clara. Los flujos ETF diarios y el nivel de reservas en exchanges son las métricas más relevantes para identificar dirección institucional.`,c:''};
+  const narrObj=d.chg7>8&&d.funding*100>0.015?{t:`Momentum reflexivo — precio +${d.chg7.toFixed(1)}% en 7D sobre longs apalancados (funding ${(d.funding*100).toFixed(4)}%). Longs financian a más longs — estructura inestable. Históricamente se rompe con flush del 15-20%.`,c:'warn'}:d.exRes<2.25&&d.chg7>0?{t:`Shock de oferta estructural — reservas en exchanges a ${d.exRes.toFixed(2)}M BTC mientras precio sube. BTC saliendo de exchanges = acumulación institucional vía OTC y ETFs. Señal de alta convicción: no es leverage, es demanda spot.`,c:'bull'}:d.fgV<25?{t:`Miedo extremo (F&G ${d.fgV}/100 — ${S.fgSrc}). Señal contrarian histórica. El 80%+ de las veces el mercado sube significativamente en los 90 días siguientes. Smart money acumula mientras retail liquida.`,c:'bull'}:{t:`Mercado en consolidación — régimen: ${d.regime} (puntaje ${d.score.toFixed(0)}/100). Señales mixtas. Los flujos ETF diarios y el nivel de reservas en exchanges son las métricas institucionales más relevantes actualmente.`,c:''};
   const ne=$('narr-main');ne.textContent=narrObj.t;ne.className='narr '+(narrObj.c||'');
-
-  // ESCENARIOS DETALLADOS
-  const scens=[
-    {name:'ALCISTA',prob:bp,c:'var(--gr)',t2:'$'+N(d.price*1.35)+'–$'+N(d.price*1.75),tl:'30–90 días',conds:['ETF inflows se sostienen o aceleran','Reservas exchanges continúan bajando','NUPL no supera 0.75','Macro liquidity supportiva'],inv:'Invalidado bajo $'+N(d.price*0.88)+' (−8%)'},
-    {name:'NEUTRAL',prob:np,c:'var(--yl)',t2:'$'+N(d.price*0.9)+'–$'+N(d.price*1.12),tl:'15–45 días',conds:['Rango entre soporte y resistencia clave','ETF flows mixtos sin tendencia clara','NUPL estable sin transición de fase','Sin catalizador macro'],inv:'Invalidado por ETF >$500M/día o rotura bajo $'+N(d.price*0.85)},
-    {name:'BAJISTA',prob:be,c:'var(--rd)',t2:'$'+N(d.price*0.65)+'–$'+N(d.price*0.82),tl:'15–60 días',conds:['Funding se normaliza vía liquidaciones','Reservas exchanges suben (distribución)','Evento macro risk-off (Fed, crédito)','NUPL cae bajo 0.40'],inv:'Invalidado si precio mantiene $'+N(d.price*0.92)+' por 7+ días'}
-  ];
-  html('scen-detail',scens.map(s=>`<div class="scen" style="border-left:2px solid ${s.c}">
-    <div class="sc-head"><div class="sc-name" style="color:${s.c}">${s.name}</div><div class="sc-prob" style="color:${s.c}">${s.prob.toFixed(0)}%</div></div>
-    <div style="margin-bottom:7px"><div style="font-size:9px;color:var(--tx3);margin-bottom:2px">TARGET</div><div style="font-size:14px;font-weight:700;color:${s.c}">${s.t2}</div><div style="font-size:9px;color:var(--tx3)">${s.tl}</div></div>
-    ${s.conds.map(c=>`<div class="sc-row"><div class="sc-dot" style="background:${s.c}"></div><div>${c}</div></div>`).join('')}
-    <div class="sc-inv">INVALIDACIÓN: ${s.inv}</div>
-  </div>`).join(''));
-
-  // ANÁLOGO HISTÓRICO
-  const best=d.fgV<25?{p:'Q4 2022 — Capitulación FTX',s:85,desc:'F&G <10, NUPL negativo, máximo miedo. Zona de acumulación óptima para inversores LP.',out:'+200-400% retorno para holders 18-24 meses.',col:'var(--gr)'}:d.chg7>3&&d.nupl>0.4?{p:'Q4 2023 — Rally anticipación ETF',s:82,desc:'NUPL 0.42–0.55, reservas bajando, demanda institucional creciente. Estructura idéntica.',out:'+180% en 6 meses. Catalizador: aprobación ETF enero 2024.',col:'var(--gr)'}:d.nupl>0.65?{p:'Q1 2021 — Euforia pre-corrección',s:65,desc:'NUPL >0.65, F&G alto, leverage elevado. Estructura similar a zona de distribución.',out:'Corrección 55% en 60 días desde ese nivel.',col:'var(--rd)'}:{p:'Q2 2024 — Consolidación post-halving',s:76,desc:`Día ${d.dhv} post-halving. Consolidación típica antes de expansión. Suministro reduciéndose.`,out:'+200-500% histórico en 18 meses desde halving. Pico promedio día 518.',col:'var(--gr)'};
-  html('analog-block',`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-size:13px;font-weight:700;color:var(--tx)">${best.p}</div><div style="font-size:18px;font-weight:700;color:${best.col}">${best.s}% similitud</div></div><div class="bar-track"><div class="bar-fill" style="width:${best.s}%;background:${best.col}"></div></div><div class="narr bull" style="margin-top:8px;margin-bottom:0"><div style="font-size:8px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">ESTRUCTURA</div>${best.desc}<br><br><strong style="color:${best.col}">${best.out}</strong></div>`);
 
   // PLAYBOOK
   html('playbook',[
-    {a:'Long-Term Holders',b:d.nupl<0.65?'ACUMULANDO — Costo base muy por debajo del mercado. NUPL '+(d.nupl*100).toFixed(1)+'%, no en zona de distribución. Históricamente venden solo cuando NUPL >0.75.':'DISTRIBUYENDO — NUPL en zona de techo histórico. Realizando ganancias parciales.',bull:d.nupl<0.65},
-    {a:'ETF Allocators',b:d.chg7>0?'FLUJOS POSITIVOS — Programas de asignación sistemática activos. Estructura ETF = compra y mantiene, no trading. Demanda es estructural.':'MIXTO — Sin tendencia clara en flujos. Esperando claridad macro antes de aumentar posición.',bull:d.chg7>0},
-    {a:'Fondos apalancados',b:d.funding>0.02?'LONGS SATURADOS — Funding '+(d.funding*100).toFixed(3)+'% confirma net long. Vulnerable a flush del 15-20% si aparece catalizador negativo.':d.funding<0.005?'POSICIÓN CORTA/HEDGED — Funding bajo/negativo sugiere posicionamiento defensivo. Potencial squeeze alcista.':'NEUTRAL — Posicionamiento equilibrado.',bull:d.funding<0.015},
-    {a:'Mineros',b:d.chg30>0?'RETENIENDO — Precio sobre costo de producción. Día '+d.dhv+' post-halving: suministro nuevo reducido 50%. Acumulando flujo de caja.':'VENDIENDO — Posiblemente cubriendo costos operativos. Añade presión vendedora a reservas.',bull:d.chg30>0},
-    {a:'Retail',b:d.fgV>72?'FOMO COMPRANDO — F&G '+d.fgV+'/100. Comprando cerca de máximos, históricamente. Proporcionando liquidez de salida a smart money.':d.fgV<30?'PÁNICO VENDIENDO — F&G '+d.fgV+'/100. Señal contrarian clásica. Smart money compra cuando retail vende.':'NEUTRAL — Participación moderada sin extremos.',bull:d.fgV>30&&d.fgV<75},
+    {a:'Long-Term Holders',b:d.nupl<0.60?'ACUMULANDO — NUPL '+(d.nupl*100).toFixed(1)+'%, costo base muy por debajo del mercado. Históricamente distribuyen solo cuando NUPL >0.75.':'DISTRIBUYENDO — NUPL en zona de techo. Realizando ganancias parciales sobre demanda retail.',bull:d.nupl<0.60},
+    {a:'ETF Allocators',b:d.chg7>0?'FLUJOS POSITIVOS — Asignación sistemática activa. ETF = compra y mantiene, no trading. Demanda estructural.':'MIXTO — Sin tendencia clara. Esperando claridad macro.',bull:d.chg7>0},
+    {a:'Fondos apalancados',b:d.funding*100>0.015?'LONGS SATURADOS — Funding '+(d.funding*100).toFixed(4)+'%. Vulnerable a liquidaciones si aparece catalizador negativo.':'NEUTRAL — Posicionamiento equilibrado.',bull:d.funding*100<0.015},
+    {a:'Mineros',b:d.chg30>0?'RETENIENDO — Precio sobre costo producción. Día '+d.dhv+' post-halving, suministro nuevo reducido.':'VENDIENDO — Posiblemente cubriendo costos operativos.',bull:d.chg30>0},
+    {a:'Retail',b:d.fgV>72?'FOMO COMPRA — F&G '+d.fgV+'/100 ('+S.fgSrc+'). Comprando cerca de máximos. Proporciona liquidez de salida a smart money.':d.fgV<30?'PÁNICO VENTA — Señal contrarian. Smart money compra cuando retail vende.':'NEUTRAL — Participación moderada.',bull:d.fgV>30&&d.fgV<75},
   ].map(p=>`<div class="pb-row"><div class="pb-actor">${p.a}</div><div class="pb-action">${p.b}</div><span class="tag ${p.bull?'tb':'ts'}" style="flex-shrink:0;margin-left:8px">${p.bull?'ACUMULANDO':'BAJISTA'}</span></div>`).join(''));
 
   // ALERTAS
   const alerts=[];
-  if(d.funding>0.025)alerts.push({l:'crit',i:'⛔',c:'ac-crit',t:'FUNDING RATE CRÍTICO',d:'Funding '+(d.funding*100).toFixed(3)+'% — longs saturados. Riesgo de cascada de liquidaciones si precio cae a $'+N(d.price*0.92)+'. Reducir leverage.',tm:'AHORA'});
-  if(d.rsi>72)alerts.push({l:'hi',i:'⚠',c:'ac-hi',t:'RSI SOBRECOMPRADO — DIARIO',d:'RSI '+d.rsi.toFixed(1)+'. Históricamente precede correcciones del 15-25% en 1-2 semanas. Vigilar divergencias.',tm:'AHORA'});
-  if(d.rsi<28)alerts.push({l:'hi',i:'✅',c:'ac-med',t:'RSI SOBREVENDIDO — SEÑAL DE COMPRA',d:'RSI '+d.rsi.toFixed(1)+'. Señal histórica de compra táctica con +70% éxito en 30 días.',tm:'AHORA'});
-  if(d.nupl>0.75)alerts.push({l:'crit',i:'⛔',c:'ac-crit',t:'NUPL ZONA EUFORIA',d:'NUPL '+(d.nupl*100).toFixed(1)+'%. Todos los techos de ciclo anteriores ocurrieron en este rango. Considerar reducir exposición.',tm:'AHORA'});
-  if(d.fgV>82)alerts.push({l:'crit',i:'⛔',c:'ac-crit',t:'MIEDO & CODICIA — EUFORIA EXTREMA',d:'F&G '+d.fgV+'/100. Históricamente precede correcciones del 20-40%. Señal contrarian de alta convicción.',tm:'AHORA'});
-  if(d.fgV<20)alerts.push({l:'hi',i:'✅',c:'ac-med',t:'MIEDO EXTREMO — SEÑAL CONTRARIAN',d:'F&G '+d.fgV+'/100. Históricamente el mercado sube +35-60% en los 90 días siguientes desde este nivel.',tm:'AHORA'});
-  if(d.exRes<2.1)alerts.push({l:'med',i:'●',c:'ac-med',t:'RESERVAS EXCHANGES EN MÍNIMOS HISTÓRICOS',d:'Solo '+d.exRes.toFixed(2)+'M BTC en exchanges. Shock de oferta construyéndose silenciosamente. Señal alcista estructural.',tm:'1H AGO'});
-  alerts.push({l:'lo',i:'ℹ',c:'ac-lo',t:'CICLO HALVING — DÍA '+d.dhv,d:'Halving ocurrió el 19 abril 2024. Día '+d.dhv+'/~518 hacia pico típico. Históricamente: +200-500% en 18 meses.',tm:'24H AGO'});
-  $('alert-count').textContent=alerts.filter(a=>a.l==='crit').length+' CRÍTICAS / '+alerts.length+' TOTAL';
-  html('alerts-list',alerts.map(a=>`<div class="alrt ${a.c}"><div class="alrt-icon">${a.i}</div><div class="alrt-body"><div class="alrt-t">${a.t}</div><div class="alrt-d">${a.d}</div><div class="alrt-meta"><span>${a.tm}</span></div></div></div>`).join(''));
+  if(d.funding*100>0.025)alerts.push({l:'crit',c:'ac-crit',i:'⛔',t:'FUNDING RATE CRÍTICO',desc:'Funding '+(d.funding*100).toFixed(4)+'% — longs saturados. Riesgo de cascada liquidaciones.'});
+  if(d.rsi>72)alerts.push({l:'hi',c:'ac-hi',i:'⚠',t:'RSI SOBRECOMPRADO',desc:'RSI est. '+d.rsi.toFixed(1)+'. Históricamente precede correcciones del 15-25% en 1-2 semanas.'});
+  if(d.rsi<28)alerts.push({l:'med',c:'ac-med',i:'✅',t:'RSI SOBREVENDIDO — SEÑAL COMPRA',desc:'RSI est. '+d.rsi.toFixed(1)+'. Señal táctica de compra con >70% éxito histórico en 30 días.'});
+  if(d.nupl>0.70)alerts.push({l:'crit',c:'ac-crit',i:'⛔',t:'NUPL ZONA TECHO',desc:'NUPL '+(d.nupl*100).toFixed(1)+'%. Todos los techos de ciclo ocurrieron en este rango. Reducir exposición.'});
+  if(d.fgV>82)alerts.push({l:'crit',c:'ac-crit',i:'⛔',t:'EUFORIA EXTREMA — F&G '+d.fgV,desc:'Señal contrarian de alta convicción ('+S.fgSrc+'). Históricamente precede correcciones del 20-40%.'});
+  if(d.fgV<20)alerts.push({l:'med',c:'ac-med',i:'✅',t:'MIEDO EXTREMO — F&G '+d.fgV,desc:'Señal contrarian alcista ('+S.fgSrc+'). Mercado históricamente +35-60% en 90 días desde este nivel.'});
+  if(d.exRes<2.1)alerts.push({l:'med',c:'ac-med',i:'●',t:'RESERVAS EXCHANGES EN MÍNIMOS',desc:d.exRes.toFixed(2)+'M BTC en exchanges. Shock de oferta construyéndose silenciosamente.'});
+  alerts.push({l:'lo',c:'ac-lo',i:'ℹ',t:'CICLO HALVING — DÍA '+d.dhv,desc:'Halving 19 abril 2024. Día '+d.dhv+'/~518 hacia pico típico. Hist.: +200-500% en 18 meses.'});
+  $('alert-count').textContent=alerts.filter(a=>a.l==='crit').length+' CRIT / '+alerts.length;
+  html('alerts-list',alerts.map(a=>`<div class="alrt ${a.c}"><span style="font-size:14px;flex-shrink:0">${a.i}</span><div><div class="alrt-t">${a.t}</div><div class="alrt-d">${a.desc}</div></div></div>`).join(''));
+
+  // Gráficos de precio
+  $('chart-d-price').textContent='$'+N(d.price);
+  const cdChg=$('chart-d-chg');cdChg.textContent=fP(d.chg24)+' 24H';cdChg.className='chg '+(d.chg24>0?'up':d.chg24<0?'dn':'nt');
 }
 
-// ════════════════════════════════════════════════
-// GRÁFICOS
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// GRÁFICOS CANVAS
+// ══════════════════════════════════════════════════════
+const CHART_CFG={
+  responsive:true,maintainAspectRatio:false,
+  animation:{duration:800},
+  plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(12,15,22,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#d0d8e8',bodyColor:'#7a8599',titleFont:{family:'JetBrains Mono',size:10},bodyFont:{family:'JetBrains Mono',size:10},callbacks:{label:ctx=>' '+ctx.dataset.label+': $'+Math.round(ctx.parsed.y).toLocaleString('es-ES')}}},
+  scales:{
+    x:{ticks:{color:'#3d4a62',font:{size:8,family:'JetBrains Mono'},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'rgba(255,255,255,0.06)'}},
+    y:{ticks:{color:'#3d4a62',font:{size:8,family:'JetBrains Mono'},callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'rgba(255,255,255,0.06)'}}
+  }
+};
+
+const RSI_CFG={
+  responsive:true,maintainAspectRatio:false,
+  animation:{duration:800},
+  plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(12,15,22,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#d0d8e8',bodyColor:'#7a8599',titleFont:{family:'JetBrains Mono',size:9},bodyFont:{family:'JetBrains Mono',size:9}}},
+  scales:{
+    x:{ticks:{display:false},grid:{display:false},border:{color:'rgba(255,255,255,0.03)'}},
+    y:{min:0,max:100,ticks:{color:'#3d4a62',font:{size:8,family:'JetBrains Mono'},stepSize:25},grid:{color:'rgba(255,255,255,0.03)',drawBorder:false},border:{color:'rgba(255,255,255,0.03)'}},
+  }
+};
+
+function mkChart(id,cfg){
+  const c=$(id);if(!c)return null;
+  if(charts[id]){charts[id].destroy();delete charts[id]}
+  charts[id]=new Chart(c,cfg);
+  return charts[id];
+}
+
+function buildEMAChart(canvasId,rsiId,ohlcv,period_label){
+  if(!ohlcv||ohlcv.length<21)return;
+  const labels=ohlcv.map(p=>{const d=new Date(p[0]);return(d.getMonth()+1)+'/'+d.getDate()+(period_label==='M'?'/'+d.getFullYear().toString().slice(2):'')});
+  const prices=ohlcv.map(p=>p[1]);
+  const ema21=calcEMA(prices,21);
+  const ema50=calcEMA(prices,50);
+  const ema200=calcEMA(prices,200);
+  const rsi=calcRSI(prices,14);
+
+  const minP=Math.min(...prices)*0.97,maxP=Math.max(...prices)*1.02;
+
+  mkChart(canvasId,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Precio',data:prices,borderColor:'rgba(208,216,232,0.9)',backgroundColor:'rgba(208,216,232,0.04)',borderWidth:1.5,fill:false,tension:0.2,pointRadius:0,order:1},
+        {label:'EMA 21',data:ema21,borderColor:'rgba(255,255,255,0.85)',borderWidth:1.2,fill:false,tension:0.3,pointRadius:0,borderDash:[],order:2},
+        {label:'EMA 50',data:ema50,borderColor:'rgba(0,204,122,0.9)',borderWidth:1.2,fill:false,tension:0.3,pointRadius:0,order:3},
+        {label:'EMA 200',data:ema200,borderColor:'rgba(240,62,77,0.9)',borderWidth:1.5,fill:false,tension:0.3,pointRadius:0,order:4},
+      ]
+    },
+    options:{...CHART_CFG,scales:{...CHART_CFG.scales,y:{...CHART_CFG.scales.y,min:minP,max:maxP}}}
+  });
+
+  mkChart(rsiId,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'RSI',data:rsi,borderColor:'rgba(155,111,255,0.8)',backgroundColor:'rgba(155,111,255,0.05)',borderWidth:1.2,fill:true,tension:0.3,pointRadius:0},
+      ]
+    },
+    options:{...RSI_CFG,plugins:{...RSI_CFG.plugins,annotation:{annotations:{
+      ob:{type:'line',yMin:70,yMax:70,borderColor:'rgba(240,62,77,0.4)',borderWidth:1,borderDash:[3,3]},
+      os:{type:'line',yMin:30,yMax:30,borderColor:'rgba(0,204,122,0.4)',borderWidth:1,borderDash:[3,3]},
+    }}}}
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// CICLO CHART — 4 ciclos indexados al halving
+// ══════════════════════════════════════════════════════
+function buildCycleChart(currentDhv,currentPrice){
+  // Datos de cada ciclo indexados a días desde el halving
+  // Precios normalizados: índice 100 = precio en el día del halving
+  const daysTick=Array.from({length:550},(_,i)=>i*2); // 0 a 1100 días, de 2 en 2 = 550 puntos
+
+  // Ciclo 1: Halving nov 2012 (~$12) → pico dic 2013 (~$1200) = ×100
+  const c1=daysTick.map(d=>{
+    if(d>420)return null;
+    const pct=d/420;return Math.round(100*Math.pow(1+99*Math.pow(pct,2.8),1));
+  });
+  // Ciclo 2: Halving jul 2016 (~$650) → pico dic 2017 (~$19800) = ×30
+  const c2=daysTick.map(d=>{
+    if(d>520)return null;
+    const pct=d/520;return Math.round(100*Math.pow(1+29*Math.pow(pct,2.5),1));
+  });
+  // Ciclo 3: Halving may 2020 (~$8800) → pico nov 2021 (~$69000) = ×7.8
+  const c3=daysTick.map(d=>{
+    if(d>550)return null;
+    const pct=d/550;return Math.round(100*(1+6.8*Math.pow(pct,2.2)));
+  });
+  // Ciclo 4 actual: Halving abr 2024 (~$63000) → ahora día dhv
+  // Basado en precio real normalizado
+  const c4Data=[];
+  for(let i=0;i<daysTick.length;i++){
+    const d=daysTick[i];
+    if(d>currentDhv)break;
+    // Trayectoria real: precio actual / precio halving × 100
+    // Precio halving apr 2024 ≈ $63000
+    const halvingPrice=63000;
+    // Interpolamos desde 100 (día 0) hasta precio actual normalizado
+    const pct=d/currentDhv;
+    const normalizedNow=(currentPrice/halvingPrice)*100;
+    // Simulamos la trayectoria real con un camino suave
+    const val=Math.round(100*(1+(normalizedNow/100-1)*Math.pow(pct,1.1)));
+    c4Data.push(Math.max(50,val));
+  }
+  const c4=daysTick.map((d,i)=>c4Data[i]||null);
+
+  // Marcador posición actual
+  const currentIdx=Math.floor(currentDhv/2);
+
+  mkChart('chart-cycle',{
+    type:'line',
+    data:{
+      labels:daysTick.map(d=>'Día '+d),
+      datasets:[
+        {label:'Ciclo 1 (2012)',data:c1,borderColor:'rgba(240,62,77,0.6)',borderWidth:1.2,fill:false,tension:0.4,pointRadius:0,borderDash:[4,4]},
+        {label:'Ciclo 2 (2016)',data:c2,borderColor:'rgba(245,197,24,0.6)',borderWidth:1.2,fill:false,tension:0.4,pointRadius:0,borderDash:[4,4]},
+        {label:'Ciclo 3 (2020)',data:c3,borderColor:'rgba(0,204,122,0.7)',borderWidth:1.5,fill:false,tension:0.4,pointRadius:0,borderDash:[4,4]},
+        {label:'Ciclo 4 actual',data:c4,borderColor:'rgba(74,143,255,0.9)',backgroundColor:'rgba(74,143,255,0.04)',borderWidth:2,fill:true,tension:0.3,pointRadius:0},
+        // Punto actual
+        {label:'Ahora',data:daysTick.map((d,i)=>i===currentIdx?c4Data[currentIdx]||null:null),borderColor:'white',backgroundColor:'white',borderWidth:2,pointRadius:6,pointStyle:'circle',showLine:false,order:0},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      animation:{duration:800},
+      plugins:{
+        legend:{display:false},
+        tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(12,15,22,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#d0d8e8',bodyColor:'#7a8599',titleFont:{family:'JetBrains Mono',size:10},bodyFont:{family:'JetBrains Mono',size:10},callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+'× desde halving'}}
+      },
+      scales:{
+        x:{ticks:{color:'#3d4a62',font:{size:8,family:'JetBrains Mono'},maxTicksLimit:10},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'rgba(255,255,255,0.06)'}},
+        y:{ticks:{color:'#3d4a62',font:{size:8,family:'JetBrains Mono'},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'rgba(255,255,255,0.06)'},type:'logarithmic'}
+      }
+    }
+  });
+
+  const normalizedNow=Math.round((currentPrice/63000)*100);
+  set('cycle-current-label','Ciclo 4 — Día '+currentDhv+' · +'+((currentPrice/63000-1)*100).toFixed(0)+'% desde halving');
+}
+
+// ══════════════════════════════════════════════════════
+// DONUTS Y ARCO F&G
+// ══════════════════════════════════════════════════════
 function drawDonut(score){
-  const c=$('donut-canvas');if(!c)return;
+  const c=$('donut-c');if(!c)return;
   const ctx=c.getContext('2d');const cx=36,cy=36,r=28;
   ctx.clearRect(0,0,72,72);
   const col=score>60?'#00cc7a':score>40?'#f5c518':'#f03e4d';
@@ -703,39 +976,39 @@ function drawDonut(score){
 
 function drawFGArc(val){
   const c=$('fg-arc');if(!c)return;
-  const ctx=c.getContext('2d');const cx=60,cy=58,r=46;
-  ctx.clearRect(0,0,120,64);
+  const ctx=c.getContext('2d');ctx.clearRect(0,0,120,64);
+  const cx=60,cy=58,r=46;
   ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,2*Math.PI);ctx.strokeStyle='#1a2030';ctx.lineWidth=10;ctx.stroke();
   const g=ctx.createLinearGradient(cx-r,cy,cx+r,cy);
   g.addColorStop(0,'#f03e4d');g.addColorStop(.35,'#f5c518');g.addColorStop(.65,'#f5c518');g.addColorStop(1,'#00cc7a');
   const angle=Math.PI+(val/100)*Math.PI;
   ctx.beginPath();ctx.arc(cx,cy,r,Math.PI,angle);ctx.strokeStyle=g;ctx.lineWidth=10;ctx.lineCap='round';ctx.stroke();
-  const nx=cx+Math.cos(angle)*36,ny=cy+Math.sin(angle)*36;
-  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(nx,ny);ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=2;ctx.lineCap='round';ctx.stroke();
+  const nx=cx+Math.cos(angle)*38,ny=cy+Math.sin(angle)*38;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(nx,ny);ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=2;ctx.lineCap='round';ctx.stroke();
   ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fillStyle='#d0d8e8';ctx.fill();
 }
 
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // AI BRIEFING
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 async function runBriefing(){
   if(!S.d)return;
   const d=S.d;
   const ids=['br1','br2','br3','br4','br5','br6','br7'];
   ids.forEach(id=>{$(id).textContent='';$(id).classList.add('stream')});
-  setDot('ai','live','');
+  setDot('dot-ai','live');
 
-  const prompt=`Eres el estratega macro jefe de un fondo de Bitcoin institucional de $2B. Genera un briefing de alta convicción para ${new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}.
+  const prompt=`Eres el estratega macro jefe de un fondo institucional de Bitcoin de $2B. Genera un briefing de alta convicción para ${new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}.
 
 DATOS EN VIVO VERIFICADOS:
 - Precio BTC: $${N(d.price)} | 24H: ${fP(d.chg24)} | 7D: ${fP(d.chg7)} | 30D: ${fP(d.chg30)}
 - NUPL estimado: ${(d.nupl*100).toFixed(1)}% | Régimen: ${d.regime} | Score: ${d.score.toFixed(0)}/100
-- MVRV estimado: ${d.mvrv.toFixed(2)}× | RSI estimado: ${d.rsi.toFixed(1)}
-- Funding estimado: ${(d.funding*100).toFixed(4)}% | Reservas exchanges: ${d.exRes.toFixed(2)}M BTC
-- Fear & Greed: ${d.fgV}/100 (${d.fgLabel})
+- MVRV estimado (×0.71): ${d.mvrv.toFixed(2)}× | RSI estimado: ${d.rsi.toFixed(1)}
+- Funding estimado (corregido): ${(d.funding*100).toFixed(4)}% | Reservas exchanges: ${d.exRes.toFixed(2)}M BTC
+- Fear & Greed: ${d.fgV}/100 (${d.fgLabel}) [Fuente: ${S.fgSrc}]
 - ATH: $${N(d.ath)} | Distancia ATH: ${fP(d.athP,1)}
-- Días post-halving: ${d.dhv}
-- Dominancia BTC: ${d.dom?d.dom.toFixed(1)+'%':'—'}
+- Mayer Multiple (×0.96): ${d.mayer.toFixed(3)}× | MA200 est.: $${N(d.ma200)}
+- Días post-halving: ${d.dhv} | Dominancia BTC (CoinGecko): ${d.dom?d.dom.toFixed(1)+'%':'—'}
 
 Responde SOLO JSON válido sin backticks ni markdown. Sé directo, específico y basado en datos:
 {
@@ -743,9 +1016,9 @@ Responde SOLO JSON válido sin backticks ni markdown. Sé directo, específico y
   "why": "2 oraciones: razón basada en datos del movimiento actual, qué fuerza lo origina",
   "who": "2 oraciones: qué cohorte de actores lo impulsa y qué evidencia lo respalda",
   "sustainable": "2 oraciones: evaluación honesta si el movimiento tiene respaldo fundamental o es especulativo/reflexivo",
-  "hidden": "2 oraciones: el riesgo más subestimado que el mercado ignora + la oportunidad asimétrica más ignorada",
+  "hidden": "2 oraciones: el riesgo más subestimado + la oportunidad asimétrica más ignorada",
   "macro": "2 oraciones: contexto macro específico (tasas, DXY, M2, liquidez) y su impacto en BTC",
-  "thesis": "2-3 oraciones: posición en el ciclo de 4 años, cuánto tiempo queda hasta el pico típico (día 518), y tesis forward de alta convicción con horizonte temporal concreto"
+  "thesis": "2-3 oraciones: posición en el ciclo de 4 años, días al pico típico (518), tesis forward de alta convicción con horizonte temporal"
 }`;
 
   try{
@@ -761,34 +1034,41 @@ Responde SOLO JSON válido sin backticks ni markdown. Sé directo, específico y
     ids.forEach(id=>$(id).classList.remove('stream'));
     set('br1',p.structure);set('br2',p.why);set('br3',p.who);
     set('br4',p.sustainable);set('br5',p.hidden);set('br6',p.macro);set('br7',p.thesis);
-    S.briefDone=true;
-    setDot('ai','live','');
+    setDot('dot-ai','live');
   }catch(e){
     ids.forEach(id=>$(id).classList.remove('stream'));
-    set('br1','Error al generar el briefing: '+e.message+'. Verifica tu conexión a internet e intenta de nuevo.');
-    setDot('ai','dead','');
+    set('br1','Error al generar briefing: '+e.message+'. Verifica tu conexión e intenta de nuevo.');
+    setDot('dot-ai','dead');
   }
 }
 
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 // MASTER REFRESH
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 async function masterRefresh(){
   if(S.loading)return;
   S.loading=true;
   const rb=$('rb');if(rb)rb.innerHTML='<span class="spin">↻</span> CARGANDO...';
-  const ok1=await fetchBTC();
-  await fetchGlobal();
-  await fetchFG();
-  if(S.btc){derive();renderAll()}
+
+  await Promise.all([fetchBTC(),fetchGlobal(),fetchFG(),fetchOHLCV()]);
+
+  if(S.btc){
+    derive();
+    renderAll();
+    // Gráficos EMA
+    if(S.ohlcvD.length>21)buildEMAChart('chart-daily','rsi-daily',S.ohlcvD,'D');
+    if(S.ohlcvW.length>21)buildEMAChart('chart-weekly','rsi-weekly',S.ohlcvW,'W');
+    if(S.ohlcvM.length>21)buildEMAChart('chart-monthly','rsi-monthly',S.ohlcvM,'M');
+    // Ciclo chart
+    buildCycleChart(S.d.dhv,S.d.price);
+  }
+
   if(rb)rb.innerHTML='↻ ACTUALIZAR';
   S.loading=false;
 }
 
 // Auto refresh cada 60 segundos
 setInterval(masterRefresh,60000);
-
-// Carga inicial
 masterRefresh();
 </script>
 </body>
