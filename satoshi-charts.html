@@ -46,12 +46,10 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
 .ema-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--tx2)}
 .ema-dot{width:18px;height:2px;border-radius:1px;flex-shrink:0}
 .ema-val{font-weight:600}
-.chart-wrap{position:relative;width:100%}
-.chart-box{width:100%;background:var(--bg2);border-radius:3px;overflow:hidden}
-.chart-main{width:100%;height:320px}
-.chart-sm{width:100%;height:200px}
-.chart-rsi{width:100%;height:80px;border-top:1px solid var(--b);margin-top:2px}
-.chart-rsi-sm{width:100%;height:60px;border-top:1px solid var(--b);margin-top:2px}
+.chart-main{width:100%;height:320px;background:var(--bg2);border-radius:3px}
+.chart-sm{width:100%;height:200px;background:var(--bg2);border-radius:3px}
+.chart-rsi{width:100%;height:80px;background:var(--bg2);border-radius:3px;border-top:1px solid var(--b);margin-top:2px}
+.chart-rsi-sm{width:100%;height:60px;background:var(--bg2);border-radius:3px;border-top:1px solid var(--b);margin-top:2px}
 .rsi-head{display:flex;align-items:center;gap:8px;padding:3px 0 1px;font-size:8px;color:var(--tx3);letter-spacing:.08em}
 .rsi-num{font-weight:700;color:var(--pu);font-size:10px}
 .rsi-sig{font-size:8px;padding:1px 5px;border-radius:2px}
@@ -59,8 +57,8 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
 .leg-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--tx2)}
 .leg-c{width:8px;height:11px;border-radius:1px;flex-shrink:0}
 .leg-l{width:18px;height:2px;border-radius:1px;flex-shrink:0}
-.loading-box{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--tx3);font-size:10px;letter-spacing:.1em;gap:6px}
-.loading-spinner{width:24px;height:24px;border:2px solid var(--b2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+.loading-box{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--tx3);font-size:10px;letter-spacing:.08em;gap:8px}
+.loading-spin{width:20px;height:20px;border:2px solid var(--b2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
 .cycle-card{background:var(--bg1);border:1px solid var(--b);border-radius:4px;padding:10px 13px;margin-bottom:8px}
 .footer{padding:5px 16px;background:var(--bg1);border-top:1px solid var(--b);display:flex;justify-content:space-between;font-size:9px;color:var(--tx3);letter-spacing:.07em;flex-wrap:wrap;gap:4px}
 ::-webkit-scrollbar{width:4px;height:4px}
@@ -84,7 +82,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
     <div class="ts"><span class="tsl">F&G</span><span class="tsv" id="pfg">—</span></div>
   </div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-    <div class="pill"><span class="dot dot-dead" id="dot-data"></span><span id="ptxt">CARGANDO</span></div>
+    <div class="pill"><span class="dot dot-warn" id="dot-data"></span><span id="ptxt">CARGANDO</span></div>
     <button class="rbtn" id="rb" onclick="loadAll()">↻ ACTUALIZAR</button>
     <span style="font-size:9px;color:var(--tx3)" id="clk">—</span>
   </div>
@@ -92,7 +90,6 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
 
 <div class="content">
 
-<!-- DIARIO -->
 <div class="ccard gmb">
   <div class="cc-head">
     <div>
@@ -109,19 +106,9 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
       <span class="chg nt" id="chart-d-chg" style="margin-top:2px;display:inline-block">—</span>
     </div>
   </div>
-  <div class="chart-box">
-    <div class="chart-main" id="wrap-d">
-      <div class="loading-box"><div class="loading-spinner"></div>CARGANDO VELAS OHLC...</div>
-    </div>
-  </div>
-  <div class="rsi-head">
-    <span>RSI (14)</span>
-    <span class="rsi-num" id="rsi-d-num">—</span>
-    <span class="rsi-sig" id="rsi-d-sig"></span>
-  </div>
-  <div class="chart-box">
-    <div class="chart-rsi" id="wrap-rsi-d"></div>
-  </div>
+  <div class="chart-main" id="wrap-d"><div class="loading-box"><div class="loading-spin"></div>CARGANDO...</div></div>
+  <div class="rsi-head"><span>RSI (14)</span><span class="rsi-num" id="rsi-d-num">—</span><span class="rsi-sig" id="rsi-d-sig"></span></div>
+  <div class="chart-rsi" id="wrap-rsi-d"></div>
   <div class="legend" style="margin-top:8px">
     <div class="leg-item"><div class="leg-c" style="background:#26a69a"></div>Vela alcista</div>
     <div class="leg-item"><div class="leg-c" style="background:#ef5350"></div>Vela bajista</div>
@@ -132,26 +119,18 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
   </div>
 </div>
 
-<!-- SEMANAL + MENSUAL -->
 <div class="g2">
   <div class="ccard" style="margin-bottom:0">
-    <div class="cc-head">
-      <div>
-        <div class="cc-title">SEMANAL · EMA 21 / 50 / 200</div>
-        <div class="ema-bar">
-          <div class="ema-item"><div class="ema-dot" style="background:#fff"></div><span class="ema-val" id="v21w">—</span></div>
-          <div class="ema-item"><div class="ema-dot" style="background:var(--gr)"></div><span class="ema-val" id="v50w">—</span></div>
-          <div class="ema-item"><div class="ema-dot" style="background:var(--rd)"></div><span class="ema-val" id="v200w">—</span></div>
-        </div>
-      </div>
+    <div class="cc-head"><div><div class="cc-title">SEMANAL · EMA 21 / 50 / 200</div>
+      <div class="ema-bar">
+        <div class="ema-item"><div class="ema-dot" style="background:#fff"></div><span class="ema-val" id="v21w">—</span></div>
+        <div class="ema-item"><div class="ema-dot" style="background:var(--gr)"></div><span class="ema-val" id="v50w">—</span></div>
+        <div class="ema-item"><div class="ema-dot" style="background:var(--rd)"></div><span class="ema-val" id="v200w">—</span></div>
+      </div></div>
     </div>
-    <div class="chart-box">
-      <div class="chart-sm" id="wrap-w">
-        <div class="loading-box"><div class="loading-spinner"></div>CARGANDO...</div>
-      </div>
-    </div>
+    <div class="chart-sm" id="wrap-w"><div class="loading-box"><div class="loading-spin"></div>CARGANDO...</div></div>
     <div class="rsi-head"><span>RSI (14)</span><span class="rsi-num" id="rsi-w-num">—</span></div>
-    <div class="chart-box"><div class="chart-rsi-sm" id="wrap-rsi-w"></div></div>
+    <div class="chart-rsi-sm" id="wrap-rsi-w"></div>
     <div class="legend" style="margin-top:6px">
       <div class="leg-item"><div class="leg-l" style="background:#fff"></div>EMA 21</div>
       <div class="leg-item"><div class="leg-l" style="background:var(--gr)"></div>EMA 50</div>
@@ -159,23 +138,16 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
     </div>
   </div>
   <div class="ccard" style="margin-bottom:0">
-    <div class="cc-head">
-      <div>
-        <div class="cc-title">MENSUAL · EMA 21 / 50 / 200</div>
-        <div class="ema-bar">
-          <div class="ema-item"><div class="ema-dot" style="background:#fff"></div><span class="ema-val" id="v21m">—</span></div>
-          <div class="ema-item"><div class="ema-dot" style="background:var(--gr)"></div><span class="ema-val" id="v50m">—</span></div>
-          <div class="ema-item"><div class="ema-dot" style="background:var(--rd)"></div><span class="ema-val" id="v200m">—</span></div>
-        </div>
-      </div>
+    <div class="cc-head"><div><div class="cc-title">MENSUAL · EMA 21 / 50 / 200</div>
+      <div class="ema-bar">
+        <div class="ema-item"><div class="ema-dot" style="background:#fff"></div><span class="ema-val" id="v21m">—</span></div>
+        <div class="ema-item"><div class="ema-dot" style="background:var(--gr)"></div><span class="ema-val" id="v50m">—</span></div>
+        <div class="ema-item"><div class="ema-dot" style="background:var(--rd)"></div><span class="ema-val" id="v200m">—</span></div>
+      </div></div>
     </div>
-    <div class="chart-box">
-      <div class="chart-sm" id="wrap-m">
-        <div class="loading-box"><div class="loading-spinner"></div>CARGANDO...</div>
-      </div>
-    </div>
+    <div class="chart-sm" id="wrap-m"><div class="loading-box"><div class="loading-spin"></div>CARGANDO...</div></div>
     <div class="rsi-head"><span>RSI (14)</span><span class="rsi-num" id="rsi-m-num">—</span></div>
-    <div class="chart-box"><div class="chart-rsi-sm" id="wrap-rsi-m"></div></div>
+    <div class="chart-rsi-sm" id="wrap-rsi-m"></div>
     <div class="legend" style="margin-top:6px">
       <div class="leg-item"><div class="leg-l" style="background:#fff"></div>EMA 21</div>
       <div class="leg-item"><div class="leg-l" style="background:var(--gr)"></div>EMA 50</div>
@@ -184,7 +156,6 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
   </div>
 </div>
 
-<!-- CICLOS -->
 <div class="cycle-card">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
     <div class="cc-title">CICLOS DE BITCOIN — INDEXADO AL HALVING · ESCALA LOGARÍTMICA</div>
@@ -201,38 +172,33 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--mono);font-size
     <div class="leg-item"><div style="width:8px;height:8px;border-radius:50%;background:white;flex-shrink:0"></div>Posición actual</div>
   </div>
 </div>
-
-</div><!-- /content -->
+</div>
 
 <div class="footer">
   <span>SATOSHI TERMINAL — CHARTS</span>
   <span id="ft">—</span>
-  <span>COINGECKO OHLC · LIGHTWEIGHT CHARTS · AUTO-SYNC 60S</span>
+  <span>COINGECKO · LIGHTWEIGHT CHARTS · AUTO-SYNC 60S</span>
 </div>
 
 <script>
 // ══════════════════════════════════════════
-// Load Lightweight Charts from multiple CDNs
+// DYNAMIC LIBRARY LOADER
 // ══════════════════════════════════════════
 function loadScript(src){
-  return new Promise((resolve,reject)=>{
+  return new Promise((res,rej)=>{
     const s=document.createElement('script');
-    s.src=src;s.onload=resolve;s.onerror=reject;
+    s.src=src;s.onload=res;s.onerror=rej;
     document.head.appendChild(s);
   });
 }
-
 async function loadLWC(){
-  const cdns=[
+  const urls=[
     'https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js',
     'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.3/lightweight-charts.standalone.production.js',
   ];
-  for(const cdn of cdns){
-    try{
-      await loadScript(cdn);
-      if(typeof LightweightCharts!=='undefined')return true;
-    }catch(e){console.warn('CDN failed:',cdn)}
+  for(const u of urls){
+    try{ await loadScript(u); if(typeof LightweightCharts!=='undefined') return true; }
+    catch(e){ console.warn('LWC CDN failed:',u); }
   }
   return false;
 }
@@ -257,9 +223,11 @@ function setDot(st,txt){
   const t=$('ptxt');if(t)t.textContent=txt||(st==='live'?'EN VIVO':st==='warn'?'PARCIAL':'ERROR');
 }
 
-function showErr(wrapId,msg){
-  const el=$(wrapId);
-  if(el)el.innerHTML=`<div class="loading-box" style="color:var(--rd)">${msg}</div>`;
+function showLoading(id,msg){
+  const e=$(id);if(e)e.innerHTML=`<div class="loading-box"><div class="loading-spin"></div>${msg}</div>`;
+}
+function showErr(id,msg){
+  const e=$(id);if(e)e.innerHTML=`<div class="loading-box" style="color:var(--rd);font-size:9px;text-align:center">${msg}</div>`;
 }
 
 // ══════════════════════════════════════════
@@ -273,7 +241,6 @@ function calcEMA(closes,n){
   for(let i=n;i<closes.length;i++)res[i]=closes[i]*k+res[i-1]*(1-k);
   return res;
 }
-
 function calcRSI(closes,n=14){
   const res=new Array(closes.length).fill(null);
   if(closes.length<n+1)return res;
@@ -291,125 +258,99 @@ function calcRSI(closes,n=14){
 }
 
 // ══════════════════════════════════════════
-// FETCH DATA
+// FETCH — múltiples fuentes con fallback
 // ══════════════════════════════════════════
-async function fetchOHLC(days){
-  // CoinGecko OHLC — real candles, CORS allowed
-  try{
-    const r=await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=${days}`);
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const raw=await r.json();
-    return raw.map(k=>({time:Math.floor(k[0]/1000),open:k[1],high:k[2],low:k[3],close:k[4]}));
-  }catch(e){console.warn('OHLC failed days='+days,e.message);return null}
+async function fetchJSON(urls){
+  for(const url of (Array.isArray(urls)?urls:[urls])){
+    try{
+      const r=await fetch(url,{headers:{'Accept':'application/json'}});
+      if(!r.ok) continue;
+      return await r.json();
+    }catch(e){ console.warn('Fetch failed:',url.slice(0,60)); }
+  }
+  return null;
 }
 
-async function fetchDaily(days){
-  try{
-    const r=await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}&interval=daily`);
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const j=await r.json();
-    return(j.prices||[]).map(p=>({time:Math.floor(p[0]/1000),close:p[1]}));
-  }catch(e){console.warn('market_chart failed',e.message);return null}
+async function fetchOHLC(days){
+  // Multiple proxy approaches
+  const base=`https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=${days}`;
+  const proxy1=`https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`;
+  const proxy2=`https://corsproxy.io/?${encodeURIComponent(base)}`;
+  const j=await fetchJSON([base,proxy1,proxy2]);
+  if(!j||!Array.isArray(j)||j.length<10) return null;
+  return j.map(k=>({time:Math.floor(k[0]/1000),open:k[1],high:k[2],low:k[3],close:k[4]}));
+}
+
+async function fetchMarketChart(days){
+  const base=`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}&interval=daily`;
+  const proxy1=`https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`;
+  const proxy2=`https://corsproxy.io/?${encodeURIComponent(base)}`;
+  const j=await fetchJSON([base,proxy1,proxy2]);
+  if(!j||!j.prices) return null;
+  return j.prices.map(p=>({time:Math.floor(p[0]/1000),close:p[1]}));
+}
+
+async function fetchPrice(){
+  const base='https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false';
+  const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`;
+  const j=await fetchJSON([base,proxy]);
+  return j?j.market_data:null;
+}
+
+async function fetchSimplePrice(){
+  const base='https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true';
+  const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(base)}`;
+  const j=await fetchJSON([base,proxy]);
+  if(!j||!j.bitcoin) return null;
+  const b=j.bitcoin;
+  return{current_price:{usd:b.usd},price_change_percentage_24h:b.usd_24h_change||0,total_volume:{usd:b.usd_24h_vol||0},market_cap:{usd:b.usd_market_cap||0},high_24h:{usd:b.usd*1.01},low_24h:{usd:b.usd*0.99},ath:{usd:126198},ath_change_percentage:{usd:((b.usd/126198)-1)*100}};
+}
+
+async function fetchFG(){
+  // CMC
+  try{const r=await fetch('https://api.coinmarketcap.com/data-api/v3/fear-greed/latest');if(r.ok){const j=await r.json();if(j.data)return{v:Math.round(j.data.value),l:j.data.value_classification,src:'CMC'}}}catch(e){}
+  // Alternative.me
+  try{const r=await fetch('https://api.alternative.me/fng/?limit=1&format=json');if(r.ok){const j=await r.json();return{v:parseInt(j.data[0].value),l:j.data[0].value_classification,src:'alt.me'}}}catch(e){}
+  return null;
 }
 
 function toWeekly(daily){
   if(!daily||daily.length<14)return null;
   const out=[];
   for(let i=0;i<daily.length;i+=7){
-    const chunk=daily.slice(i,i+7);
-    if(chunk.length<3)continue;
-    const closes=chunk.map(d=>d.close);
-    out.push({time:chunk[0].time,open:closes[0],high:Math.max(...closes),low:Math.min(...closes),close:closes[closes.length-1]});
+    const c=daily.slice(i,i+7);if(c.length<3)continue;
+    const cl=c.map(d=>d.close);
+    out.push({time:c[0].time,open:cl[0],high:Math.max(...cl),low:Math.min(...cl),close:cl[cl.length-1]});
   }
   return out.length>10?out:null;
 }
-
 function toMonthly(daily){
   if(!daily||daily.length<30)return null;
   const out=[];
   for(let i=0;i<daily.length;i+=30){
-    const chunk=daily.slice(i,i+30);
-    if(chunk.length<10)continue;
-    const closes=chunk.map(d=>d.close);
-    out.push({time:chunk[0].time,open:closes[0],high:Math.max(...closes),low:Math.min(...closes),close:closes[closes.length-1]});
+    const c=daily.slice(i,i+30);if(c.length<10)continue;
+    const cl=c.map(d=>d.close);
+    out.push({time:c[0].time,open:cl[0],high:Math.max(...cl),low:Math.min(...cl),close:cl[cl.length-1]});
   }
   return out.length>5?out:null;
 }
 
-async function fetchPriceInfo(){
-  try{
-    const r=await fetch('https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false');
-    if(!r.ok)throw new Error();
-    return(await r.json()).market_data;
-  }catch(e){
-    try{
-      const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true&include_24hr_vol=true&include_market_cap=true');
-      if(!r.ok)throw new Error();
-      const j=await r.json();const b=j.bitcoin;
-      return{current_price:{usd:b.usd},price_change_percentage_24h:b.usd_24h_change||0,total_volume:{usd:b.usd_24h_vol||0},market_cap:{usd:b.usd_market_cap||0},high_24h:{usd:b.usd*1.01},low_24h:{usd:b.usd*0.99},ath:{usd:126198},ath_change_percentage:{usd:((b.usd/126198)-1)*100}};
-    }catch(e2){return null}
-  }
-}
-
-async function fetchFG(){
-  try{
-    const r=await fetch('https://api.coinmarketcap.com/data-api/v3/fear-greed/latest',{headers:{Accept:'application/json'}});
-    if(r.ok){const j=await r.json();if(j.data)return{v:Math.round(j.data.value),l:j.data.value_classification,src:'CMC'}}
-  }catch(e){}
-  try{
-    const r=await fetch('https://api.alternative.me/fng/?limit=1&format=json');
-    if(r.ok){const j=await r.json();return{v:parseInt(j.data[0].value),l:j.data[0].value_classification,src:'alt.me'}}
-  }catch(e){}
-  return null;
-}
-
 // ══════════════════════════════════════════
-// BUILD CHART
+// CHART BUILDER
 // ══════════════════════════════════════════
 const ACTIVE={};
+function destroyChart(key){if(ACTIVE[key]){try{ACTIVE[key].remove()}catch(e){}delete ACTIVE[key]}}
 
-function destroyChart(key){
-  if(ACTIVE[key]){try{ACTIVE[key].remove()}catch(e){}delete ACTIVE[key]}
-}
+function buildChart(wrapId,rsiId,candles,e21Id,e50Id,e200Id,rsiNumId,rsiSigId){
+  if(!candles||candles.length<22){showErr(wrapId,'Sin datos suficientes');return;}
 
-let COPTS,ROPTS;
-function initOpts(){
-  COPTS={
-    layout:{background:{color:'#0c0f16'},textColor:'#3d4a62'},
-    grid:{vertLines:{color:'rgba(255,255,255,0.025)'},horzLines:{color:'rgba(255,255,255,0.025)'}},
-    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.2)',labelBackgroundColor:'#1c2335'},horzLine:{color:'rgba(255,255,255,0.2)',labelBackgroundColor:'#1c2335'}},
-    rightPriceScale:{borderColor:'rgba(255,255,255,0.05)',textColor:'#3d4a62'},
-    timeScale:{borderColor:'rgba(255,255,255,0.05)',timeVisible:true,secondsVisible:false},
-    handleScroll:true,handleScale:true,
-  };
-  ROPTS={
-    layout:{background:{color:'#0c0f16'},textColor:'#3d4a62'},
-    grid:{vertLines:{color:'rgba(255,255,255,0.015)'},horzLines:{color:'rgba(255,255,255,0.015)'}},
-    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.15)',labelBackgroundColor:'#1c2335'},horzLine:{color:'rgba(255,255,255,0.15)',labelBackgroundColor:'#1c2335'}},
-    rightPriceScale:{borderColor:'rgba(255,255,255,0.03)',textColor:'#3d4a62',scaleMargins:{top:0.05,bottom:0.05}},
-    timeScale:{visible:false},
-    handleScroll:false,handleScale:false,
-  };
-}
-
-function buildChart(wrapId,rsiWrapId,candles,e21Id,e50Id,e200Id,rsiNumId,rsiSigId){
-  if(!candles||candles.length<22){
-    showErr(wrapId,'Sin datos suficientes');return;
-  }
-
-  // Clear wrapper
-  const wrapEl=$(wrapId);
-  if(!wrapEl)return;
-  wrapEl.innerHTML='';
-
-  const rsiEl=$(rsiWrapId);
-  if(rsiEl)rsiEl.innerHTML='';
+  const wEl=$(wrapId);if(!wEl)return;
+  wEl.innerHTML='';
+  const rEl=$(rsiId);if(rEl)rEl.innerHTML='';
 
   const closes=candles.map(c=>c.close);
   const times=candles.map(c=>c.time);
-  const e21=calcEMA(closes,21);
-  const e50=calcEMA(closes,50);
-  const e200=calcEMA(closes,200);
+  const e21=calcEMA(closes,21),e50=calcEMA(closes,50),e200=calcEMA(closes,200);
   const r14=calcRSI(closes,14);
 
   const le21=e21.filter(Boolean).pop();
@@ -420,115 +361,87 @@ function buildChart(wrapId,rsiWrapId,candles,e21Id,e50Id,e200Id,rsiNumId,rsiSigI
   if(e21Id)set(e21Id,'$'+N(le21));
   if(e50Id)set(e50Id,'$'+N(le50));
   if(e200Id)set(e200Id,'$'+N(le200));
-
-  if(rsiNumId){
-    $(rsiNumId).textContent=lr14?lr14.toFixed(1):'—';
-    $(rsiNumId).style.color=lr14>70?'#f03e4d':lr14<30?'#00cc7a':'#9b6fff';
-  }
+  if(rsiNumId){$(rsiNumId).textContent=lr14?lr14.toFixed(1):'—';$(rsiNumId).style.color=lr14>70?'#f03e4d':lr14<30?'#00cc7a':'#9b6fff'}
   if(rsiSigId){
     const sig=lr14>70?'SOBRECOMPRADO':lr14<30?'SOBREVENDIDO':'NEUTRAL';
     const el=$(rsiSigId);
-    if(el){
-      el.textContent=sig;
-      el.style.color=lr14>70?'#f03e4d':lr14<30?'#00cc7a':'#7a8599';
-      el.style.background=lr14>70?'rgba(240,62,77,.1)':lr14<30?'rgba(0,204,122,.1)':'transparent';
-    }
+    if(el){el.textContent=sig;el.style.color=lr14>70?'#f03e4d':lr14<30?'#00cc7a':'#7a8599';el.style.background=lr14>70?'rgba(240,62,77,.1)':lr14<30?'rgba(0,204,122,.1)':'transparent'}
   }
 
-  // Price chart
+  const COPTS={
+    layout:{background:{color:'#0c0f16'},textColor:'#3d4a62'},
+    grid:{vertLines:{color:'rgba(255,255,255,0.025)'},horzLines:{color:'rgba(255,255,255,0.025)'}},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.2)',labelBackgroundColor:'#1c2335'},horzLine:{color:'rgba(255,255,255,0.2)',labelBackgroundColor:'#1c2335'}},
+    rightPriceScale:{borderColor:'rgba(255,255,255,0.05)',textColor:'#3d4a62'},
+    timeScale:{borderColor:'rgba(255,255,255,0.05)',timeVisible:true,secondsVisible:false},
+    handleScroll:true,handleScale:true,
+  };
+  const ROPTS={
+    layout:{background:{color:'#0c0f16'},textColor:'#3d4a62'},
+    grid:{vertLines:{color:'rgba(255,255,255,0.015)'},horzLines:{color:'rgba(255,255,255,0.015)'}},
+    crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(255,255,255,0.15)',labelBackgroundColor:'#1c2335'},horzLine:{color:'rgba(255,255,255,0.15)',labelBackgroundColor:'#1c2335'}},
+    rightPriceScale:{borderColor:'rgba(255,255,255,0.03)',textColor:'#3d4a62',scaleMargins:{top:0.05,bottom:0.05}},
+    timeScale:{visible:false},handleScroll:false,handleScale:false,
+  };
+
   destroyChart(wrapId);
-  const chart=LightweightCharts.createChart(wrapEl,{
-    ...COPTS,
-    width:wrapEl.clientWidth,
-    height:wrapEl.clientHeight,
-  });
+  const chart=LightweightCharts.createChart(wEl,{...COPTS,width:wEl.clientWidth,height:wEl.clientHeight});
   ACTIVE[wrapId]=chart;
 
-  const cs=chart.addCandlestickSeries({
-    upColor:'#26a69a',downColor:'#ef5350',
-    borderUpColor:'#26a69a',borderDownColor:'#ef5350',
-    wickUpColor:'#26a69a',wickDownColor:'#ef5350',
-  });
+  const cs=chart.addCandlestickSeries({upColor:'#26a69a',downColor:'#ef5350',borderUpColor:'#26a69a',borderDownColor:'#ef5350',wickUpColor:'#26a69a',wickDownColor:'#ef5350'});
   cs.setData(candles);
-
   const s21=chart.addLineSeries({color:'rgba(255,255,255,0.85)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,title:'EMA21'});
   s21.setData(times.map((t,i)=>e21[i]!=null?{time:t,value:e21[i]}:null).filter(Boolean));
-
   const s50=chart.addLineSeries({color:'rgba(0,204,122,0.9)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,title:'EMA50'});
   s50.setData(times.map((t,i)=>e50[i]!=null?{time:t,value:e50[i]}:null).filter(Boolean));
-
   const s200=chart.addLineSeries({color:'rgba(240,62,77,0.95)',lineWidth:2,priceLineVisible:false,lastValueVisible:true,title:'EMA200'});
   s200.setData(times.map((t,i)=>e200[i]!=null?{time:t,value:e200[i]}:null).filter(Boolean));
-
   chart.timeScale().fitContent();
 
-  // RSI chart
-  if(rsiEl){
-    destroyChart(rsiWrapId);
-    const rc=LightweightCharts.createChart(rsiEl,{
-      ...ROPTS,
-      width:rsiEl.clientWidth,
-      height:rsiEl.clientHeight,
-    });
-    ACTIVE[rsiWrapId]=rc;
-
-    const rs=rc.addLineSeries({
-      color:'rgba(155,111,255,0.9)',lineWidth:1.5,
-      priceLineVisible:false,lastValueVisible:true,title:'RSI',
-      autoscaleInfoProvider:()=>({priceRange:{minValue:0,maxValue:100}}),
-    });
+  if(rEl){
+    destroyChart(rsiId);
+    const rc=LightweightCharts.createChart(rEl,{...ROPTS,width:rEl.clientWidth,height:rEl.clientHeight});
+    ACTIVE[rsiId]=rc;
+    const rs=rc.addLineSeries({color:'rgba(155,111,255,0.9)',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,title:'RSI',autoscaleInfoProvider:()=>({priceRange:{minValue:0,maxValue:100}})});
     rs.setData(times.map((t,i)=>r14[i]!=null?{time:t,value:r14[i]}:null).filter(Boolean));
-
     const ob=rc.addLineSeries({color:'rgba(240,62,77,0.4)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
     ob.setData([{time:times[0],value:70},{time:times[times.length-1],value:70}]);
     const os=rc.addLineSeries({color:'rgba(0,204,122,0.4)',lineWidth:1,lineStyle:LightweightCharts.LineStyle.Dashed,priceLineVisible:false,lastValueVisible:false});
     os.setData([{time:times[0],value:30},{time:times[times.length-1],value:30}]);
-
     rc.timeScale().fitContent();
-
-    // Sync crosshair
     chart.subscribeCrosshairMove(p=>{if(p.time)rc.setCrosshairPosition(0,{time:p.time},rs)});
   }
 
-  // Resize
   const ro=new ResizeObserver(()=>{
-    if(ACTIVE[wrapId])ACTIVE[wrapId].applyOptions({width:wrapEl.clientWidth,height:wrapEl.clientHeight});
-    if(ACTIVE[rsiWrapId]&&rsiEl)ACTIVE[rsiWrapId].applyOptions({width:rsiEl.clientWidth,height:rsiEl.clientHeight});
+    if(ACTIVE[wrapId])ACTIVE[wrapId].applyOptions({width:wEl.clientWidth,height:wEl.clientHeight});
+    if(ACTIVE[rsiId]&&rEl)ACTIVE[rsiId].applyOptions({width:rEl.clientWidth,height:rEl.clientHeight});
   });
-  ro.observe(wrapEl);
+  ro.observe(wEl);
 }
 
 // ══════════════════════════════════════════
-// CYCLE CHART (Canvas 2D)
+// CYCLE CHART
 // ══════════════════════════════════════════
 function buildCycle(dhv,price){
-  const canvas=$('cycle-canvas');
-  if(!canvas)return;
+  const canvas=$('cycle-canvas');if(!canvas)return;
   const wrap=canvas.parentElement;
   const dpr=window.devicePixelRatio||1;
   const W=wrap.clientWidth,H=wrap.clientHeight;
   canvas.width=W*dpr;canvas.height=H*dpr;
   canvas.style.width=W+'px';canvas.style.height=H+'px';
-  const ctx=canvas.getContext('2d');
-  ctx.scale(dpr,dpr);
-
-  const P={t:10,r:58,b:28,l:8};
-  const CW=W-P.l-P.r,CH=H-P.t-P.b;
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const P={t:10,r:58,b:28,l:8},CW=W-P.l-P.r,CH=H-P.t-P.b;
   ctx.fillStyle='#0c0f16';ctx.fillRect(0,0,W,H);
-
-  const DAYS=1100;const halvP=63000;
-  const normNow=(price/halvP)*100;
-  const LOG_MIN=Math.log(90),LOG_MAX=Math.log(11000);
-  const toY=v=>P.t+CH-(Math.log(Math.max(v,1))-LOG_MIN)/(LOG_MAX-LOG_MIN)*CH;
+  const DAYS=1100,halvP=63000,normNow=(price/halvP)*100;
+  const LMN=Math.log(90),LMX=Math.log(11000);
+  const toY=v=>P.t+CH-(Math.log(Math.max(v,1))-LMN)/(LMX-LMN)*CH;
   const toX=d=>P.l+(d/DAYS)*CW;
-
-  // Grid
   [100,200,500,1000,2000,5000,10000].forEach(v=>{
     const y=toY(v);
     ctx.strokeStyle='rgba(255,255,255,0.025)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+CW,y);ctx.stroke();
     ctx.fillStyle='#3d4a62';ctx.font='8px JetBrains Mono';ctx.textAlign='right';
-    ctx.fillText(v+'%',W-P.r+52,y+3);
+    ctx.fillText(v+'%',W-4,y+3);
   });
   [0,200,400,600,800,1000].forEach(d=>{
     const x=toX(d);
@@ -537,57 +450,37 @@ function buildCycle(dhv,price){
     ctx.fillStyle='#3d4a62';ctx.font='8px JetBrains Mono';ctx.textAlign='center';
     ctx.fillText('D'+d,x,H-5);
   });
-
-  // Historical cycles
   [{c:'rgba(240,62,77,0.65)',maxD:420,maxM:100,exp:2.8},
    {c:'rgba(245,197,24,0.65)',maxD:520,maxM:30,exp:2.5},
    {c:'rgba(0,204,122,0.75)',maxD:550,maxM:7.8,exp:2.2}
   ].forEach(c=>{
     ctx.strokeStyle=c.c;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
-    ctx.beginPath();let first=true;
-    for(let d=0;d<=DAYS;d+=2){
-      if(d>c.maxD)break;
+    ctx.beginPath();let f=true;
+    for(let d=0;d<=c.maxD;d+=2){
       const v=Math.max(100,100*(1+(c.maxM-1)*Math.pow(d/c.maxD,c.exp)));
-      first?(ctx.moveTo(toX(d),toY(v)),first=false):ctx.lineTo(toX(d),toY(v));
+      f?(ctx.moveTo(toX(d),toY(v)),f=false):ctx.lineTo(toX(d),toY(v));
     }
     ctx.stroke();ctx.setLineDash([]);
   });
-
-  // Cycle 4
-  ctx.strokeStyle='rgba(74,143,255,0.95)';ctx.lineWidth=2.5;ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(74,143,255,0.95)';ctx.lineWidth=2.5;
   ctx.beginPath();let f4=true;
   for(let d=0;d<=dhv;d+=2){
-    const pct=d/Math.max(dhv,1);
-    const v=Math.max(90,100*(1+(normNow/100-1)*Math.pow(pct,1.05)));
+    const v=Math.max(90,100*(1+(normNow/100-1)*Math.pow(d/Math.max(dhv,1),1.05)));
     f4?(ctx.moveTo(toX(d),toY(v)),f4=false):ctx.lineTo(toX(d),toY(v));
   }
   ctx.stroke();
-
-  // Fill
   ctx.beginPath();ctx.moveTo(toX(0),toY(100));
-  for(let d=0;d<=dhv;d+=2){
-    const pct=d/Math.max(dhv,1);
-    const v=Math.max(90,100*(1+(normNow/100-1)*Math.pow(pct,1.05)));
-    ctx.lineTo(toX(d),toY(v));
-  }
-  ctx.lineTo(toX(dhv),toY(100));ctx.closePath();
-  ctx.fillStyle='rgba(74,143,255,0.06)';ctx.fill();
-
-  // Vertical line
+  for(let d=0;d<=dhv;d+=2){const v=Math.max(90,100*(1+(normNow/100-1)*Math.pow(d/Math.max(dhv,1),1.05)));ctx.lineTo(toX(d),toY(v))}
+  ctx.lineTo(toX(dhv),toY(100));ctx.closePath();ctx.fillStyle='rgba(74,143,255,0.06)';ctx.fill();
   const xN=toX(dhv);
   ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-  ctx.beginPath();ctx.moveTo(xN,P.t);ctx.lineTo(xN,P.t+CH);ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Current dot
+  ctx.beginPath();ctx.moveTo(xN,P.t);ctx.lineTo(xN,P.t+CH);ctx.stroke();ctx.setLineDash([]);
   const curV=Math.round(normNow);
-  ctx.beginPath();ctx.arc(toX(dhv),toY(curV),5,0,Math.PI*2);
-  ctx.fillStyle='white';ctx.fill();
+  ctx.beginPath();ctx.arc(toX(dhv),toY(curV),5,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
   ctx.strokeStyle='rgba(74,143,255,0.8)';ctx.lineWidth=2;ctx.stroke();
   ctx.fillStyle='#d0d8e8';ctx.font='bold 9px JetBrains Mono';ctx.textAlign='left';
   ctx.fillText('Día '+dhv+' · '+curV+'%',toX(dhv)+8,toY(curV)+3);
-
-  set('cycle-lbl','Ciclo 4 · Día '+dhv+' · +'+((price/halvP-1)*100).toFixed(0)+'% desde halving ($63K)');
+  set('cycle-lbl','Ciclo 4 · Día '+dhv+' · +'+((price/halvP-1)*100).toFixed(0)+'% desde halving');
 }
 
 // ══════════════════════════════════════════
@@ -599,23 +492,27 @@ async function loadAll(){
   const rb=$('rb');if(rb)rb.innerHTML='<span class="spin">↻</span>';
   setDot('warn','CARGANDO...');
 
-  const[md,fg,ohlcD,daily5y]=await Promise.all([
-    fetchPriceInfo(),
+  // Fetch all in parallel
+  const[md,mdSimple,fg,ohlcD,daily]=await Promise.all([
+    fetchPrice(),
+    fetchSimplePrice(),
     fetchFG(),
     fetchOHLC(365),
-    fetchDaily(1825),
+    fetchMarketChart(1825),
   ]);
 
-  if(md){
-    const price=md.current_price.usd;
-    const chg24=md.price_change_percentage_24h||0;
+  const priceData=md||mdSimple;
+
+  if(priceData){
+    const price=priceData.current_price.usd;
+    const chg24=priceData.price_change_percentage_24h||0;
     $('px').textContent='$'+N(price);
     const pc=$('pxc');pc.textContent=fP(chg24)+' (24H)';pc.className='chg '+(chg24>0?'up':chg24<0?'dn':'nt');
     $('chart-d-px').textContent='$'+N(price);
     const cdc=$('chart-d-chg');cdc.textContent=fP(chg24)+' 24H';cdc.className='chg '+(chg24>0?'up':chg24<0?'dn':'nt');
-    set('phl','$'+N(md.high_24h.usd)+' / $'+N(md.low_24h.usd));
-    set('pvol',fK(md.total_volume.usd));set('pmcap',fK(md.market_cap.usd));
-    set('path','$'+N(md.ath.usd)+' ('+fP(md.ath_change_percentage.usd,1)+')');
+    set('phl','$'+N(priceData.high_24h.usd)+' / $'+N(priceData.low_24h.usd));
+    set('pvol',fK(priceData.total_volume.usd));set('pmcap',fK(priceData.market_cap.usd));
+    set('path','$'+N(priceData.ath.usd)+' ('+fP(priceData.ath_change_percentage.usd,1)+')');
     const dhv=Math.floor((new Date()-new Date('2024-04-19'))/86400000);
     buildCycle(dhv,price);
   }
@@ -625,23 +522,27 @@ async function loadAll(){
     fe.style.color=fg.v>70?'#f03e4d':fg.v<30?'#00cc7a':'#f5c518';
   }
 
+  let anyChartLoaded=false;
+
   if(ohlcD&&ohlcD.length>22){
-    setDot('live','EN VIVO');
     buildChart('wrap-d','wrap-rsi-d',ohlcD,'v21d','v50d','v200d','rsi-d-num','rsi-d-sig');
+    setDot('live','EN VIVO');
+    anyChartLoaded=true;
   }else{
-    setDot('dead','ERROR');
-    showErr('wrap-d','Error cargando datos');
+    showErr('wrap-d','No se pudieron cargar los datos.<br><span style="font-size:8px">Recarga en unos segundos</span>');
+    setDot('dead','ERROR DATOS');
   }
 
-  if(daily5y&&daily5y.length>50){
-    const wk=toWeekly(daily5y);
-    const mo=toMonthly(daily5y);
-    if(wk)buildChart('wrap-w','wrap-rsi-w',wk,'v21w','v50w','v200w','rsi-w-num',null);
+  if(daily&&daily.length>50){
+    const wk=toWeekly(daily);
+    const mo=toMonthly(daily);
+    if(wk){buildChart('wrap-w','wrap-rsi-w',wk,'v21w','v50w','v200w','rsi-w-num',null);anyChartLoaded=true;}
     else showErr('wrap-w','Sin datos semanales');
-    if(mo)buildChart('wrap-m','wrap-rsi-m',mo,'v21m','v50m','v200m','rsi-m-num',null);
+    if(mo){buildChart('wrap-m','wrap-rsi-m',mo,'v21m','v50m','v200m','rsi-m-num',null);anyChartLoaded=true;}
     else showErr('wrap-m','Sin datos mensuales');
   }else{
-    showErr('wrap-w','Sin datos');showErr('wrap-m','Sin datos');
+    showErr('wrap-w','Sin datos disponibles');
+    showErr('wrap-m','Sin datos disponibles');
   }
 
   if(rb)rb.innerHTML='↻ ACTUALIZAR';
@@ -649,19 +550,18 @@ async function loadAll(){
 }
 
 // ══════════════════════════════════════════
-// INIT — load library first, then data
+// INIT
 // ══════════════════════════════════════════
 (async()=>{
-  setDot('warn','CARGANDO LIBRERÍA...');
+  setDot('warn','CARGANDO LIB...');
   const ok=await loadLWC();
   if(!ok){
-    setDot('dead','ERROR LIBRERÍA');
-    ['wrap-d','wrap-w','wrap-m'].forEach(id=>showErr(id,'Error cargando librería de gráficos.<br>Verifica tu conexión a internet.'));
+    setDot('dead','ERROR');
+    ['wrap-d','wrap-w','wrap-m'].forEach(id=>showErr(id,'Error cargando librería.<br>Verifica tu conexión.'));
     return;
   }
-  initOpts();
   setInterval(loadAll,60000);
-  loadAll();
+  await loadAll();
 })();
 </script>
 </body>
