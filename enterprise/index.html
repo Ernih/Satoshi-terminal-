@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Jalibor — Real-Time Urban Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+
+.licon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;
+  border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07);
+  flex-shrink:0}
+.licon svg{display:block}
+:root{--black:#000;--night:#060810;--surface:#0A0C12;--card:#0E1018;--teal:#41B4D3;--teal2:#6ECDE6;--teal3:#2A8FA8;--silver:#90A4AE;--white:#F0F4F8;--dim:rgba(65,180,211,.10);--brd:rgba(65,180,211,.18);--brd2:rgba(65,180,211,.08)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'Space Grotesk',sans-serif;overflow-x:hidden;cursor:none}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1;mix-blend-mode:overlay}
+#cur{position:fixed;width:8px;height:8px;background:var(--teal);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .15s,height .15s}
+#cur-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(65,180,211,.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:22px 64px;display:flex;align-items:center;justify-content:space-between;transition:all .4s}
+nav.scrolled{padding:14px 64px;background:rgba(0,0,0,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--brd2)}
+.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px}
+.nav-logo .bor{color:var(--teal)}
+.nav-links{display:flex;gap:40px;list-style:none}
+.nav-links a{color:rgba(240,244,248,.45);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:transparent;border:1px solid var(--brd);color:var(--teal);padding:9px 24px;border-radius:3px;font-size:12px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:none;letter-spacing:1px;text-transform:uppercase;transition:all .25s}
+.nav-cta:hover{background:var(--teal);color:#000;box-shadow:0 0 30px rgba(65,180,211,.3)}
+
+
+
+.ticker-item .pulse{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:blink 2s ease infinite}
+.ticker-item .v{color:var(--teal);font-weight:600}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+section{position:relative;z-index:2}
+.inner{max-width:1200px;margin:0 auto;padding:0 64px}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--teal);text-transform:uppercase;display:block;margin-bottom:14px}
+.h-xl{font-family:'Syne',sans-serif;font-size:clamp(52px,7vw,96px);font-weight:800;line-height:.9;letter-spacing:-3px}
+.h-lg{font-family:'Syne',sans-serif;font-size:clamp(38px,5vw,64px);font-weight:800;line-height:.95;letter-spacing:-2px}
+.h-md{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:700;line-height:1.05;letter-spacing:-1px}
+.accent{color:var(--teal)}
+.dim{color:var(--silver);font-weight:300;line-height:1.75}
+/* HERO */
+#hero{position:relative;min-height:100svh;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 80px 100px;overflow:hidden}
+#hero-logo{position:absolute;right:60px;top:50%;transform:translateY(-50%);z-index:2;pointer-events:none}
+
+
+#elayer{transform-origin:200px 200px;animation:eyeOrbit 18s linear infinite}
+#elayer2{transform-origin:200px 200px;animation:eyeOrbit 28s linear infinite reverse}
+@keyframes eyeOrbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}to{transform:rotate(360deg)}}
+.logo-wrap:hover #elayer{animation-duration:8s}
+.logo-wrap{width:460px;height:460px}
+.logo-wrap svg{width:100%;height:100%}
+.glow{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none}
+.g1{width:700px;height:700px;background:radial-gradient(circle,rgba(65,180,211,.18),transparent 70%);top:-200px;right:-200px;animation:mg1 8s ease-in-out infinite}
+.g2{width:500px;height:500px;background:radial-gradient(circle,rgba(65,180,211,.10),transparent 70%);bottom:-100px;left:-100px;animation:mg2 10s ease-in-out infinite}
+@keyframes mg1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-60px,40px) scale(1.15)}66%{transform:translate(40px,-30px) scale(.9)}}
+@keyframes mg2{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-60px) scale(1.2)}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:rgba(65,180,211,.75);text-transform:uppercase;margin-bottom:28px;border:1px solid var(--brd2);border-radius:3px;padding:7px 14px;background:rgba(65,180,211,.05)}
+.hero-line{display:block;opacity:0;transform:translateY(100%);animation:slideUp .9s cubic-bezier(.16,1,.3,1) forwards}
+.hero-line:nth-child(1){animation-delay:.1s}
+.hero-line:nth-child(2){animation-delay:.22s}
+.hero-line:nth-child(3){animation-delay:.34s;color:rgba(240,244,248,.2)}
+@keyframes slideUp{to{opacity:1;transform:none}}
+@keyframes fadeIn{to{opacity:1}}
+.hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-top:48px;flex-wrap:wrap}
+.hero-desc{max-width:440px;font-size:16px;color:var(--silver);font-weight:300;line-height:1.75;opacity:0;animation:fadeIn .8s .55s forwards}
+.hero-acts{display:flex;gap:14px;opacity:0;animation:fadeIn .8s .7s forwards;flex-wrap:wrap}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--brd2);border-radius:4px;overflow:hidden;background:rgba(10,12,18,.7);backdrop-filter:blur(20px);margin-top:60px}
+.stat{padding:28px 24px;border-right:1px solid var(--brd2);opacity:0;animation:fadeIn .6s forwards}
+.stat:nth-child(1){animation-delay:.85s}.stat:nth-child(2){animation-delay:1s}.stat:nth-child(3){animation-delay:1.15s}.stat:nth-child(4){animation-delay:1.3s}
+.stat:last-child{border:none}
+.sv{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;display:block;margin-bottom:4px}
+.sl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px}
+/* BUTTONS */
+.bp{background:var(--teal);color:#000;border:none;padding:14px 36px;border-radius:3px;font-size:13px;font-weight:700;font-family:'Space Grotesk',sans-serif;cursor:none;letter-spacing:.5px;transition:all .25s}
+.bp:hover{background:var(--teal2);box-shadow:0 0 40px rgba(65,180,211,.45);transform:translateY(-2px)}
+.bs{background:transparent;color:var(--white);border:1px solid rgba(240,244,248,.18);padding:14px 36px;border-radius:3px;font-size:13px;font-weight:500;font-family:'Space Grotesk',sans-serif;cursor:none;letter-spacing:.3px;transition:all .25s}
+.bs:hover{border-color:var(--teal);color:var(--teal)}
+/* MARQUEE */
+.mq-wrap{overflow:hidden;padding:40px 0;border-top:1px solid var(--brd2);border-bottom:1px solid var(--brd2);background:var(--surface)}
+.mq-track{display:inline-flex;gap:60px;white-space:nowrap;animation:marquee 20s linear infinite}
+.mq-item{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:rgba(240,244,248,.05);letter-spacing:-2px;text-transform:uppercase;flex-shrink:0}
+.mq-item .hi{color:rgba(65,180,211,.2)}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+/* PROBLEM */
+#problem{padding:140px 0;overflow:hidden}
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center}
+.pvis{position:relative;height:520px}
+.cube-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.df{position:absolute;background:rgba(10,12,18,.92);border:1px solid var(--brd);border-radius:6px;padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;backdrop-filter:blur(10px);white-space:nowrap}
+.df1{top:14%;left:5%;animation:f1 6s ease-in-out infinite}
+.df2{top:34%;right:2%;animation:f2 7s ease-in-out infinite 1s}
+.df3{bottom:22%;left:8%;animation:f1 5.5s ease-in-out infinite 2s}
+.df4{top:62%;right:6%;animation:f2 8s ease-in-out infinite .5s}
+@keyframes f1{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-18px) rotate(1deg)}}
+@keyframes f2{0%,100%{transform:translateY(0) rotate(1deg)}50%{transform:translateY(-14px) rotate(-1deg)}}
+.pl{display:flex;flex-direction:column;gap:22px}
+.point{display:flex;gap:18px;align-items:flex-start;padding:22px;border:1px solid var(--brd2);border-radius:6px;background:rgba(14,16,24,.7);transition:all .3s;position:relative;overflow:hidden}
+.point::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--teal);transform:scaleY(0);transition:transform .3s;transform-origin:bottom}
+.point:hover{border-color:var(--brd);transform:translateX(8px)}.point:hover::after{transform:scaleY(1)}
+.pi{width:40px;height:40px;border-radius:6px;background:var(--dim);border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pt{font-size:15px;font-weight:600;color:var(--white);margin-bottom:5px}
+.pd{font-size:13px;color:var(--silver);line-height:1.65}
+/* HOW */
+#how{padding:140px 0;background:var(--surface);border-top:1px solid var(--brd2);border-bottom:1px solid var(--brd2)}
+.stg{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;margin-top:60px}
+.step{background:var(--card);padding:40px 28px;position:relative;transition:background .3s;cursor:none}
+.step::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(65,180,211,.06),transparent);opacity:0;transition:opacity .3s}
+.step:hover{background:rgba(65,180,211,.03)}.step:hover::before{opacity:1}
+.sn{font-family:'Syne',sans-serif;font-size:72px;font-weight:800;color:rgba(65,180,211,.06);line-height:1;display:block;margin-bottom:20px}
+.si{font-size:28px;display:block;margin-bottom:18px}
+.st{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--white);margin-bottom:10px}
+.sd{font-size:13px;color:var(--silver);line-height:1.65}
+.sbar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--teal);transform:scaleX(0);transition:transform .4s;transform-origin:left}
+.step:hover .sbar{transform:scaleX(1)}
+/* FORMULA */
+#formula{padding:140px 0}
+.fl{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.cb{background:var(--card);border:1px solid var(--brd);border-radius:6px;overflow:hidden}
+.ch{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--brd2);background:rgba(65,180,211,.04)}
+.cd{width:10px;height:10px;border-radius:50%}
+.cfn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--silver);margin-left:8px}
+.cbody{padding:28px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2}
+.co{color:rgba(144,164,174,.4)}.cf{color:rgba(240,244,248,.5)}.cv{color:var(--teal)}.ck{color:var(--teal2)}
+.tt{display:flex;flex-direction:column;gap:6px}
+.tr{display:flex;align-items:center;gap:14px;padding:12px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card);transition:all .25s;position:relative;overflow:hidden}
+.tr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--teal);opacity:0;transition:opacity .25s}
+.tr:hover{border-color:var(--brd);background:rgba(65,180,211,.05)}.tr:hover::before{opacity:1}
+.tp{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--teal);min-width:58px}
+.tn{font-size:13px;font-weight:600;color:var(--white);flex:1}
+.tnd{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--silver)}
+/* TOKENOMICS */
+#tokenomics{padding:140px 0;background:var(--surface);border-top:1px solid var(--brd2);border-bottom:1px solid var(--brd2)}
+.tkg{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:64px}
+.ptab{display:flex;flex-direction:column;gap:1px;border:1px solid var(--brd2);border-radius:6px;overflow:hidden}
+.pr{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:var(--card);border-bottom:1px solid var(--brd2);transition:background .2s}
+.pr:last-child{border:none}.pr:hover{background:rgba(65,180,211,.04)}
+.pk{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--silver);text-transform:uppercase;letter-spacing:.5px}
+.pv{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);font-weight:600;text-align:right}
+.dl{display:flex;flex-direction:column;gap:14px}
+.di{display:flex;align-items:flex-start;gap:16px}
+.dp{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--teal);min-width:60px;line-height:1.1}
+.din{flex:1}
+.dn{font-size:13px;font-weight:600;color:var(--white);margin-bottom:5px}
+.dbar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.dfill{height:100%;border-radius:2px;background:var(--teal);width:0;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+.ds{font-size:11px;color:var(--silver);font-family:'JetBrains Mono',monospace}
+/* ROADMAP */
+#roadmap{padding:140px 0}
+.rmh{text-align:center;max-width:640px;margin:0 auto 100px}
+.rmw{position:relative}
+.rms{position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--teal) 8%,var(--teal) 92%,transparent);transform:translateX(-50%)}
+.rmr{display:grid;grid-template-columns:1fr 80px 1fr;align-items:start;margin-bottom:64px;opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.rmr.vis{opacity:1;transform:none}
+.rmr:nth-child(odd) .rmc{grid-column:1;padding-right:50px;text-align:right}
+.rmr:nth-child(odd) .rmd{grid-column:2}
+.rmr:nth-child(odd) .rmg{grid-column:3}
+.rmr:nth-child(even) .rmg{grid-column:1}
+.rmr:nth-child(even) .rmd{grid-column:2}
+.rmr:nth-child(even) .rmc{grid-column:3;padding-left:50px;text-align:left}
+.rmd{display:flex;justify-content:center;padding-top:6px}
+.rmdn{width:16px;height:16px;border-radius:50%;border:2px solid var(--teal);background:var(--black);flex-shrink:0;transition:all .4s}
+.rmdn.live{background:var(--teal);box-shadow:0 0 20px rgba(65,180,211,.6)}
+.rmy{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;line-height:1;display:block;margin-bottom:4px}
+.rmph{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;color:var(--silver);text-transform:uppercase;margin-bottom:12px;display:block}
+.rmtit{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:10px}
+.rmbl{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.rmb{font-size:13px;color:var(--silver);display:flex;align-items:center;gap:7px}
+.rmb::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.rmr:nth-child(odd) .rmb{justify-content:flex-end}.rmr:nth-child(odd) .rmb::before{order:1}
+.rmbdg{display:inline-flex;align-items:center;gap:6px;background:var(--dim);border:1px solid var(--brd);border-radius:3px;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal)}
+/* ECOSYSTEM */
+#ecosystem{padding:140px 0;background:var(--surface);border-top:1px solid var(--brd2);border-bottom:1px solid var(--brd2)}
+.ecog{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;margin-top:60px}
+.ecoc{background:var(--card);padding:44px 32px;transition:background .3s;position:relative;overflow:hidden;cursor:none}
+.ecog2{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(65,180,211,.14),transparent 70%);top:-60px;right:-60px;opacity:0;transition:opacity .4s;filter:blur(30px)}
+.ecoc:hover{background:rgba(65,180,211,.03)}.ecoc:hover .ecog2{opacity:1}
+.ecoico{font-size:32px;display:block;margin-bottom:22px}
+.ecot{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:12px}
+.ecod{font-size:13px;color:var(--silver);line-height:1.7}
+.ecotag{display:inline-block;margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);border:1px solid var(--brd);border-radius:3px;padding:3px 9px;letter-spacing:.5px}
+/* IDO */
+#ido{padding:160px 0;overflow:hidden;position:relative}
+.ido-gc{position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(65,180,211,.12),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);filter:blur(80px);pointer-events:none;animation:mg1 10s ease-in-out infinite}
+.idoi{text-align:center;max-width:820px;margin:0 auto;position:relative;z-index:2}
+.idobdg{display:inline-flex;align-items:center;gap:8px;background:rgba(204,48,48,.10);border:1px solid rgba(204,48,48,.28);border-radius:3px;padding:7px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#FF8888;letter-spacing:1.5px;margin-bottom:36px}
+.idobdg::before{content:'●';font-size:8px;animation:blink 1.2s infinite}
+.idostats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:52px 0;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden}
+.idostat{background:var(--card);padding:36px 24px;text-align:center}
+.idov{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;display:block;margin-bottom:6px}
+.idol{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px}
+/* FOOTER */
+footer{border-top:1px solid var(--brd2);background:var(--surface);padding:64px;position:relative;z-index:2}
+.fg{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px}
+.flogo{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:14px}
+.flogo .bor{color:var(--teal)}
+.fdesc{font-size:13px;color:var(--silver);line-height:1.7;max-width:280px}
+.fcol h5{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);font-weight:600;margin-bottom:18px}
+.fcol a{display:block;color:rgba(144,164,174,.6);text-decoration:none;font-size:13px;margin-bottom:10px;transition:color .2s}
+.fcol a:hover{color:var(--white)}
+.fbot{max-width:1200px;margin:40px auto 0;padding-top:24px;border-top:1px solid var(--brd2);display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(144,164,174,.3);letter-spacing:.5px}
+/* REVEALS */
+.rv{opacity:0;transform:translateY(32px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.rvl{opacity:0;transform:translateX(-40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.rvr{opacity:0;transform:translateX(40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.rv.vis,.rvl.vis,.rvr.vis{opacity:1;transform:none}
+
+/* ── 960px — tablet landscape ─────────────────────────── */
+@media(max-width:960px){
+  nav{padding:14px 20px}
+  .nav-links,.nav-cta,.lang-switcher{display:none}
+  .inner{padding:0 32px}
+  #hero{padding:0 32px 80px;min-height:100svh}
+  #hero-logo{display:none}
+  .hero-inner{grid-template-columns:1fr}
+  .h-xl{font-size:clamp(44px,8vw,72px);letter-spacing:-2px}
+  .h-lg{font-size:clamp(32px,5vw,52px)}
+  .h-md{font-size:clamp(24px,3.5vw,36px)}
+  .stats-bar,.pg,.fl,.tkg,.ecog{grid-template-columns:1fr}
+  .stg{grid-template-columns:1fr 1fr}
+  .rms{display:none}
+  .rmr{grid-template-columns:24px 1fr;margin-bottom:32px;opacity:1;transform:none}
+  .rmr:nth-child(odd) .rmc,.rmr:nth-child(even) .rmc{grid-column:2;text-align:left;padding:0}
+  .rmr:nth-child(odd) .rmd,.rmr:nth-child(even) .rmd{grid-column:1}
+  .rmr:nth-child(odd) .rmg,.rmr:nth-child(even) .rmg{display:none}
+  .rmr:nth-child(odd) .rmb{justify-content:flex-start}.rmr:nth-child(odd) .rmb::before{order:0}
+  #network .idostats{grid-template-columns:1fr}
+  .fg{grid-template-columns:1fr 1fr;gap:32px}
+  .pvis{height:280px}
+  #problem,#how,#formula,#ecosystem,#roadmap,#network{padding:80px 0}
+  .pmc3d-hud{display:none}
+  .pmc3d-panel-l,.pmc3d-panel-r{display:none}
+  .pmc3d-bar{padding:0 16px}
+
+  .nav-ham{display:flex}
+  .nav-links,.nav-cta,.lang-switcher{display:none!important}
+}
+
+/* ── 768px — tablet portrait ───────────────────────────── */
+@media(max-width:768px){
+  .inner{padding:0 20px}
+  #hero{padding:0 20px 60px}
+  .h-xl{font-size:clamp(36px,9vw,56px);letter-spacing:-1.5px;line-height:1}
+  .h-lg{font-size:clamp(28px,6vw,44px);letter-spacing:-1px}
+  .h-md{font-size:clamp(22px,4.5vw,32px)}
+  .hero-bottom{flex-direction:column;align-items:flex-start;gap:24px}
+  .stats-bar{grid-template-columns:1fr 1fr;border-radius:4px}
+  .stg{grid-template-columns:1fr}
+  .fl,.tkg{gap:40px}
+  .ecog{grid-template-columns:1fr 1fr}
+  .fg{grid-template-columns:1fr;gap:24px}
+  .fbot{flex-direction:column;align-items:flex-start;gap:16px}
+  .rmh{margin-bottom:48px}
+  .pr{flex-direction:column;align-items:flex-start;gap:6px}
+  .tt .tr{flex-wrap:wrap;gap:8px}
+  #problem,#how,#formula,#ecosystem,#roadmap,#network{padding:60px 0}
+  #pmc-3d{height:420px}
+  #pmc-main-canvas{height:420px!important}
+  .pmc3d-wrap,.pmc3d-wrap canvas{height:420px!important}
+  .pg{gap:40px}
+  .point{flex-direction:column;gap:12px}
+}
+
+/* ── 480px — mobile ─────────────────────────────────────── */
+@media(max-width:480px){
+  nav{padding:12px 16px}
+  .inner{padding:0 16px}
+  #hero{padding:0 16px 48px;min-height:100svh}
+  .h-xl{font-size:clamp(32px,10vw,48px);letter-spacing:-1px;line-height:1.02}
+  .h-lg{font-size:clamp(24px,7vw,36px);letter-spacing:-.5px}
+  .h-md{font-size:clamp(20px,5.5vw,28px)}
+  .hero-acts{flex-direction:column;gap:10px}
+  .hero-acts .bp,.hero-acts .bs{width:100%;text-align:center;padding:14px 20px}
+  .stats-bar{grid-template-columns:1fr}
+  .stg{grid-template-columns:1fr;gap:1px}
+  .ecog{grid-template-columns:1fr}
+  .fl,.pg,.tkg{grid-template-columns:1fr;gap:32px}
+  .fg{grid-template-columns:1fr}
+  .fbot{flex-direction:column;gap:12px}
+  #problem,#how,#formula,#ecosystem,#roadmap,#network{padding:48px 0}
+  .rmr{margin-bottom:24px}
+  .rmh{margin-bottom:32px}
+  section .inner > .tag{font-size:8px;letter-spacing:2px}
+  .sv{font-size:clamp(28px,8vw,48px)!important}
+  .bp,.bs{font-size:13px!important;padding:12px 18px!important}
+  .modal-box{margin:16px;padding:24px 18px!important;max-height:88vh;overflow-y:auto}
+  .modal-box h2{font-size:clamp(22px,6vw,32px)!important}
+  .idostats{grid-template-columns:1fr!important}
+  #pmc-3d{height:340px}
+  .pmc3d-wrap,.pmc3d-wrap canvas{height:340px!important}
+  .pmc3d-bar{flex-wrap:wrap;gap:12px;padding:0 12px}
+  .pmc3d-bar>div{min-width:calc(50% - 6px)}
+  .tt .tr{padding:10px 12px}
+  .tp{font-size:14px!important;min-width:60px!important}
+  .chapter{padding:28px 20px}
+  .fcol{min-width:unset}
+  .lang-btn{font-size:9px}
+  .nav-logo{font-size:18px!important}
+}
+
+
+.lang-switcher{display:flex;align-items:center;gap:6px;margin-left:12px}
+.lang-btn{background:none;border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:rgba(144,164,174,.45);padding:4px 2px;transition:color .2s}
+.lang-btn:hover{color:var(--teal)}
+.lang-btn.active{color:var(--teal);font-weight:700}
+.lang-div{color:rgba(144,164,174,.2);font-size:10px}
+
+/* Mobile nav */
+.nav-ham{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;z-index:201}
+.nav-ham span{display:block;width:22px;height:2px;background:var(--teal);border-radius:2px;transition:all .3s}
+.nav-ham.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.nav-ham.open span:nth-child(2){opacity:0}
+.nav-ham.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mob-nav{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:200;transform:translateX(100%);transition:transform .35s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+.mob-nav.open{transform:translateX(0)}
+.mob-nav-inner{display:flex;flex-direction:column;justify-content:center;padding:80px 32px 40px;height:100%;gap:0}
+.mob-nav-inner ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.mob-nav-inner ul li a{display:block;font-family:'Syne',sans-serif;font-size:clamp(28px,7vw,42px);font-weight:800;color:var(--white);text-decoration:none;padding:12px 0;border-bottom:1px solid var(--brd2);letter-spacing:-1px;transition:color .2s}
+.mob-nav-inner ul li a:hover{color:var(--teal)}
+.mob-nav-actions{margin-top:32px;display:flex;flex-direction:column;gap:12px}
+.mob-nav-actions .bp{width:100%;text-align:center}
+
+
+img,canvas{max-width:100%;height:auto}
+#pmc-main-canvas{width:100%!important}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav id="nav">
+  <div class="nav-logo">Jali<span class="bor">bor</span></div>
+  <ul class="nav-links">
+    <li><a href="#problem" data-i18n="nav_platform">Platform</a></li>
+    <li><a href="#how" data-i18n="nav_tech">Technology</a></li>
+    <li><a href="#formula" data-i18n="nav_consensus">Consensus</a></li>
+    <li><a href="#ecosystem" data-i18n="nav_network">Network</a></li>
+    <li><a href="#roadmap" data-i18n="nav_roadmap">Roadmap</a></li>
+    <li><a href="#network" data-i18n="nav_vision">Vision</a></li>
+  </ul>
+  <button class="nav-cta" onclick="jalOpen('jal-wp-modal')" data-i18n="nav_cta">Technical Overview</button>
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('en')" id="lang-en">EN</button>
+    <span class="lang-div">|</span>
+    <button class="lang-btn" onclick="setLang('es')" id="lang-es">ES</button>
+    <div class="lang-switcher" style="margin-left:8px">
+    <a href="jalibor-enterprise-light.html" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:rgba(65,180,211,.45);text-decoration:none;padding:4px 2px;transition:color .2s" title="Switch to light version">◑ Light</a>
+  </div>
+  <!-- Mobile hamburger -->
+  <button class="nav-ham" onclick="toggleMobileNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<!-- Mobile nav drawer -->
+<div id="mobile-nav" class="mob-nav">
+  <div class="mob-nav-inner">
+    <ul>
+      <li><a href="#problem" onclick="closeMobileNav()" data-i18n="nav_platform">Platform</a></li>
+      <li><a href="#how" onclick="closeMobileNav()" data-i18n="nav_tech">Technology</a></li>
+      <li><a href="#formula" onclick="closeMobileNav()" data-i18n="nav_consensus">Consensus</a></li>
+      <li><a href="#ecosystem" onclick="closeMobileNav()" data-i18n="nav_network">Network</a></li>
+      <li><a href="#roadmap" onclick="closeMobileNav()" data-i18n="nav_roadmap">Roadmap</a></li>
+      <li><a href="#network" onclick="closeMobileNav()" data-i18n="nav_vision">Vision</a></li>
+    </ul>
+    <div class="mob-nav-actions">
+      <button class="bp" onclick="jalOpen('jal-wp-modal');closeMobileNav()" data-i18n="nav_cta">Technical Overview</button>
+      <div class="lang-switcher" style="justify-content:center;margin-top:16px">
+        <button class="lang-btn" onclick="setLang('en')" id="mob-lang-en">EN</button>
+        <span class="lang-div">|</span>
+        <button class="lang-btn" onclick="setLang('es')" id="mob-lang-es">ES</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<section id="hero">
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+  <div id="hero-logo">
+    <div class="logo-wrap">
+<svg id="logosvg" viewBox="0 0 400 400">
+        <defs><radialGradient id="cg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#41B4D3" stop-opacity=".25"/><stop offset="100%" stop-color="#41B4D3" stop-opacity="0"/></radialGradient></defs>
+        <circle fill="url(#cg)" cx="200" cy="200" r="180"/>
+        <circle fill="none" stroke="rgba(65,180,211,.06)" stroke-width=".8" cx="200" cy="200" r="168"/>
+        <circle fill="none" stroke="rgba(65,180,211,.12)" stroke-width=".8" cx="200" cy="200" r="120"/>
+        <circle fill="none" stroke="rgba(65,180,211,.06)" stroke-width=".8" stroke-dasharray="3 9" cx="200" cy="200" r="62"/>
+        <g fill="none" stroke="rgba(65,180,211,.14)" stroke-width=".7">
+          <line x1="200" y1="200" x2="200" y2="80"/><line x1="200" y1="200" x2="285" y2="115"/>
+          <line x1="200" y1="200" x2="320" y2="200"/><line x1="200" y1="200" x2="285" y2="285"/>
+          <line x1="200" y1="200" x2="200" y2="320"/><line x1="200" y1="200" x2="115" y2="285"/>
+          <line x1="200" y1="200" x2="80" y2="200"/><line x1="200" y1="200" x2="115" y2="115"/>
+        </g>
+        <g id="elayer">
+          <g transform="translate(200,80) rotate(180)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(285,115) rotate(135)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(320,200) rotate(90)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(285,285) rotate(45)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(200,320) rotate(0)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(115,285) rotate(315)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(80,200) rotate(270)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(115,115) rotate(225)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+        </g>
+        <circle cx="200" cy="200" r="38" fill="rgba(65,180,211,.06)"/>
+        <circle cx="200" cy="200" r="24" fill="rgba(65,180,211,.14)"/>
+        <circle cx="200" cy="200" r="14" fill="none" stroke="#41B4D3" stroke-width="1.8"/>
+        <circle cx="200" cy="200" r="9" fill="#41B4D3"/>
+      </svg>
+    </div>
+  </div>
+  <div>
+<div class="hero-eyebrow"><span style="width:5px;height:5px;border-radius:50%;background:var(--teal);animation:blink 1.8s infinite;display:inline-block"></span>Urban Intelligence Infrastructure</div>
+    <h1 class="h-xl" style="overflow:hidden;margin-bottom:32px" data-i18n-html="hero_h1">
+      <span class="hero-line">Real-world events need</span>
+      <span class="hero-line accent">real-time consensus.</span>
+    </h1>
+    <div class="hero-bottom">
+      <p class="hero-desc">Jalibor provides the infrastructure layer for distributed validation and tracking of moving real-world events.</p>
+      <div class="hero-acts">
+        <button class="bp" onclick="jalOpen('jal-wp-modal')" data-i18n="btn_brief">Technical Brief</button>
+        <button class="bs" onclick="jalOpen('jal-demo-modal')" data-i18n="btn_demo">Request Demo →</button>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat"><span class="sv">&lt;800ms</span><span class="sl" data-i18n="stat_lat">Consensus latency</span></div>
+      <div class="stat"><span class="sv">PMC</span><span class="sl" data-i18n="stat_pmc">Presence Mesh Consensus</span></div>
+      <div class="stat"><span class="sv">Human+AI</span><span class="sl" data-i18n="stat_nodes">Hybrid node types</span></div>
+    </div>
+    <div id="hero-logo">
+      <div class="logo-wrap">
+<svg id="logosvg" viewBox="0 0 400 400">
+        <defs><radialGradient id="cg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#41B4D3" stop-opacity=".25"/><stop offset="100%" stop-color="#41B4D3" stop-opacity="0"/></radialGradient></defs>
+        <circle fill="url(#cg)" cx="200" cy="200" r="180"/>
+        <circle fill="none" stroke="rgba(65,180,211,.06)" stroke-width=".8" cx="200" cy="200" r="168"/>
+        <circle fill="none" stroke="rgba(65,180,211,.12)" stroke-width=".8" cx="200" cy="200" r="120"/>
+        <circle fill="none" stroke="rgba(65,180,211,.06)" stroke-width=".8" stroke-dasharray="3 9" cx="200" cy="200" r="62"/>
+        <g fill="none" stroke="rgba(65,180,211,.14)" stroke-width=".7">
+          <line x1="200" y1="200" x2="200" y2="80"/><line x1="200" y1="200" x2="285" y2="115"/>
+          <line x1="200" y1="200" x2="320" y2="200"/><line x1="200" y1="200" x2="285" y2="285"/>
+          <line x1="200" y1="200" x2="200" y2="320"/><line x1="200" y1="200" x2="115" y2="285"/>
+          <line x1="200" y1="200" x2="80" y2="200"/><line x1="200" y1="200" x2="115" y2="115"/>
+        </g>
+        <g id="elayer">
+          <g transform="translate(200,80) rotate(180)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(285,115) rotate(135)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(320,200) rotate(90)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(285,285) rotate(45)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(200,320) rotate(0)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(115,285) rotate(315)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(80,200) rotate(270)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(115,115) rotate(225)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+        </g>
+        <circle cx="200" cy="200" r="38" fill="rgba(65,180,211,.06)"/>
+        <circle cx="200" cy="200" r="24" fill="rgba(65,180,211,.14)"/>
+        <circle cx="200" cy="200" r="14" fill="none" stroke="#41B4D3" stroke-width="1.8"/>
+        <circle cx="200" cy="200" r="9" fill="#41B4D3"/>
+      </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+<section id="pmc-3d" style="position:relative;z-index:2;background:#000;border-top:1px solid rgba(65,180,211,.10);border-bottom:1px solid rgba(65,180,211,.10)">
+  <div style="max-width:1200px;margin:0 auto;padding:40px 64px 32px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+      <div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--teal);text-transform:uppercase;display:block;margin-bottom:10px" data-i18n="pmc_tag">Live simulation — Presence Mesh Consensus</span>
+        <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-1.5px;color:var(--white)">Watch the <span style="color:var(--teal)">mesh activate</span></h2>
+      </div>
+      <p style="font-size:13px;color:var(--silver);max-width:340px;line-height:1.75;font-weight:300" data-i18n="pmc_sub">A moving entity triggers the network. Nodes activate, consensus grows, trajectory is reconstructed — in real time across the distributed mesh.</p>
+    </div>
+  </div>
+
+  <style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+#pmc3d-wrap #pmc3d-hud{position:absolute;inset:0;z-index:10;pointer-events:none;font-family:'JetBrains Mono',monospace}
+
+/* -- NAV -- */
+#pmc3d-wrap #pmc3d-nav{position:absolute;top:0;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 36px;border-bottom:1px solid rgba(65,180,211,.07);background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent)}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px;color:#F0F4F8}
+.logo em{color:#41B4D3;font-style:normal}
+.nav-tag{font-size:11px;letter-spacing:3px;color:rgba(65,180,211,.85);text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.nav-time{font-size:10px;color:rgba(144,164,174,.5);letter-spacing:1px}
+
+/* -- PHASE PANEL left -- */
+#pmc3d-wrap #pmc3d-panel-l{position:absolute;left:36px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;max-width:180px}
+.ph-num{font-size:10px;letter-spacing:2.5px;color:rgba(65,180,211,.6);text-transform:uppercase}
+.ph-name{font-size:19px;font-weight:600;color:rgba(240,244,248,.85);line-height:1.3;letter-spacing:.1px}
+.ph-desc{font-size:10px;color:rgba(144,164,174,.4);line-height:1.5;margin-top:4px;letter-spacing:.3px}
+
+/* -- CONFIDENCE right -- */
+#pmc3d-wrap #pmc3d-panel-r{position:absolute;right:36px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:16px}
+.conf-wrap{position:relative;width:90px;height:90px}
+.conf-wrap svg{width:100%;height:100%}
+.conf-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.conf-pct{font-size:32px;font-weight:700;color:#41B4D3;line-height:1}
+.conf-unit{font-size:8px;color:rgba(144,164,174,.4);letter-spacing:1.5px}
+.side-metric{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.sm-label{font-size:9px;color:rgba(144,164,174,.45);letter-spacing:1.5px;text-transform:uppercase}
+.sm-val{font-size:24px;color:#41B4D3;font-weight:700;letter-spacing:-.5px}
+
+/* -- FEED top-right -- */
+#pmc3d-wrap #pmc3d-feed{position:absolute;right:36px;top:80px;display:flex;flex-direction:column;gap:5px;max-width:220px}
+.pmc3d-fe{opacity:0;transform:translateY(-4px);transition:opacity .5s,transform .5s;border-left:1px solid rgba(65,180,211,.25);padding:5px 10px}
+.pmc3d-fe.in{opacity:1;transform:none}
+.pmc3d-fe-tag{font-size:8px;color:rgba(65,180,211,.7);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px}
+.pmc3d-fe-txt{font-size:10px;color:rgba(144,164,174,.55);line-height:1.5;letter-spacing:.2px}
+
+/* -- BOTTOM BAR -- */
+#pmc3d-wrap #pmc3d-bar{position:absolute;bottom:0;left:0;right:0;height:56px;display:flex;align-items:center;gap:0;border-top:1px solid rgba(65,180,211,.07);background:linear-gradient(to top,rgba(0,0,0,.65),transparent)}
+.bm{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-right:1px solid rgba(65,180,211,.06)}
+.bm:last-child{border:none}
+.bm-l{font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.45);text-transform:uppercase}
+.bm-v{font-size:20px;font-weight:700;color:#41B4D3;letter-spacing:-.5px}
+
+/* -- PROGRESS -- */
+#pmc3d-wrap #pmc3d-prog{position:absolute;top:0;left:0;right:0;height:1px;background:rgba(65,180,211,.06)}
+#pmc3d-prog-f{height:1px;width:0;background:#41B4D3;transition:width .8s ease;box-shadow:0 0 6px rgba(65,180,211,.5)}
+
+/* -- PHASE TRANSITION FLASH -- */
+#pmc3d-wrap #pmc3d-flash{position:absolute;inset:0;background:rgba(65,180,211,.0);pointer-events:none;transition:background .15s}
+
+  </style>
+
+  <div id="pmc3d-wrap" style="position:relative;width:100%;height:640px;overflow:hidden;background:#000">
+    <canvas id="pmc-main-canvas" style="display:block;width:100%;height:640px"></canvas>
+    
+
+<div id="pmc3d-hud">
+  <div id="pmc3d-prog"><div id="pmc3d-prog-f"></div></div>
+  <div id="pmc3d-flash"></div>
+
+  <div id="pmc3d-nav">
+    <div class="nav-tag" style="font-size:clamp(13px,1.2vw,16px);letter-spacing:3px;color:var(--teal);opacity:.9">PRESENCE MESH CONSENSUS <span style="opacity:.5">*</span> LIVE</div>
+    <div class="nav-time" id="pmc3d-nt">T+00:00</div>
+  </div>
+
+  <div id="pmc3d-panel-l">
+    <div class="ph-num" id="pmc3d-ph-n" data-i18n="rm_ph1_tag">Phase 01 * AMBIENT</div>
+    <div class="ph-name" id="pmc3d-ph-nm">Ambient city state</div>
+    <div class="ph-desc" id="pmc3d-ph-d">Distributed nodes in standby. Mesh dormant.</div>
+  </div>
+
+  <div id="pmc3d-panel-r">
+    <div class="conf-wrap" style="width:120px;height:120px">
+      <svg viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(65,180,211,.08)" stroke-width="3.5"/>
+        <circle id="pmc3d-ca" cx="60" cy="60" r="50" fill="none" stroke="#41B4D3" stroke-width="3.5"
+          stroke-dasharray="314.2" stroke-dashoffset="314.2"
+          stroke-linecap="round" transform="rotate(-90 60 60)"
+          style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>
+      </svg>
+      <div class="conf-num"><span class="conf-pct" id="pmc3d-cp">0</span><span class="conf-unit">CONSENSUS</span></div>
+    </div>
+    <div class="side-metric"><div class="sm-label">Active nodes</div><div class="sm-val" id="pmc3d-m-an">0</div></div>
+    <div class="side-metric"><div class="sm-label">Validated</div><div class="sm-val" id="pmc3d-m-vn">0</div></div>
+    <div class="side-metric"><div class="sm-label">Mesh radius</div><div class="sm-val" id="pmc3d-m-mr">--</div></div>
+  </div>
+
+  <div id="pmc3d-feed"></div>
+
+  <div id="pmc3d-bar">
+    <div class="bm"><div class="bm-l">Latency</div><div class="bm-v" id="pmc3d-b-lat">--</div></div>
+    <div class="bm"><div class="bm-l">Protocol</div><div class="bm-v" style="font-size:10px;letter-spacing:.5px">PMC v2.4</div></div>
+    <div class="bm"><div class="bm-l">Node types</div><div class="bm-v" style="font-size:10px">HUMAN * AI</div></div>
+    <div class="bm"><div class="bm-l">Status</div><div class="bm-v" id="pmc3d-b-st" style="font-size:10px;letter-spacing:.5px">STANDBY</div></div>
+    <div class="bm"><div class="bm-l">Coverage</div><div class="bm-v" id="pmc3d-b-cov">--</div></div>
+  </div>
+</div>
+
+
+
+  </div>
+</section>
+<script>
+(function(){
+'use strict';
+
+var wrap = document.getElementById('pmc3d-wrap');
+var cv   = document.getElementById('pmc-main-canvas');
+if(!wrap || !cv || typeof THREE === 'undefined') return;
+
+// ── Renderer ──────────────────────────────────────────────────────────
+var W = wrap.clientWidth, H = wrap.clientHeight;
+var renderer = new THREE.WebGLRenderer({ canvas:cv, antialias:true, alpha:false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setSize(W,H);
+renderer.setClearColor(0x000000,1);
+
+var scene  = new THREE.Scene();
+scene.fog  = new THREE.FogExp2(0x000000, 0.005);
+var camera = new THREE.PerspectiveCamera(50, W/H, 0.1, 300);
+camera.position.set(-22, 15, 24);
+
+window.addEventListener('resize', function(){
+  W=wrap.clientWidth; H=wrap.clientHeight;
+  renderer.setSize(W,H);
+  camera.aspect=W/H; camera.updateProjectionMatrix();
+});
+
+// ── Lights ────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0x060c18, 1.0));
+var dl = new THREE.DirectionalLight(0x41B4D3, 0.28);
+dl.position.set(8,20,12); scene.add(dl);
+scene.add(new THREE.HemisphereLight(0x000810,0x000000,0.4));
+
+// ── Ground ────────────────────────────────────────────────────────────
+var gnd = new THREE.Mesh(
+  new THREE.PlaneGeometry(140,140),
+  new THREE.MeshLambertMaterial({color:0x010306})
+);
+gnd.rotation.x=-Math.PI/2; gnd.position.y=-0.52; scene.add(gnd);
+
+// ── Urban street grid — minimal, elegant ──────────────────────────────
+// Major grid: wide city blocks
+var grid1 = new THREE.Mesh(
+  new THREE.PlaneGeometry(100,100,14,14),
+  new THREE.MeshBasicMaterial({
+    color:0x0A1E2E, wireframe:true, transparent:true, opacity:0.22
+  })
+);
+grid1.rotation.x=-Math.PI/2; grid1.position.y=-0.50; scene.add(grid1);
+
+// Minor grid: finer sub-blocks
+var grid2 = new THREE.Mesh(
+  new THREE.PlaneGeometry(100,100,42,42),
+  new THREE.MeshBasicMaterial({
+    color:0x061422, wireframe:true, transparent:true, opacity:0.07
+  })
+);
+grid2.rotation.x=-Math.PI/2; grid2.position.y=-0.49; scene.add(grid2);
+
+// ── Street lines — horizontal avenues and vertical streets ────────────
+// Adds the feeling of a real city grid without Google Maps style
+var streetMat = new THREE.LineBasicMaterial({
+  color:0x0D2840, transparent:true, opacity:0.35
+});
+function addStreet(x1,z1,x2,z2){
+  var geo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(x1,-0.48,z1),
+    new THREE.Vector3(x2,-0.48,z2)
+  ]);
+  scene.add(new THREE.Line(geo, streetMat));
+}
+// Major avenues (horizontal)
+[-18,-9,0,9,18].forEach(function(z){
+  addStreet(-50,z,50,z);
+});
+// Major streets (vertical)
+[-18,-9,0,9,18].forEach(function(x){
+  addStreet(x,-50,x,50);
+});
+// Secondary streets
+[-22,-13,-4,4,13,22].forEach(function(z){
+  var mat2 = new THREE.LineBasicMaterial({color:0x071828,transparent:true,opacity:0.18});
+  var geo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-50,-0.47,z),new THREE.Vector3(50,-0.47,z)
+  ]);
+  scene.add(new THREE.Line(geo,mat2));
+});
+[-22,-13,-4,4,13,22].forEach(function(x){
+  var mat2 = new THREE.LineBasicMaterial({color:0x071828,transparent:true,opacity:0.18});
+  var geo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(x,-0.47,-50),new THREE.Vector3(x,-0.47,50)
+  ]);
+  scene.add(new THREE.Line(geo,mat2));
+});
+
+// ── 2 landmark buildings only — not blocking ──────────────────────────
+function addBuilding(x,z,w,h,d){
+  var geo  = new THREE.BoxGeometry(w,h,d);
+  var mesh = new THREE.Mesh(geo,
+    new THREE.MeshLambertMaterial({color:0x040A10,transparent:true,opacity:0.85}));
+  mesh.position.set(x,h/2-0.5,z); scene.add(mesh);
+  var edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo),
+    new THREE.LineBasicMaterial({color:0x0B1E30,transparent:true,opacity:0.5}));
+  edges.position.copy(mesh.position); scene.add(edges);
+  // Soft glow at base
+  var glowGeo = new THREE.PlaneGeometry(w+4,d+4);
+  var glowMat = new THREE.MeshBasicMaterial({
+    color:0x0D2840,transparent:true,opacity:0.15,side:THREE.DoubleSide
+  });
+  var glow = new THREE.Mesh(glowGeo,glowMat);
+  glow.rotation.x=-Math.PI/2; glow.position.set(x,-0.4,z); scene.add(glow);
+}
+addBuilding(-22,-16, 5,16,5);   // landmark west
+addBuilding( 19,-17, 4,22,4);   // landmark east
+
+// ── NODE POOL — 140 nodes distributed across urban area ───────────────
+var STOP_POS = {x:0, z:-4};
+var nodes = [];
+var NODE_TOTAL = 140;
+
+for(var i=0; i<NODE_TOTAL; i++){
+  var nx, nz;
+  if(i < 55){
+    // Dense cluster around final stop
+    var a = Math.random()*Math.PI*2;
+    var r = 1.5 + Math.random()*6;
+    nx = STOP_POS.x + Math.cos(a)*r + (Math.random()-0.5)*2;
+    nz = STOP_POS.z + Math.sin(a)*r + (Math.random()-0.5)*2;
+  } else if(i < 100){
+    // Medium ring
+    var a = Math.random()*Math.PI*2;
+    var r = 7 + Math.random()*8;
+    nx = STOP_POS.x + Math.cos(a)*r;
+    nz = STOP_POS.z + Math.sin(a)*r;
+  } else {
+    // Distributed urban
+    var a = Math.random()*Math.PI*2;
+    var r = 14 + Math.random()*18;
+    nx = Math.cos(a)*r; nz = Math.sin(a)*r;
+  }
+  // Snap nodes to street grid feel (slight alignment)
+  nx = nx + (Math.random()-0.5)*1.5;
+  nz = nz + (Math.random()-0.5)*1.5;
+
+  var mat = new THREE.MeshBasicMaterial({color:0x41B4D3,transparent:true,opacity:0.08});
+  var mesh = new THREE.Mesh(new THREE.SphereGeometry(0.13,8,8),mat);
+  mesh.position.set(nx,0,nz); scene.add(mesh);
+
+  var hMat  = new THREE.MeshBasicMaterial({color:0x6ECDE6,transparent:true,opacity:0,side:THREE.DoubleSide});
+  var hMesh = new THREE.Mesh(new THREE.RingGeometry(0.34,0.50,24),hMat);
+  hMesh.rotation.x=-Math.PI/2; hMesh.position.set(nx,0.02,nz); scene.add(hMesh);
+
+  var h2Mat  = new THREE.MeshBasicMaterial({color:0x41B4D3,transparent:true,opacity:0,side:THREE.DoubleSide});
+  var h2Mesh = new THREE.Mesh(new THREE.RingGeometry(0.65,0.78,24),h2Mat);
+  h2Mesh.rotation.x=-Math.PI/2; h2Mesh.position.set(nx,0.01,nz); scene.add(h2Mesh);
+
+  nodes.push({
+    mesh:mesh, mat:mat,
+    halo:hMesh, hMat:hMat,
+    halo2:h2Mesh, h2Mat:h2Mat,
+    x:nx, z:nz,
+    phase:Math.random()*Math.PI*2,
+    activateAt:9999,
+    active:false, validated:false,
+    baseOp:0.05+Math.random()*0.05
+  });
+}
+
+// ── ENTITY (red event) ────────────────────────────────────────────────
+var entMat = new THREE.MeshBasicMaterial({color:0xCC2020});
+var entity = new THREE.Mesh(new THREE.SphereGeometry(0.52,20,20),entMat);
+scene.add(entity);
+
+var eRings = [];
+[{r:0.9,op:0.50},{r:1.7,op:0.26},{r:2.8,op:0.12},{r:4.0,op:0.05}].forEach(function(cfg){
+  var m  = new THREE.MeshBasicMaterial({color:0xCC2020,transparent:true,opacity:cfg.op,side:THREE.DoubleSide});
+  var me = new THREE.Mesh(new THREE.RingGeometry(cfg.r-0.06,cfg.r+0.06,32),m);
+  me.rotation.x=-Math.PI/2; scene.add(me);
+  eRings.push({mesh:me,mat:m,baseOp:cfg.op});
+});
+
+// ── RADAR WAVES — fire from locked position ───────────────────────────
+var WAVE_POOL     = 14;
+var WAVE_MAX_R    = 18;
+var WAVE_SPEED    = 5.0;
+var wavePool      = [];
+var lastWaveFire  = 0;
+
+for(var wi=0; wi<WAVE_POOL; wi++){
+  var wPts = [];
+  var wSegs = 64;
+  for(var wi2=0; wi2<=wSegs; wi2++){
+    var a2 = (wi2/wSegs)*Math.PI*2;
+    wPts.push(Math.cos(a2),0,Math.sin(a2));
+  }
+  var wGeo = new THREE.BufferGeometry();
+  wGeo.setAttribute('position', new THREE.Float32BufferAttribute(wPts,3));
+  var wMat = new THREE.LineBasicMaterial({color:0x41B4D3,transparent:true,opacity:0});
+  var wLine = new THREE.Line(wGeo,wMat);
+  wLine.position.y=0.04; scene.add(wLine);
+  wavePool.push({line:wLine,geo:wGeo,mat:wMat,active:false,r:0,born:0});
+}
+
+function fireWave(x,z){
+  for(var fi=0;fi<WAVE_POOL;fi++){
+    var wv=wavePool[fi];
+    if(!wv.active){
+      wv.active=true; wv.r=0.1; wv.born=elapsed;
+      wv.line.position.set(x,0.04,z);
+      wv.mat.opacity=0.55;
+      return;
+    }
+  }
+}
+
+// ── TRAIL ─────────────────────────────────────────────────────────────
+var TRAIL_MAX = 280;
+var trailBuf  = new Float32Array(TRAIL_MAX*3);
+var trailGeo  = new THREE.BufferGeometry();
+trailGeo.setAttribute('position',new THREE.BufferAttribute(trailBuf,3));
+trailGeo.setDrawRange(0,0);
+var trailLine = new THREE.Line(trailGeo,
+  new THREE.LineBasicMaterial({color:0xCC2020,transparent:true,opacity:0.60}));
+scene.add(trailLine);
+
+// ── PATH — city-like zig-zag route through the urban grid ─────────────
+// Points are snapped to street-like coordinates for realism
+var PATH_PTS = [
+  new THREE.Vector3(-26, 0,  18),   // starts moving
+  new THREE.Vector3(-18, 0,   9),   // turns south
+  new THREE.Vector3(-18, 0,  -0),   // along vertical street
+  new THREE.Vector3( -9, 0,  -0),   // turns east
+  new THREE.Vector3( -9, 0,  -9),   // turns south
+  new THREE.Vector3(  0, 0,  -9),   // turns east
+  new THREE.Vector3(  0, 0,  -4),   // approach stop
+  new THREE.Vector3(  0, 0,  -4),   // final stop
+];
+var curve    = new THREE.CatmullRomCurve3(PATH_PTS,false,'catmullrom',0.3);
+var NPTS     = 600;
+var curvePts = curve.getPoints(NPTS);
+
+// ── VALIDATION LINES ──────────────────────────────────────────────────
+var valLines = [];
+function spawnValLine(from,to){
+  var geo = new THREE.BufferGeometry().setFromPoints([from.clone(),to.clone()]);
+  var mat = new THREE.LineBasicMaterial({color:0x6ECDE6,transparent:true,opacity:0.55});
+  valLines.push({line:new THREE.Line(geo,mat), mat:mat, born:0});
+  scene.add(valLines[valLines.length-1].line);
+}
+
+// ── PRE-SCHEDULE NODE ACTIVATIONS ─────────────────────────────────────
+var JOURNEY_TIME = 36;
+nodes.forEach(function(n){
+  var minDist=999, minT=0;
+  for(var i=0;i<NPTS;i++){
+    var pt=curvePts[i];
+    var dx=pt.x-n.x, dz=pt.z-n.z;
+    var d=Math.sqrt(dx*dx+dz*dz);
+    if(d<minDist){minDist=d;minT=i/NPTS;}
+  }
+  n.closestDist=minDist;
+  if(minDist<18){
+    n.activateAt=minT*JOURNEY_TIME + Math.random()*1.2;
+  }
+});
+
+// ── HUD ELEMENTS ──────────────────────────────────────────────────────
+var elPhN  = document.getElementById('pmc3d-ph-n');
+var elPhNm = document.getElementById('pmc3d-ph-nm');
+var elPhD  = document.getElementById('pmc3d-ph-d');
+var elCa   = document.getElementById('pmc3d-ca');
+var elCp   = document.getElementById('pmc3d-cp');
+var elAN   = document.getElementById('pmc3d-m-an');
+var elVN   = document.getElementById('pmc3d-m-vn');
+var elMR   = document.getElementById('pmc3d-m-mr');
+var elFeed = document.getElementById('pmc3d-feed');
+var elLat  = document.getElementById('pmc3d-b-lat');
+var elSt   = document.getElementById('pmc3d-b-st');
+var elCov  = document.getElementById('pmc3d-b-cov');
+var elNt   = document.getElementById('pmc3d-nt');
+
+function addFeed(tag,txt){
+  if(!elFeed) return;
+  var d=document.createElement('div');
+  d.className='pmc3d-fe';
+  d.innerHTML='<div class="pmc3d-fe-tag">'+tag+'</div><div class="pmc3d-fe-txt">'+txt+'</div>';
+  elFeed.insertBefore(d,elFeed.firstChild);
+  requestAnimationFrame(function(){d.classList.add('in');});
+  while(elFeed.children.length>5) elFeed.removeChild(elFeed.lastChild);
+}
+
+var PHASES=[
+  {n:'01',nm:'Event detected',        d:'Moving entity identified. Mesh activating.'},
+  {n:'02',nm:'Geographic activation', d:'Nodes coming online. Radius expanding.'},
+  {n:'03',nm:'Dynamic tracking',      d:'PMC consensus building. Trajectory live.'},
+  {n:'04',nm:'Consensus reached',     d:'Entity stopped. 94%+ confidence. PMC resolved.'},
+];
+var curPhase=-1;
+function setPhase(i){
+  if(i===curPhase) return;
+  curPhase=i;
+  var ph=PHASES[i];
+  if(elPhN)  elPhN.textContent ='Phase '+ph.n+' * PMC';
+  if(elPhNm) elPhNm.textContent=ph.nm;
+  if(elPhD)  elPhD.textContent =ph.d;
+  addFeed(ph.nm.toUpperCase(),ph.d);
+}
+
+// ── STATE — entity starts moving immediately ───────────────────────────
+// Pre-offset t so entity is already partway through path on frame 1
+var JOURNEY_SPEED = 1/JOURNEY_TIME/60;
+var t         = 0.04;              // ← already 4% into the route = already moving
+var stopped   = false;
+var STOP_T    = 0.975;
+var conf      = 0, activeN=0, validN=0;
+var trailCnt  = 0, lastPtIdx=0;
+var camAngle  = 0.3, camR=19, camY=14;
+var focX=0, focZ=0;
+var elapsed   = 0, startT=-1;
+var lastFeedT = 0;
+
+// ── MAIN LOOP ─────────────────────────────────────────────────────────
+function tick(ts){
+  requestAnimationFrame(tick);
+  if(startT<0) startT=ts;
+  elapsed=(ts-startT)/1000;
+  var dt=0.016;
+
+  // ── Clock ──────────────────────────────────────────────────────
+  var sec=Math.floor(elapsed),mm=Math.floor(sec/60),ss=sec%60;
+  if(elNt) elNt.textContent='T+'+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0');
+
+  // ── Entity movement — continuous from start ─────────────────────
+  if(!stopped){
+    t += JOURNEY_SPEED;
+    if(t>=STOP_T){
+      t=STOP_T; stopped=true;
+      setPhase(3);
+      addFeed('ENTITY STOPPED',validN+' validators · '+Math.round(conf)+'% consensus · resolved');
+    }
+  }
+  var pct=t/STOP_T;
+  if(pct<0.12)      setPhase(0);
+  else if(pct<0.28) setPhase(1);
+  else if(pct<0.82) setPhase(2);
+
+  var ptIdx = Math.min(Math.floor(t*NPTS), NPTS-1);
+  var ePos  = curvePts[ptIdx].clone(); ePos.y=0;
+  entity.position.copy(ePos);
+
+  // Entity pulse rings
+  eRings.forEach(function(r){
+    r.mesh.position.set(ePos.x,0.02,ePos.z);
+    r.mat.opacity=r.baseOp*(0.65+0.35*Math.sin(elapsed*3.2));
+  });
+
+  // ── RADAR WAVES from locked position ──────────────────────────
+  var wInterval = stopped ? 0.55 : 0.85;
+  if(elapsed-lastWaveFire >= wInterval){
+    lastWaveFire=elapsed;
+    fireWave(ePos.x, ePos.z);
+  }
+  wavePool.forEach(function(wv){
+    if(!wv.active) return;
+    wv.r += WAVE_SPEED*dt;
+    var progress=wv.r/WAVE_MAX_R;
+    var pos=wv.geo.attributes.position.array;
+    for(var si=0;si<=64;si++){
+      var a=(si/64)*Math.PI*2;
+      pos[si*3]=Math.cos(a)*wv.r; pos[si*3+1]=0; pos[si*3+2]=Math.sin(a)*wv.r;
+    }
+    wv.geo.attributes.position.needsUpdate=true;
+    var baseOp=stopped?0.65:0.52;
+    wv.mat.opacity=Math.max(0,baseOp*(1-progress));
+    wv.mat.color.setHex(progress<0.3?0x6ECDE6:0x41B4D3);
+    if(wv.r>=WAVE_MAX_R){wv.active=false;wv.mat.opacity=0;wv.r=0;}
+  });
+
+  // ── Trail ─────────────────────────────────────────────────────
+  if(ptIdx>lastPtIdx && trailCnt<TRAIL_MAX){
+    for(var ii=lastPtIdx;ii<ptIdx&&trailCnt<TRAIL_MAX;ii+=2){
+      var tc=trailCnt*3;
+      trailBuf[tc]=curvePts[ii].x; trailBuf[tc+1]=0.06; trailBuf[tc+2]=curvePts[ii].z;
+      trailCnt++;
+    }
+    lastPtIdx=ptIdx;
+    trailGeo.attributes.position.needsUpdate=true;
+    trailGeo.setDrawRange(0,trailCnt);
+  }
+
+  // ── Progressive node activation ───────────────────────────────
+  nodes.forEach(function(n){
+    if(!n.active && elapsed>=n.activateAt){
+      n.active=true; activeN++;
+      spawnValLine(ePos, n.mesh.position);
+      if(elapsed-lastFeedT>0.65){
+        lastFeedT=elapsed;
+        addFeed('NODE '+String(activeN).padStart(3,'0')+' ACTIVE',
+          'Grid ('+n.x.toFixed(1)+','+n.z.toFixed(1)+') validating');
+      }
+    }
+  });
+
+  // After stop: cascade remaining nearby nodes
+  if(stopped){
+    nodes.forEach(function(n){
+      if(!n.active){
+        var dx=n.x-ePos.x,dz=n.z-ePos.z;
+        var d=Math.sqrt(dx*dx+dz*dz);
+        if(d<11 && n.activateAt>elapsed){
+          n.activateAt=elapsed+d*0.10+Math.random()*0.5;
+        }
+      }
+    });
+  }
+
+  // ── Node visual states ─────────────────────────────────────────
+  nodes.forEach(function(n){
+    var dx=n.x-ePos.x, dz=n.z-ePos.z;
+    var dist=Math.sqrt(dx*dx+dz*dz);
+    if(n.active){
+      if(dist<5.5){
+        if(!n.validated){
+          n.validated=true; validN++;
+          if(elapsed-lastFeedT>0.4){
+            lastFeedT=elapsed;
+            addFeed('VALIDATED','Conf +0.'+Math.floor(Math.random()*18+8)+' · Obs #'+validN);
+          }
+        }
+        n.mat.color.setHex(0xcceeee);
+        n.mat.opacity=0.88+0.10*Math.sin(elapsed*6+n.phase);
+        n.hMat.opacity=0.62+0.36*Math.sin(elapsed*5+n.phase);
+        n.hMat.color.setHex(0x6ECDE6);
+        var outerOp=0.30+0.18*Math.sin(elapsed*2.2+n.phase+1.0);
+        n.h2Mat.opacity=outerOp;
+        if(stopped){
+          var ps=elapsed-STOP_T*JOURNEY_TIME;
+          n.halo2.scale.setScalar(1.0+Math.min(ps*0.09,0.85));
+          n.h2Mat.opacity=0.28+0.20*Math.sin(elapsed*1.8+n.phase);
+        }
+      } else if(dist<11){
+        n.mat.color.setHex(0x41B4D3);
+        n.mat.opacity=0.38+0.14*Math.sin(elapsed*1.8+n.phase);
+        n.hMat.opacity=0.08+0.07*Math.sin(elapsed*2.2+n.phase);
+        n.hMat.color.setHex(0x41B4D3);
+        n.h2Mat.opacity=0;
+      } else {
+        n.mat.color.setHex(0x41B4D3);
+        n.mat.opacity=0.18+0.05*Math.sin(elapsed*1.0+n.phase);
+        n.hMat.opacity=0; n.h2Mat.opacity=0;
+      }
+    } else {
+      n.mat.opacity=n.baseOp+0.02*Math.sin(elapsed*0.6+n.phase);
+      n.hMat.opacity=0; n.h2Mat.opacity=0;
+    }
+  });
+
+  // ── Validation lines fade ──────────────────────────────────────
+  valLines.forEach(function(vl){
+    if(!vl.born) vl.born=elapsed;
+    var age=elapsed-vl.born;
+    vl.mat.opacity=age<2.2?0.52*(1-age/2.2):0;
+  });
+
+  // ── Confidence ────────────────────────────────────────────────
+  var tConf=Math.min(94,pct*86+validN*0.07+(stopped?4:0));
+  conf+=(tConf-conf)*0.022;
+  var cInt=Math.round(conf);
+  if(elCp) elCp.textContent=cInt;
+  if(elCa) elCa.style.strokeDashoffset=314.2*(1-conf/100);
+  if(elAN) elAN.textContent=activeN;
+  if(elVN) elVN.textContent=validN;
+  if(elMR) elMR.textContent=activeN>0?(2.0+pct*2.5).toFixed(1)+'km':'--';
+
+  if(elLat) elLat.textContent=(750+Math.round(Math.random()*80))+'ms';
+  if(elSt)  elSt.textContent =stopped?'RESOLVED':'TRACKING';
+  if(elCov) elCov.textContent=activeN>0?(activeN*0.14).toFixed(0)+'%':'--';
+
+  // ── Camera slow orbit ─────────────────────────────────────────
+  camAngle+=dt*(stopped?0.05:0.085);
+  focX+=(ePos.x-focX)*0.030; focZ+=(ePos.z-focZ)*0.030;
+  camera.position.set(
+    focX+camR*Math.cos(camAngle), camY,
+    focZ+camR*Math.sin(camAngle)
+  );
+  camera.lookAt(focX,0,focZ);
+
+  renderer.render(scene,camera);
+}
+
+// ── Boot — entity already moving on first frame ────────────────────────
+function start(){
+  // Activate initial nodes along the already-traveled section
+  nodes.forEach(function(n){
+    if(n.activateAt < t*JOURNEY_TIME){
+      n.active=true; n.validated=false; activeN++;
+    }
+  });
+
+  // Pre-fill trail for the portion already traveled
+  for(var ii=0; ii<Math.floor(t*NPTS); ii+=2){
+    if(trailCnt>=TRAIL_MAX) break;
+    var tc=trailCnt*3;
+    trailBuf[tc]=curvePts[ii].x; trailBuf[tc+1]=0.06; trailBuf[tc+2]=curvePts[ii].z;
+    trailCnt++;
+  }
+  lastPtIdx=Math.floor(t*NPTS);
+  trailGeo.attributes.position.needsUpdate=true;
+  trailGeo.setDrawRange(0,trailCnt);
+
+  setPhase(1); // starts in phase 2 — already tracking
+  addFeed('PMC MESH ACTIVE','CDMX Zone 4 · Entity in motion · tracking');
+  tick(performance.now());
+}
+
+if('IntersectionObserver' in window){
+  var obs=new IntersectionObserver(function(e){
+    if(e[0].isIntersecting){obs.disconnect();start();}
+  },{threshold:0.1});
+  obs.observe(wrap);
+} else { start(); }
+
+setTimeout(function(){
+  document.querySelectorAll('.rmr').forEach(function(el){el.classList.add('vis');});
+},300);
+
+})();
+</script>
+
+
+
+
+
+
+<section id="problem">
+  <div class="inner">
+    <div class="pg">
+      <div class="rvl">
+        <span class="tag" data-i18n="prob_tag">The Problem</span>
+        <h2 class="h-lg" style="margin-bottom:32px" data-i18n-html="prob_h2">No system tracks<br><span class="accent">what is moving.</span></h2>
+        <p class="dim" style="font-size:15px;margin-bottom:28px" data-i18n="prob_body">Every city has cameras. Every citizen has a smartphone. Every business has sensors. But none of these are connected into a unified intelligence layer capable of tracking what is happening — as it happens. The result: 94% of cameras are unlinked, response times average 11 minutes, and moving threats are invisible to every system in existence.</p>
+        <div class="pl">
+          <div class="point">
+            <div style="display:flex;justify-content:center;margin-bottom:inherit"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div></div>
+            <div>
+              <div class="pt" data-i18n="prob_card1_h">Isolated surveillance infrastructure</div>
+              <p class="pd" data-i18n="prob_card1_d">Millions of cameras — public, private, municipal — operate as disconnected silos. No shared intelligence layer. No real-time correlation. No event tracking across feeds.</p>
+            </div>
+          </div>
+          <div class="point">
+            <div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
+            <div>
+              <div class="pt" data-i18n="prob_card2_h">Reactive, not real-time</div>
+              <p class="pd" data-i18n="prob_card2_d">Emergency response averages 8–12 minutes after a call. By then, a moving entity — a vehicle, a suspect, an unfolding event — has traversed multiple city blocks. There is no system that tracks it.</p>
+            </div>
+          </div>
+          <div class="point">
+            <div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg></div></div>
+            <div>
+              <div class="pt" data-i18n="prob_card3_h">No collaborative sensing layer</div>
+              <p class="pd" data-i18n="prob_legacy">Cities have cameras. Citizens have eyes. Businesses have sensors. Police have radios. But none of these are connected into a unified real-time intelligence layer capable of dynamic event reconstruction.</p>
+            </div>
+          </div>
+          <div class="point">
+            <div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+            <div>
+              <div class="pt" data-i18n="prob_card4_h">Static systems for dynamic threats</div>
+              <p class="pd">Existing systems — including navigation apps, public safety platforms, and municipal reporting tools — focus on isolated, point-in-time events.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pvis rvr">
+        <div class="cube-wrap">
+          <svg width="300" height="300" viewBox="0 0 300 300">
+            <ellipse fill="none" stroke="rgba(65,180,211,.14)" stroke-width="1" cx="150" cy="150" rx="130" ry="44" style="transform-origin:150px 150px;animation:ox 8s linear infinite"/>
+            <ellipse fill="none" stroke="rgba(65,180,211,.10)" stroke-width="1" cx="150" cy="150" rx="44" ry="130" style="transform-origin:150px 150px;animation:oy 10s linear infinite"/>
+            <circle fill="rgba(65,180,211,.06)" cx="150" cy="150" r="35"/>
+            <circle fill="rgba(65,180,211,.14)" cx="150" cy="150" r="22"/>
+            <circle fill="#41B4D3" cx="150" cy="150" r="10"/>
+          </svg>
+        </div>
+        <div class="df df1"><div style="color:rgba(144,164,174,.5);font-size:10px;margin-bottom:4px">AVG RESPONSE TIME</div><div style="color:#41B4D3;font-size:18px;font-weight:700">11 min</div></div>
+        <div class="df df2"><div style="color:rgba(144,164,174,.5);font-size:10px;margin-bottom:4px">CAMERAS UNLINKED</div><div style="color:#41B4D3;font-size:18px;font-weight:700">94%</div></div>
+        <div class="df df3"><div style="color:rgba(144,164,174,.5);font-size:10px;margin-bottom:4px">EVENTS UNRESOLVED</div><div style="color:#41B4D3;font-size:18px;font-weight:700">67%</div></div>
+        <div class="df df4"><div style="color:rgba(144,164,174,.5);font-size:10px;margin-bottom:4px">TRACKING COVERAGE</div><div style="color:#41B4D3;font-size:18px;font-weight:700">0%</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<section id="how">
+  <div class="inner">
+    <div class="rv" style="text-align:center;max-width:640px;margin:0 auto">
+      <span class="tag" data-i18n="how_tag">How Jalibor Works</span>
+      <h2 class="h-lg" data-i18n-html="how_h2">Distributed tracking of<br><span class="accent">moving real-world entities</span></h2>
+      <p class="dim" style="margin-top:16px;font-size:15px" data-i18n="eco_body">Jalibor uses Presence Mesh Consensus to validate and track real-world events in real time. Unlike platforms that report static events, Jalibor continuously reconstructs the trajectory of moving entities — through a distributed mesh of human observers and AI systems.</p>
+    </div>
+    <div class="stg rv" style="transition-delay:.1s">
+      <div class="step">
+        <span class="sn">01</span>
+        <span class="si"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M7.76 7.76a6 6 0 0 0 0 8.49"/><path d="M10.59 10.59a2 2 0 0 0 0 2.83"/></svg></div></span>
+        <div class="st" data-i18n="step1_t">Event detected</div>
+        <p class="sd" data-i18n="step1_d">A node — human or AI — detects an event and submits a georeferenced, timestamped report. Single-source confidence: low.</p>
+        <div class="sbar"></div>
+      </div>
+      <div class="step">
+        <span class="sn">02</span>
+        <span class="si"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg></div></span>
+        <div class="st" data-i18n="step2_t">Mesh activated</div>
+        <p class="sd" data-i18n="step2_d">The geographic mesh surrounding the event is instantly alerted. Nearby human nodes and AI cameras enter a heightened validation state.</p>
+        <div class="sbar"></div>
+      </div>
+      <div class="step">
+        <span class="sn">03</span>
+        <span class="si"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></span>
+        <div class="st" data-i18n="step3_t">Validation</div>
+        <p class="sd" data-i18n="step3_d">Independent nodes confirm, deny, or extend the event with new observations. Spatial and temporal coherence is verified. Consensus builds.</p>
+        <div class="sbar"></div>
+      </div>
+      <div class="step">
+        <span class="sn">04</span>
+        <span class="si"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg></div></span>
+        <div class="st" data-i18n="step4_t">Dynamic reconstruction</div>
+        <p class="sd" data-i18n="step4_d">The consensus engine reconstructs the entity's trajectory in real time. A moving motorcycle, a suspect route — tracked across the city through the distributed mesh.</p>
+        <div class="sbar"></div>
+      </div>
+    </div>
+    <div class="rv" style="margin-top:3px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;transition-delay:.2s">
+      <div style="background:var(--card);padding:24px 20px;text-align:center">
+        <div style="margin-bottom:10px;display:flex;justify-content:center"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div></div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px" data-i18n="node1_h">Human nodes</div>
+        <div style="font-size:12px;color:var(--silver);line-height:1.6" data-i18n="node1_d">Citizens, businesses, security personnel with smartphones</div>
+      </div>
+      <div style="background:var(--card);padding:24px 20px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="margin-bottom:10px;display:flex;justify-content:center"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div></div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px" data-i18n="node2_h">AI camera nodes</div>
+        <div style="font-size:12px;color:var(--silver);line-height:1.6" data-i18n="node2_d">Connected cameras providing autonomous visual validation</div>
+      </div>
+      <div style="background:var(--card);padding:24px 20px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="margin-bottom:10px;display:flex;justify-content:center"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div></div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px" data-i18n="node3_h">Business nodes</div>
+        <div style="font-size:12px;color:var(--silver);line-height:1.6" data-i18n="node3_d">Retail, logistics, buildings with sensor and camera infrastructure</div>
+      </div>
+      <div style="background:var(--card);padding:24px 20px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="margin-bottom:10px;display:flex;justify-content:center"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div></div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px" data-i18n="node4_h">Future IoT nodes</div>
+        <div style="font-size:12px;color:var(--silver);line-height:1.6" data-i18n="node4_d">Connected vehicles, public sensors, smart city infrastructure</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="formula">
+  <div class="inner">
+    <!-- DYNAMIC TRACKING ENGINE -->
+    <div class="fl" style="margin-bottom:100px">
+      <div class="rvl">
+        <span class="tag" data-i18n="formula_tag">Dynamic Tracking Engine</span>
+        <h2 class="h-md" style="margin-bottom:20px" data-i18n-html="formula_h2">Not reporting.<br><span class="accent">Tracking.</span></h2>
+        <p class="dim" style="font-size:14px;margin-bottom:24px" data-i18n="formula_body">Current urban platforms focus on isolated event reporting. Jalibor enables distributed real-time tracking and validation of moving real-world entities across city environments.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">
+          <div style="padding:16px;border:1px solid var(--brd2);border-radius:6px;background:rgba(204,48,48,.04);border-color:rgba(204,48,48,.15)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(204,48,48,.7);letter-spacing:1px;margin-bottom:8px" data-i18n="legacy_label">LEGACY SYSTEMS</div>
+            <div style="font-size:12px;color:var(--silver);line-height:1.7" data-i18n="legacy_items">Point-in-time reports · Static location · No trajectory · No cross-validation · Siloed data</div>
+          </div>
+          <div style="padding:16px;border:1px solid var(--brd);border-radius:6px;background:rgba(65,180,211,.04)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:8px">JaliborBOR PMC</div>
+            <div style="font-size:12px;color:var(--silver);line-height:1.7" data-i18n="pmc_items">Real-time trajectory · Moving entity tracking · Distributed witness mesh · AI-human consensus · Confidence scoring</div>
+          </div>
+        </div>
+        <div class="cb">
+          <div class="ch"><div class="cd" style="background:#FF5F57"></div><div class="cd" style="background:#FEBC2E"></div><div class="cd" style="background:#28C840"></div><span class="cfn">tracking_engine.ts</span></div>
+          <div class="cbody">
+            <div><span class="co">// PMC — Presence Mesh Consensus</span></div>
+            <div><span class="ck">event</span> <span class="cf">detected</span>(<span class="cv">entity</span>, <span class="cv">geo</span>) {</div>
+            <div>&nbsp;&nbsp;<span class="cv">mesh</span>.activate(<span class="cv">geo</span>.radius(<span class="ck">800m</span>));</div>
+            <div>&nbsp;&nbsp;<span class="cv">nodes</span>.forEach(<span class="cv">n</span> =&gt; <span class="cv">n</span>.alert(<span class="cv">entity</span>));</div>
+            <div>&nbsp;&nbsp;<span class="ck">while</span> (<span class="cv">confidence</span> &lt; <span class="ck">0.85</span>) {</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cv">consensus</span>.update(<span class="cv">validations</span>);</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cv">trajectory</span>.reconstruct();</div>
+            <div>&nbsp;&nbsp;}</div>
+            <div>} <span class="co">// latency: &lt;800ms</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="rvr">
+        <span class="tag" data-i18n="net_rev_h">Confidence Engine · POPV</span>
+        <h2 class="h-md" style="margin-bottom:8px">Confidence <span class="accent">Engine</span></h2>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--silver);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:28px">Proof of Presence Validation (POPV)</p>
+        <p class="dim" style="font-size:14px;margin-bottom:28px">Every event generates a distributed confidence score updated in real time as independent nodes corroborate. Single reports never reach high confidence — structural anti-fraud by design.</p>
+        <div class="tt">
+          <div class="tr"><span class="tp">0–14%</span><span class="tn" data-i18n="conf_0">Unverified report</span><span class="tnd">0–1 node</span></div>
+          <div class="tr"><span class="tp">15–29%</span><span class="tn" data-i18n="conf_1">Initial signal</span><span class="tnd">2–4 nodes</span></div>
+          <div class="tr"><span class="tp">30–49%</span><span class="tn" data-i18n="conf_2">Possible — alert state</span><span class="tnd">5–9 nodes</span></div>
+          <div class="tr"><span class="tp">50–64%</span><span class="tn" data-i18n="conf_3">Probable — mesh active</span><span class="tnd">10–19 nodes</span></div>
+          <div class="tr" style="border-color:rgba(65,180,211,.25)"><span class="tp">65–79%</span><span class="tn" data-i18n="conf_4">Confirmed — broadcast active</span><span class="tnd">20–39 nodes</span></div>
+          <div class="tr" style="border-color:rgba(65,180,211,.35)"><span class="tp">80–89%</span><span class="tn" data-i18n="conf_5">Verified — trajectory live</span><span class="tnd">40–74 nodes</span></div>
+          <div class="tr" style="border-color:rgba(65,180,211,.5);background:rgba(65,180,211,.06)"><span class="tp" style="color:var(--teal2)">90–100%</span><span class="tn" style="color:var(--teal2)" data-i18n="conf_6">Strongly validated</span><span class="tnd">75+ nodes</span></div>
+        </div>
+        <div style="margin-top:20px;padding:16px 20px;background:rgba(65,180,211,.06);border:1px solid rgba(65,180,211,.15);border-radius:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1.5px;display:block;margin-bottom:6px" data-i18n="conf_live">LIVE EXAMPLE</span>
+          <span style="font-size:13px;color:var(--white)">11 cameras + 7 human nodes → <strong style="color:var(--teal)">94%</strong> confidence · 2.3km trajectory · 18 independent observers</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANTI-FRAUD ARCHITECTURE -->
+    <div class="rv" style="text-align:center;max-width:560px;margin:0 auto 48px">
+      <span class="tag">Trust Architecture</span>
+      <h2 class="h-md">Distributed <span class="accent">anti-fraud</span></h2>
+      <p class="dim" style="margin-top:12px;font-size:14px">False reports become structurally difficult. Not through moderation — through math. Consensus requires independent corroboration across spatial and temporal dimensions simultaneously.</p>
+    </div>
+    <div class="rv" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden">
+      <div style="background:var(--card);padding:28px 24px">
+        <div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg></div></div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px">Multi-node requirement</div>
+        <p style="font-size:12px;color:var(--silver);line-height:1.65">A single report never achieves high confidence. Independent nodes — with no knowledge of each other — must corroborate independently.</p>
+      </div>
+      <div style="background:var(--card);padding:28px 24px;border-left:1px solid var(--brd2)">
+        <div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M7.76 7.76a6 6 0 0 0 0 8.49"/><path d="M10.59 10.59a2 2 0 0 0 0 2.83"/></svg></div></div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px">Spatial coherence check</div>
+        <p style="font-size:12px;color:var(--silver);line-height:1.65">Validations must be geographically consistent with the event's reported location. Nodes outside the plausible radius are penalized.</p>
+      </div>
+      <div style="background:var(--card);padding:28px 24px;border-left:1px solid var(--brd2)">
+        <div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px">Temporal coherence check</div>
+        <p style="font-size:12px;color:var(--silver);line-height:1.65">Reports must be temporally consistent with a plausible entity trajectory. Retroactive or impossibly-timed reports reduce the submitter's trust score.</p>
+      </div>
+      <div style="background:var(--card);padding:28px 24px;border-left:1px solid var(--brd2)">
+        <div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div></div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px">AI visual arbitration</div>
+        <p style="font-size:12px;color:var(--silver);line-height:1.65">AI camera nodes provide independent visual verification. Contradictions between human reports and AI observations reduce confidence and flag the discrepancy.</p>
+      </div>
+    </div>
+
+    <!-- TRUST SCORE TABLE -->
+    
+  </div>
+</section>
+
+<section id="ecosystem">
+  <div class="inner">
+    <div class="rv" style="text-align:center;max-width:640px;margin:0 auto">
+      <span class="tag" data-i18n="eco_tag">Network Participants</span>
+      <h2 class="h-lg">The <span class="accent">mesh</span> is everyone</h2>
+      <p class="dim" style="margin-top:16px;font-size:15px">Jalibor's network effect compounds with every node that joins. The more participants, the stronger the consensus, the faster the validation, the broader the geographic coverage. Infrastructure that scales with adoption.</p>
+    </div>
+    <div class="ecog">
+      <div class="ecoc"><div style="display:flex;justify-content:center;margin-bottom:inherit"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div></div>
+        <p class="ecod" data-i18n="eco_card1_d">Primary validation nodes. Report events, validate sightings, and track moving entities through the city mesh. Their verified presence is the foundation of PMC.</p>
+        <span class="ecotag" data-i18n="eco_card1_h">Human Node Layer</span>
+      </div>
+      <div class="ecoc"><div style="display:flex;justify-content:center;margin-bottom:inherit"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div></div>
+        <p class="ecod" data-i18n="eco_card2_d">Connected cameras — residential, commercial, municipal — operating as autonomous AI validation nodes. Visual entity detection, direction tracking, and confidence contribution without human intervention.</p>
+        <span class="ecotag" data-i18n="eco_card2_h">Autonomous Node Layer</span>
+      </div>
+      <div class="ecoc"><div style="display:flex;justify-content:center;margin-bottom:inherit"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div></div>
+        <p class="ecod" data-i18n="eco_card3_d">Real-time urban event intelligence via API. Situational awareness dashboards, dynamic threat tracking, and inter-agency event sharing. From reactive to predictive.</p>
+        <span class="ecotag" data-i18n="eco_card3b_h">Command & Control API</span>
+      </div>
+      <div class="ecoc"><div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+        <p class="ecod" data-i18n="eco_card3b_d">Police, private security, and rapid response teams integrate PMC data for real-time situational awareness. Moving entity tracking. Trajectory prediction. Coordinated response.</p>
+        <span class="ecotag" data-i18n="eco_card4_h">Response Integration</span>
+      </div>
+      <div class="ecoc"><div style="display:flex;justify-content:center;margin-bottom:inherit"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div></div>
+        <p class="ecod" data-i18n="eco_card4_d">Logistics, insurance, retail and real estate operators integrate urban intelligence to reduce operational risk, protect assets, and optimize coverage in high-density urban areas.</p>
+        <span class="ecotag" data-i18n="eco_card5_h">Enterprise Intelligence API</span>
+      </div>
+      <div class="ecoc"><div style="display:flex;justify-content:center;margin-bottom:inherit"><div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(65,180,211,.22);border-radius:8px;background:rgba(65,180,211,.07)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div></div>
+        <p class="ecod" data-i18n="eco_card5_d">Connected vehicles, smart city sensors, public infrastructure nodes joining the mesh. As the IoT ecosystem expands, Jalibor's coverage and resolution increase automatically.</p>
+        <span class="ecotag">Next-Gen Node Layer</span>
+      </div>
+    </div>
+
+    <!-- NETWORK EFFECTS CALLOUT -->
+    <div class="rv" style="margin-top:3px;padding:40px;border:1px solid var(--brd2);border-radius:6px;background:rgba(65,180,211,.03);display:flex;gap:60px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px">
+        <span class="tag" style="margin-bottom:10px" data-i18n="eco_net_h">Network Effects</span>
+        <h3 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--white);margin-bottom:12px">Every node <span class="accent">strengthens every other node</span></h3>
+        <p style="font-size:14px;color:var(--silver);line-height:1.7">Like Uber with drivers or Waze with users — but the network effect here compounds geometrically. More nodes means stronger consensus, faster validation, better tracking, and wider geographic coverage. The system becomes exponentially more accurate with scale.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0">
+        <div style="text-align:center;padding:20px;border:1px solid var(--brd2);border-radius:6px;background:var(--card)">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--teal)">2×</div>
+          <div style="font-size:11px;color:var(--silver);margin-top:4px">Nodes = 4× validation speed</div>
+        </div>
+        <div style="text-align:center;padding:20px;border:1px solid var(--brd2);border-radius:6px;background:var(--card)">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--teal)">10×</div>
+          <div style="font-size:11px;color:var(--silver);margin-top:4px">Nodes = 30× coverage area</div>
+        </div>
+        <div style="text-align:center;padding:20px;border:1px solid var(--brd2);border-radius:6px;background:var(--card)">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--teal)">100×</div>
+          <div style="font-size:11px;color:var(--silver);margin-top:4px">Nodes = near-total urban visibility</div>
+        </div>
+        <div style="text-align:center;padding:20px;border:1px solid rgba(65,180,211,.3);border-radius:6px;background:rgba(65,180,211,.06)">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--teal2)">∞</div>
+          <div style="font-size:11px;color:var(--silver);margin-top:4px">Scale unlocks AI self-training</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="inner">
+    <div class="rmh rv">
+      <span class="tag" data-i18n="rm_tag">Vision 2026–2036</span>
+      <h2 class="h-lg">Road<span class="accent">map</span></h2>
+      <p class="dim" style="margin-top:16px;font-size:15px" data-i18n="rm_sub">A decade to build the largest distributed urban intelligence network — from Latin America to the world.</p>
+    </div>
+    <div class="rmw">
+      <div class="rms"></div>
+      <div class="rmr"><div class="rmc"><span class="rmy">2026</span><span class="rmph" data-i18n="rm_ph2_tag">Phase 0–1 · Foundation & Protocol Launch</span><div class="rmtit" data-i18n="rm_ph1_1">Protocol genesis</div><div class="rmbl"><div class="rmb" data-i18n="rm_ph1_2">Mobile app MVP + WhatsApp bot</div><div class="rmb" data-i18n="rm_ph1_3">Private beta 500 users — CDMX</div><div class="rmb" data-i18n="rm_ph1_4">Protocol audit — network live</div><div class="rmb" data-i18n="rm_ph1_5">B2B API partnerships — enterprise contracts structure</div><div class="rmb" data-i18n="rm_ph2_1">Enterprise API contracts structured only via network participation validation</div></div><span class="rmbdg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> 10K active contributors</span></div><div class="rmd"><div class="rmdn live"></div></div><div class="rmg"></div></div>
+      <div class="rmr"><div class="rmg"></div><div class="rmd"><div class="rmdn"></div></div><div class="rmc"><span class="rmy">2027</span><span class="rmph" data-i18n="rm_ph3_tag">Phase 2 · LATAM Expansion</span><div class="rmtit" data-i18n="rm_ph2_sub">Regional growth</div><div class="rmbl"><div class="rmb" data-i18n="rm_ph2_2">Expansion to Bogotá, Lima, Buenos Aires</div><div class="rmb" data-i18n="rm_ph2_3">Integration with 15 municipalities</div><div class="rmb" data-i18n="rm_ph2_4">Municipal API integrations — 5+ cities</div><div class="rmb" data-i18n="rm_ph2_5">B2B API — logistics and insurance companies</div><div class="rmb">Series A fundraising — smart city platform partnerships</div></div><span class="rmbdg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> 500K contributors · 3 countries</span></div></div>
+      <div class="rmr"><div class="rmc"><span class="rmy">2028</span><span class="rmph" data-i18n="rm_ph4_tag">Phase 3 · Mass Scale</span><div class="rmtit" data-i18n="rm_ph3_sub">Enterprise expansion</div><div class="rmbl"><div class="rmb">Enterprise security contracts — Tier 1 cities</div><div class="rmb">1 million active users</div><div class="rmb">Live B2B data marketplace</div><div class="rmb">Expansion to 8 LATAM countries</div></div><span class="rmbdg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> 1M users · 8 countries</span></div><div class="rmd"><div class="rmdn"></div></div><div class="rmg"></div></div>
+      <div class="rmr"><div class="rmg"></div><div class="rmd"><div class="rmdn"></div></div><div class="rmc"><span class="rmy">2030</span><span class="rmph">Phase 4–5 · Global</span><div class="rmtit">From LATAM to the world</div><div class="rmbl"><div class="rmb">Expansion to Sub-Saharan Africa</div><div class="rmb">Smart cities platform integration</div><div class="rmb">Jalibor as global civic reputation standard</div><div class="rmb">UN-Habitat partnership</div></div><span class="rmbdg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> 20M users · 30+ countries</span></div></div>
+      <div class="rmr"><div class="rmc"><span class="rmy">2032</span><span class="rmph">Phase 6 · Global Network</span><div class="rmtit">Urban intelligence protocol</div><div class="rmbl"><div class="rmb">50M+ users on global network</div><div class="rmb">Jalibor global enterprise platform</div><div class="rmb">Multi-city smart infrastructure integration</div><div class="rmb">IoT urban system integration</div></div><span class="rmbdg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> 50M users · 60+ countries</span></div><div class="rmd"><div class="rmdn"></div></div><div class="rmg"></div></div>
+      <div class="rmr"><div class="rmg"></div><div class="rmd"><div class="rmdn" style="border-color:rgba(65,180,211,.35)"></div></div><div class="rmc"><span class="rmy">2036</span><span class="rmph">Phase 7 · Maturity</span><div class="rmtit">World's largest civic network</div><div class="rmbl"><div class="rmb">100M+ active contributing citizens</div><div class="rmb">Jalibor integrated in digital identity</div><div class="rmb">Trust score as global civic standard</div><div class="rmb">Fully enterprise-grade global platform</div></div><span class="rmbdg"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> 100M+ users · 100+ countries</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="network">
+  <div class="ido-gc"></div>
+  <div class="inner">
+    <!-- MARKET OPPORTUNITY -->
+    <div style="text-align:center;max-width:700px;margin:0 auto 80px" class="rv">
+      <span class="tag" data-i18n="net_tag">Market Opportunity</span>
+      <h2 class="h-lg" style="margin-bottom:20px">A <span class="accent">$120B market</span><br>with no infrastructure layer</h2>
+      <p class="dim" style="font-size:15px" data-i18n="net_body">The global urban security and smart city intelligence market is valued at $120B and growing at 14% CAGR. Every city, every municipality, every government security agency needs real-time situational awareness. None have a distributed, consensus-validated intelligence layer. Until now.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;margin-bottom:80px" class="rv">
+      <div style="background:var(--card);padding:36px 28px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;margin-bottom:6px">$120B</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px" data-i18n="net_stat1">Urban intelligence market</div>
+      </div>
+      <div style="background:var(--card);padding:36px 28px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;margin-bottom:6px">1B+</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px" data-i18n="net_stat2">Urban surveillance cameras globally</div>
+      </div>
+      <div style="background:var(--card);padding:36px 28px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;margin-bottom:6px">0%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px" data-i18n="net_stat3">Connected to a real-time consensus layer</div>
+      </div>
+    </div>
+
+    <!-- DEPIN INCENTIVE LAYER -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-bottom:80px">
+      <div class="rvl">
+        <span class="tag">Revenue Model</span>
+        <h2 class="h-md" style="margin-bottom:20px" data-i18n-html="net_os_h2">Infrastructure <span class="accent">subscriptions</span></h2>
+        <p class="dim" style="font-size:14px;margin-bottom:24px" data-i18n="net_rev_body">Jalibor operates on a B2B SaaS model. Municipalities, enterprise security teams, and logistics operators subscribe to the urban intelligence API. Revenue scales with coverage and node density — not speculation.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+            <span style="font-size:13px;color:var(--silver)"><strong style="color:var(--white)" data-i18n="net_api_m">Municipal API</strong> — Real-time situational awareness dashboard and event tracking feed</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+            <span style="font-size:13px;color:var(--silver)"><strong style="color:var(--white)" data-i18n="net_api_e">Enterprise Security API</strong> — Asset protection, route tracking, and incident intelligence</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+            <span style="font-size:13px;color:var(--silver)"><strong style="color:var(--white)" data-i18n="net_api_l">Logistics Intelligence</strong> — Fleet monitoring, dynamic risk scoring, and coverage analytics</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+            <span style="font-size:13px;color:var(--silver)"><strong style="color:var(--white)" data-i18n="net_api_c">AI Camera Integration SDK</strong> — Connect existing infrastructure as autonomous validation nodes</span>
+          </div>
+        </div>
+      </div>
+      <div class="rvr">
+        <span class="tag">Vision</span>
+        <h2 class="h-md" style="margin-bottom:20px">The operating system for <span class="accent">urban reality</span></h2>
+        <p class="dim" style="font-size:14px;margin-bottom:24px" data-i18n="net_ten_y">Ten years from now, every city will have a real-time intelligence layer. Every camera will be a node. Every vehicle will contribute to the mesh. Every moving threat will be tracked from first sighting to resolution.</p>
+        <div style="display:flex;flex-direction:column;gap:2px;border:1px solid var(--brd2);border-radius:6px;overflow:hidden">
+          <div style="background:var(--card);padding:20px 24px;border-bottom:1px solid var(--brd2)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:6px">2026 — GENESIS</div>
+            <p style="font-size:13px;color:var(--silver);line-height:1.6" data-i18n="net_yr2026">CDMX. 10,000 nodes. PMC protocol live. First municipal API integrations.</p>
+          </div>
+          <div style="background:var(--card);padding:20px 24px;border-bottom:1px solid var(--brd2)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:6px">2028 — LATAM SCALE</div>
+            <p style="font-size:13px;color:var(--silver);line-height:1.6" data-i18n="net_yr2028">1M nodes. AI camera integration live. 8 cities. Enterprise API partnerships.</p>
+          </div>
+          <div style="background:var(--card);padding:20px 24px;border-bottom:1px solid var(--brd2)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:6px">2030 — GLOBAL MESH</div>
+            <p style="font-size:13px;color:var(--silver);line-height:1.6" data-i18n="net_yr2030">20M nodes. 30 cities. UN-Habitat integration. IoT and vehicle node layer live.</p>
+          </div>
+          <div style="background:rgba(65,180,211,.04);padding:20px 24px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal2);letter-spacing:1px;margin-bottom:6px">2036 — URBAN OS</div>
+            <p style="font-size:13px;color:var(--silver);line-height:1.6" data-i18n="net_yr2036">100M+ nodes. The world's largest distributed urban intelligence network.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINAL CTA -->
+    <div class="idoi rv" style="position:relative;z-index:2;padding-top:0">
+      <div class="idobdg">REAL-TIME URBAN INTELLIGENCE · PRESENCE MESH CONSENSUS · DISTRIBUTED VALIDATION</div>
+      <h2 class="h-xl" style="letter-spacing:-3px" data-i18n="net_cta_h2">We build the future together</h2>
+      <p style="font-size:16px;color:var(--silver);margin:24px auto 0;max-width:520px;line-height:1.75;font-weight:300" data-i18n="footer_main">Jalibor is real-time urban intelligence infrastructure — built for cities, enterprises, and public safety. The network grows stronger with every node that joins. </p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:52px 0;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden">
+        
+        
+        
+      </div>
+      
+      <p style="margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(144,164,174,.3);letter-spacing:.5px">jalibor.app · technical@jalibor.app · Urban Intelligence Infrastructure · 2026</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+<footer>
+  <div class="fg">
+    <div><div class="flogo">Jali<span class="bor">bor</span></div><p class="fdesc" data-i18n="footer_desc">Real-time urban intelligence infrastructure. Presence Mesh Consensus protocol. Human + AI cooperative sensing network.</p></div>
+    <div class="fcol"><h5>Protocol</h5><a href="#" onclick="jalOpen('jal-wp-modal');return false">Technical Overview</a><a href="https://bscscan.com" target="_blank" rel="noopener">Smart Contract</a><a href="https://jalibor.app/security" target="_blank" rel="noopener">Audit</a><a href="https://jalibor.app/docs" target="_blank" rel="noopener">Protocol Docs</a></div>
+    <div class="fcol"><h5>Resources</h5><a href="https://jalibor.app/docs" target="_blank" rel="noopener">Documentation</a><a href="https://jalibor.app/api" target="_blank" rel="noopener">API Reference</a><a href="https://jalibor.app/blog" target="_blank" rel="noopener">Blog</a><a href="https://jalibor.app/media" target="_blank" rel="noopener">Media Kit</a></div>
+    <div class="fcol"><h5>Community</h5><a href="https://t.me/jalibor" target="_blank" rel="noopener">Telegram</a><a href="https://twitter.com/JaliborApp" target="_blank" rel="noopener">Twitter / X</a><a href="https://discord.gg/jalibor" target="_blank" rel="noopener">Discord</a><a href="https://wa.me/jalibor" target="_blank" rel="noopener">WhatsApp</a></div>
+  </div>
+  <div class="fbot"><span>© 2026 Jalibor. All rights reserved.</span><span>jalibor.app · enterprise@jalibor.app</span></div>
+</footer>
+
+
+
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+if(cur){document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';});}
+// REVEAL
+const rvObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');}});},{threshold:0.12});
+document.querySelectorAll('.rv,.rvl,.rvr,.rmr').forEach(el=>rvObs.observe(el));
+</script>
+
+<!-- ═══════════════ JaliborBOR MODALS ═══════════════ -->
+<div id="jal-overlay" onclick="jalClose()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;backdrop-filter:blur(6px)"></div>
+
+<!-- WHITEPAPER MODAL -->
+<div id="jal-wp-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9001;width:min(520px,92vw);background:#0A0C14;border:1px solid rgba(65,180,211,.25);border-radius:8px;padding:44px;font-family:'JetBrains Mono',monospace">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px">
+    <div>
+      <div style="font-size:9px;letter-spacing:3px;color:rgba(65,180,211,.6);text-transform:uppercase;margin-bottom:8px">Technical Document</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#F0F4F8;letter-spacing:-.5px;margin:0">Technical Overview</h2>
+    </div>
+    <button onclick="jalClose()" style="background:none;border:none;color:rgba(144,164,174,.5);font-size:20px;cursor:pointer;line-height:1;padding:4px">&#x2715;</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid rgba(65,180,211,.12);border-radius:5px;background:rgba(65,180,211,.04)">
+      <span style="font-size:20px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#41B4D3" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+      <div>
+        <div style="font-size:13px;color:#F0F4F8;font-weight:600;margin-bottom:2px">Jalibor Technical Overview — Enterprise</div>
+        <div style="font-size:11px;color:rgba(144,164,174,.6)">Presence Mesh Consensus Protocol  ·  2026  ·  EN</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div style="text-align:center;padding:12px;border:1px solid rgba(65,180,211,.10);border-radius:4px"><div style="font-size:14px;font-weight:700;color:#41B4D3">10</div><div style="font-size:9px;color:rgba(144,164,174,.5);letter-spacing:1px;margin-top:2px">SECTIONS</div></div>
+      <div style="text-align:center;padding:12px;border:1px solid rgba(65,180,211,.10);border-radius:4px"><div style="font-size:14px;font-weight:700;color:#41B4D3">PMC</div><div style="font-size:9px;color:rgba(144,164,174,.5);letter-spacing:1px;margin-top:2px">PROTOCOL</div></div>
+      <div style="text-align:center;padding:12px;border:1px solid rgba(65,180,211,.10);border-radius:4px"><div style="font-size:14px;font-weight:700;color:#41B4D3">.docx</div><div style="font-size:9px;color:rgba(144,164,174,.5);letter-spacing:1px;margin-top:2px">FORMAT</div></div>
+    </div>
+  </div>
+  <div id="jal-wp-req-wrap">
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <div>
+        <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Name</label>
+        <input id="jf-wp-name" type="text" placeholder="Your name" style="width:100%;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+      </div>
+      <div>
+        <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Work email</label>
+        <input id="jf-wp-email" type="email" placeholder="you@organization.com" style="width:100%;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+      </div>
+      <div>
+        <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Organization</label>
+        <input id="jf-wp-org" type="text" placeholder="City / Agency / Company" style="width:100%;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+      </div>
+    </div>
+    <button onclick="jalSubmitWPReq()" style="display:block;width:100%;text-align:center;padding:14px;background:#41B4D3;color:#000;font-weight:700;font-size:13px;letter-spacing:1px;border:none;border-radius:5px;cursor:pointer;transition:opacity .2s;font-family:inherit" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'" data-i18n="wp_modal_btn">REQUEST TECHNICAL OVERVIEW →</button>
+    <p style="text-align:center;margin-top:12px;font-size:10px;color:rgba(144,164,174,.35);letter-spacing:.5px" data-i18n="wp_modal_note">We respond within 24 hours with the document.</p>
+  </div>
+  <div id="jal-wp-req-success" style="display:none;text-align:center;padding:20px 0">
+    <div style="font-size:36px;margin-bottom:16px">✓</div>
+    <div style="font-size:16px;font-weight:700;color:#41B4D3;margin-bottom:8px" data-i18n="wp_success_h">Request received</div>
+    <div style="font-size:13px;color:rgba(144,164,174,.6);line-height:1.6" data-i18n="wp_success_d">We'll send the technical overview to your email within 24 hours.</div>
+  </div>
+</div>
+
+<!-- DEMO REQUEST MODAL -->
+<div id="jal-demo-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9001;width:min(520px,92vw);background:#0A0C14;border:1px solid rgba(65,180,211,.25);border-radius:8px;padding:44px;font-family:'JetBrains Mono',monospace">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px">
+    <div>
+      <div style="font-size:9px;letter-spacing:3px;color:rgba(65,180,211,.6);text-transform:uppercase;margin-bottom:8px" data-i18n="demo_modal_tag">Live Demo</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#F0F4F8;letter-spacing:-.5px;margin:0">Request a Demo</h2>
+    </div>
+    <button onclick="jalClose()" style="background:none;border:none;color:rgba(144,164,174,.5);font-size:20px;cursor:pointer;line-height:1;padding:4px">&#x2715;</button>
+  </div>
+  <p style="font-size:13px;color:rgba(144,164,174,.6);margin-bottom:24px;line-height:1.6" data-i18n="demo_sub">See Presence Mesh Consensus live. We work with municipalities, enterprise security teams, and smart city operators.</p>
+
+  <div id="jal-form-wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">First name</label>
+        <input id="jf-fname" type="text" placeholder="Jane" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+      </div>
+      <div>
+        <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Last name</label>
+        <input id="jf-lname" type="text" placeholder="Smith" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Work email</label>
+      <input id="jf-email" type="email" placeholder="jane@city.gov" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Organization</label>
+      <input id="jf-org" type="text" placeholder="City of Austin / Acme Corp" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Use case</label>
+      <select id="jf-usecase" style="width:100%;padding:11px 14px;background:#0A0C14;border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box;cursor:pointer" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+        <option value="" style="background:#0A0C14">Select use case...</option>
+        <option value="municipal" style="background:#0A0C14">Municipal / Government</option>
+        <option value="enterprise" style="background:#0A0C14">Enterprise Security</option>
+        <option value="logistics" style="background:#0A0C14">Logistics / Transportation</option>
+        <option value="insurance" style="background:#0A0C14">Insurance</option>
+        <option value="smartcity" style="background:#0A0C14">Smart City Platform</option>
+        <option value="investor" style="background:#0A0C14">Investor / Partner</option>
+        <option value="other" style="background:#0A0C14">Other</option>
+      </select>
+    </div>
+    <button onclick="jalSubmitDemo()" style="width:100%;padding:14px;background:#41B4D3;color:#000;font-weight:700;font-size:13px;letter-spacing:1px;border:none;border-radius:5px;cursor:pointer;transition:opacity .2s;font-family:inherit" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">REQUEST DEMO →</button>
+    <p style="text-align:center;margin-top:12px;font-size:10px;color:rgba(144,164,174,.35);letter-spacing:.5px">We respond within 24 hours. No spam.</p>
+  </div>
+
+  <div id="jal-form-success" style="display:none;text-align:center;padding:20px 0">
+    <div style="font-size:36px;margin-bottom:16px">✓</div>
+    <div style="font-size:16px;font-weight:700;color:#41B4D3;margin-bottom:8px">Request received</div>
+    <div style="font-size:13px;color:rgba(144,164,174,.6);line-height:1.6">We will contact you within 24 hours to schedule your demo.</div>
+  </div>
+</div>
+
+<script>
+function jalOpen(id){
+  document.getElementById('jal-overlay').style.display='block';
+  document.getElementById(id).style.display='block';
+  document.body.style.overflow='hidden';
+}
+function jalClose(){
+  ['jal-overlay','jal-wp-modal','jal-demo-modal'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') jalClose(); });
+function jalSubmitWPReq(){
+  var name=document.getElementById('jf-wp-name').value.trim();
+  var email=document.getElementById('jf-wp-email').value.trim();
+  var org=document.getElementById('jf-wp-org').value.trim();
+  if(!name||!email||!org){alert('Please fill in all fields.');return;}
+  if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){alert('Please enter a valid email address.');return;}
+  document.getElementById('jal-wp-req-wrap').style.display='none';
+  document.getElementById('jal-wp-req-success').style.display='block';
+}
+function jalSubmitDemo(){
+  var fname=document.getElementById('jf-fname').value.trim();
+  var email=document.getElementById('jf-email').value.trim();
+  var org=document.getElementById('jf-org').value.trim();
+  if(!fname||!email||!org){
+    alert('Please fill in name, email, and organization.');
+    return;
+  }
+  if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){
+    alert('Please enter a valid email address.');
+    return;
+  }
+  document.getElementById('jal-form-wrap').style.display='none';
+  document.getElementById('jal-form-success').style.display='block';
+}
+</script>
+
+
+<script>
+// Roadmap visibility fallback — ensures .rmr elements are visible even if IntersectionObserver doesn't fire
+setTimeout(function(){
+  document.querySelectorAll('.rmr').forEach(function(el){
+    el.classList.add('vis');
+  });
+}, 300);
+</script>
+
+<script>
+// ── Jalibor i18n engine ───────────────────────────────────────────────
+var LANG = {
+  en: {
+    // Nav
+    nav_platform:  'Platform',
+    nav_tech:      'Technology',
+    nav_consensus: 'Consensus',
+    nav_network:   'Network',
+    nav_roadmap:   'Roadmap',
+    nav_vision:    'Vision',
+    nav_cta:       'Technical Overview',
+    // Hero
+    hero_tag:      'URBAN INTELLIGENCE INFRASTRUCTURE',
+    hero_h1:       'Real-world events need<br><span class="accent">real-time consensus.</span>',
+    hero_sub:      'Jalibor provides the infrastructure layer for distributed validation and tracking of moving real-world events.',
+    btn_brief:     'Technical Brief',
+    btn_demo:      'Request Demo →',
+    stat_lat:      'Consensus latency',
+    stat_pmc:      'Presence Mesh Consensus',
+    stat_nodes:    'Hybrid node types',
+    // PMC-3D
+    pmc_tag:       'Live simulation — Presence Mesh Consensus',
+    pmc_h2:        'Watch the mesh activate',
+    pmc_sub:       'A moving entity triggers the network. Nodes activate, consensus grows, trajectory is reconstructed — in real time across the distributed mesh.',
+    // Problem
+    prob_tag:      'The Problem',
+    prob_h2:       'No system tracks<br><span class="accent">what is moving.</span>',
+    // How
+    how_tag:       'How Jalibor Works',
+    how_h2:        'Distributed tracking of<br><span class="accent">moving real-world entities</span>',
+    step1_t:       'Event detected',
+    step2_t:       'Mesh activated',
+    step3_t:       'Validation',
+    step4_t:       'Dynamic reconstruction',
+    // Formula
+    formula_tag:   'Dynamic Tracking Engine',
+    formula_h2:    'Not reporting.<br><span class="accent">Tracking.</span>',
+    conf_h2:       'Confidence Engine<br><span style="font-size:clamp(13px,1.4vw,16px);font-weight:400;color:var(--silver);letter-spacing:1px;font-family:\'JetBrains Mono\',monospace">Proof of Presence Validation (POPV)</span>',
+    // Ecosystem
+    eco_tag:       'Network Participants',
+    eco_h2:        'The mesh is everyone',
+    // Roadmap
+    rm_tag:        'Vision 2026–2036',
+    rm_h2:         'Road map',
+    rm_sub:        'A decade to build the largest distributed urban intelligence network — from Latin America to the world.',
+    // Network
+    net_tag:       'Market Opportunity',
+    net_h2:        'A $120B market<br><span class="accent">with no infrastructure layer</span>',
+    // Modals
+    wp_modal_tag:  'TECHNICAL DOCUMENT',
+    wp_modal_h2:   'Technical Overview',
+    wp_modal_btn:  'REQUEST TECHNICAL OVERVIEW →',
+    wp_modal_note: 'We respond within 24 hours with the document.',
+    wp_success_h:  'Request received',
+    demo_modal_tag:'Live Demo',
+    demo_modal_h2: 'Request a Demo',
+    // Footer
+    footer_desc:   'Real-time urban intelligence infrastructure.',
+  
+  },
+  es: {
+    // Nav
+    nav_platform:  'Plataforma',
+    nav_tech:      'Tecnología',
+    nav_consensus: 'Consenso',
+    nav_network:   'Red',
+    nav_roadmap:   'Hoja de ruta',
+    nav_vision:    'Visión',
+    nav_cta:       'Resumen técnico',
+    // Hero
+    hero_tag:      'INFRAESTRUCTURA DE INTELIGENCIA URBANA',
+    hero_h1:       'Los eventos del mundo real necesitan<br><span class="accent">consenso en tiempo real.</span>',
+    hero_sub:      'Jalibor provee la capa de infraestructura para la validación distribuida y el seguimiento de eventos en movimiento.',
+    btn_brief:     'Resumen técnico',
+    btn_demo:      'Solicitar Demo →',
+    stat_lat:      'Latencia de consenso',
+    stat_pmc:      'Presence Mesh Consensus',
+    stat_nodes:    'Tipos de nodo híbrido',
+    // PMC-3D
+    pmc_tag:       'Simulación en vivo — Presence Mesh Consensus',
+    pmc_h2:        'Observa cómo se activa la red',
+    pmc_sub:       'Un evento en movimiento activa la red. Los nodos se activan, el consenso crece y la trayectoria se reconstruye en tiempo real a través de la red distribuida.',
+    // Problem
+    prob_tag:      'El problema',
+    prob_h2:       'Ningún sistema rastrea<br><span class="accent">lo que está en movimiento.</span>',
+    // How
+    how_tag:       'Cómo funciona Jalibor',
+    how_h2:        'Seguimiento distribuido de<br><span class="accent">entidades urbanas en movimiento</span>',
+    step1_t:       'Evento detectado',
+    step2_t:       'Red activada',
+    step3_t:       'Validación',
+    step4_t:       'Reconstrucción dinámica',
+    // Formula
+    formula_tag:   'Motor de seguimiento dinámico',
+    formula_h2:    'No reportamos.<br><span class="accent">Rastreamos.</span>',
+    conf_h2:       'Motor de Confianza<br><span style="font-size:clamp(13px,1.4vw,16px);font-weight:400;color:var(--silver);letter-spacing:1px;font-family:\'JetBrains Mono\',monospace">Validación de Presencia (POPV)</span>',
+    // Ecosystem
+    eco_tag:       'Participantes de la red',
+    eco_h2:        'La red somos todos',
+    // Roadmap
+    rm_tag:        'Visión 2026–2036',
+    rm_h2:         'Hoja de ruta',
+    rm_sub:        'Una década para construir la red de inteligencia urbana distribuida más grande — desde América Latina al mundo.',
+    // Network
+    net_tag:       'Oportunidad de mercado',
+    net_h2:        'Un mercado de $120B<br><span class="accent">sin capa de infraestructura</span>',
+    // Modals
+    wp_modal_tag:  'DOCUMENTO TÉCNICO',
+    wp_modal_h2:   'Resumen técnico',
+    wp_modal_btn:  'SOLICITAR RESUMEN TÉCNICO →',
+    wp_modal_note: 'Respondemos en 24 horas con el documento.',
+    wp_success_h:  'Solicitud recibida',
+    demo_modal_tag:'Demo en vivo',
+    demo_modal_h2: 'Solicitar una Demo',
+    // Footer
+    footer_desc:   'Infraestructura de inteligencia urbana en tiempo real.',
+    eco_card3_h: 'API de Comando y Control',
+    eco_net_sub: 'Cada nodo fortalece a todos los demás',
+    rm_ph1_tag: 'Fase 0–1 · Fundación y lanzamiento del protocolo',
+    rm_ph4_tag: 'Fase 4 · Plataforma global',
+    rm_ph4_sub: 'Capa de inteligencia global',
+    net_rev_sub: 'Suscripciones de infraestructura',
+    net_api1: 'API Municipal — Dashboard de conciencia situacional en tiempo real y feed de seguimiento de eventos',
+    net_api2: 'API de Seguridad Empresarial — Protección de activos, rastreo de rutas e inteligencia de incidentes',
+    net_api3: 'Inteligencia Logística — Monitoreo de flotas, puntuación dinámica de riesgos y análisis de cobertura',
+    net_cta_h: 'El sistema operativo para la realidad urbana',
+    footer_tag: 'Protocolo Presence Mesh Consensus.',
+    footer_sub: 'Red de detección cooperativa Humano + IA.',
+    demo_body: 'Trabajamos con municipios, equipos de seguridad empresarial y operadores de ciudad inteligente. Cuéntanos sobre tu caso de uso.',
+    net_os_h2: 'El sistema operativo para <span class="accent">la realidad urbana</span>',
+    net_ten_y: 'En diez años, cada ciudad tendrá una capa de inteligencia en tiempo real. Cada municipio, cada gobierno, cada empresa de seguridad operará con visibilidad distribuida en tiempo real.',
+    net_yr2026: 'CDMX. 10.000 nodos. Protocolo PMC en vivo. Primeras integraciones API municipales.',
+    net_yr2028: '1M nodos. Integración de cámara IA en vivo. 8 ciudades. Alianzas API enterprise.',
+    net_yr2030: '20M nodos. 30 ciudades. Integración ONU-Hábitat. Capa de nodos IoT y vehículos.',
+    net_yr2036: '100M+ nodos. La red de inteligencia urbana distribuida más grande del mundo.',
+    footer_main: 'Jalibor es infraestructura de inteligencia urbana en tiempo real — construida para ciudades, municipios y equipos de seguridad empresarial.',
+    net_api_m: 'API Municipal',
+    net_api_e: 'API de Seguridad Empresarial',
+    net_api_l: 'Inteligencia Logística',
+    net_api_c: 'SDK de Integración Cámaras IA',
+    net_api_m: 'API Municipal',
+    net_api_e: 'API de Seguridad Empresarial',
+    conf_0: 'Reporte no verificado',
+    conf_1: 'Señal inicial',
+    conf_2: 'Posible — estado de alerta',
+    conf_3: 'Probable — red activa',
+    conf_4: 'Confirmado — difusión activa',
+    conf_5: 'Verificado — trayectoria en vivo',
+    conf_6: 'Fuertemente validado',
+    conf_live: 'EJEMPLO EN VIVO',
+    demo_sub: 'Ver Presence Mesh Consensus en vivo.',
+    eco_body: 'El efecto de red de Jalibor se potencia con cada nodo que se une. Más participantes, más fuerte el consenso, más rápida la validación, mayor cobertura geográfica.',
+    eco_card1_d: 'Nodos de validación primaria. Reportan eventos, validan avistamientos y rastrean entidades en movimiento a través de la red urbana.',
+    eco_card1_h: 'Capa de nodos humanos',
+    eco_card2_d: 'Cámaras conectadas que operan como nodos de validación IA autónomos. Detección visual, seguimiento de dirección y contribución de confianza sin intervención humana.',
+    eco_card2_h: 'Capa de nodos autónomos',
+    eco_card3_d: 'Inteligencia de eventos urbanos en tiempo real vía API. Dashboards de conciencia situacional, seguimiento dinámico de amenazas y compartición de eventos inter-agencias.',
+    eco_card3b_d: 'Policía, seguridad privada y equipos de respuesta rápida integran datos PMC para coordinación táctica en tiempo real.',
+    eco_card3b_h: 'Integración de respuesta',
+    eco_card4_d: 'Operadores de logística, seguros, retail e inmobiliario integran inteligencia urbana para gestión de riesgos y optimización de rutas.',
+    eco_card4_h: 'API de Inteligencia Empresarial',
+    eco_card5_d: 'Vehículos conectados, sensores de ciudad inteligente, nodos de infraestructura pública que se suman a la red de consenso.',
+    eco_card5_h: 'Capa de nodos Next-Gen',
+    eco_net_h: 'Efectos de red',
+    formula_body: 'Las plataformas urbanas actuales se enfocan en reportes de eventos aislados. Jalibor habilita el seguimiento y la validación distribuida en tiempo real de entidades en movimiento.',
+    legacy_items: 'Reportes puntuales · Ubicación estática · Sin trayectoria · Sin validación cruzada · Datos en silos',
+    legacy_label: 'SISTEMAS LEGACY',
+    net_body: 'El mercado global de seguridad urbana e inteligencia de ciudad inteligente está valorado en $120B y crece al 14% CAGR. Ninguno tiene una capa de inteligencia validada por consenso distribuido. Hasta ahora.',
+    net_cta_h2: 'Construimos el futuro juntos',
+    net_rev_body: 'Jalibor opera con un modelo B2B SaaS. Municipios, equipos de seguridad empresarial y operadores logísticos se suscriben a la API de inteligencia urbana.',
+    net_rev_h: 'Modelo de ingresos',
+    net_stat1: 'Mercado de inteligencia urbana',
+    net_stat2: 'Cámaras de vigilancia urbana globalmente',
+    net_stat3: 'Conectadas a una capa de consenso en tiempo real',
+    node1_d: 'Ciudadanos, empresas, personal de seguridad con smartphones',
+    node1_h: 'Nodos humanos',
+    node2_d: 'Cámaras conectadas que proveen validación visual autónoma',
+    node2_h: 'Nodos de cámara IA',
+    node3_d: 'Retail, logística, edificios con infraestructura de sensores y cámaras',
+    node3_h: 'Nodos empresariales',
+    node4_d: 'Vehículos conectados, sensores públicos, infraestructura de ciudad inteligente',
+    node4_h: 'Nodos IoT futuros',
+    pmc_items: 'Trayectoria en tiempo real · Seguimiento de entidad en movimiento · Red de testigos distribuidos · Consenso IA-humano · Puntuación de confianza',
+    prob_body: 'Cada ciudad tiene cámaras. Cada ciudadano tiene un smartphone. Cada negocio tiene sensores. Pero ninguno está conectado en una capa de inteligencia unificada capaz de rastrear lo que ocurre mientras ocurre.',
+    prob_card1_d: 'Millones de cámaras — públicas, privadas, municipales — operan como silos desconectados. Sin inteligencia compartida.',
+    prob_card1_h: 'Infraestructura de vigilancia aislada',
+    prob_card2_d: 'El tiempo de respuesta promedia 8–12 minutos tras una llamada. Para entonces, la entidad ya se fue.',
+    prob_card2_h: 'Reactivo, no en tiempo real',
+    prob_card3_h: 'Sin capa de detección colaborativa',
+    prob_card4_h: 'Sistemas estáticos para amenazas dinámicas',
+    prob_legacy: 'Los sistemas existentes — incluyendo apps de navegación, plataformas de seguridad pública y herramientas de reporte municipal — se enfocan en eventos aislados y puntuales.',
+    rm_ph1_1: 'Génesis del protocolo',
+    rm_ph1_2: 'App móvil MVP + bot de WhatsApp',
+    rm_ph1_3: 'Beta privada 500 usuarios — CDMX',
+    rm_ph1_4: 'Auditoría del protocolo — red en vivo',
+    rm_ph1_5: 'Alianzas B2B — estructura de contratos enterprise',
+    rm_ph2_1: 'Expansión a Bogotá, Lima, Buenos Aires',
+    rm_ph2_2: 'Integración con 15 municipios',
+    rm_ph2_3: 'Integraciones API municipales — 5+ ciudades',
+    rm_ph2_4: 'API B2B — empresas de logística y seguros',
+    rm_ph2_5: 'Recaudación Serie A — alianzas de ciudad inteligente',
+    rm_ph2_sub: 'Crecimiento regional',
+    rm_ph2_tag: 'Fase 2 · Expansión LATAM',
+    rm_ph3_sub: 'Expansión enterprise',
+    rm_ph3_tag: 'Fase 3 · Escala masiva',
+    step1_d: 'Un nodo — humano o IA — detecta un evento y envía un reporte georreferenciado con marca de tiempo. Confianza de fuente única: baja.',
+    step2_d: 'La red geográfica que rodea el evento es alertada de inmediato. Los nodos humanos y cámaras IA cercanas entran en estado de validación elevado.',
+    step3_d: 'Nodos independientes confirman, niegan o extienden el evento con nuevas observaciones. Se verifica la coherencia espacial y temporal. El consenso crece.',
+    step4_d: 'El motor de consenso reconstruye la trayectoria de la entidad en tiempo real. Una ruta sospechosa — rastreada a través de la ciudad mediante la red distribuida.',
+    wp_success_d: 'Te enviaremos el resumen técnico a tu email en menos de 24 horas.',
+  }
+};
+
+
+var currentLang = 'en';
+
+function setLang(lang) {
+  if (!LANG[lang]) return;
+  currentLang = lang;
+
+  // Update button states
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('lang-es').classList.toggle('active', lang === 'es');
+
+  var dict = LANG[lang];
+
+  // Translate data-i18n (text content)
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.textContent = dict[key];
+  });
+
+  // Translate data-i18n-html (innerHTML — allows spans/br)
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-html');
+    if (dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+
+  // Update html lang attribute
+  document.documentElement.lang = lang;
+
+  // Persist preference
+  try { localStorage.setItem('jal_lang', lang); } catch(e) {}
+}
+
+// Auto-detect on load
+(function() {
+  var saved;
+  try { saved = localStorage.getItem('jal_lang'); } catch(e) {}
+  var browser = (navigator.language || navigator.userLanguage || 'en').slice(0,2).toLowerCase();
+  var init = saved || (browser === 'es' ? 'es' : 'en');
+  // Wait for DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setLang(init); });
+  } else {
+    setLang(init);
+  }
+})();
+</script>
+
+
+<script>
+function toggleMobileNav(){
+  var nav = document.getElementById('mobile-nav');
+  var ham = document.querySelector('.nav-ham');
+  nav.classList.toggle('open');
+  ham.classList.toggle('open');
+  document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+}
+function closeMobileNav(){
+  var nav = document.getElementById('mobile-nav');
+  var ham = document.querySelector('.nav-ham');
+  nav.classList.remove('open');
+  ham.classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Close on escape
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeMobileNav(); });
+// Sync mobile lang buttons
+var _origSetLang = typeof setLang === 'function' ? setLang : null;
+function syncMobileLang(lang){
+  ['mob-lang-en','mob-lang-es'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.classList.toggle('active', id === 'mob-lang-'+lang);
+  });
+}
+// Patch setLang to also update mobile buttons
+document.addEventListener('DOMContentLoaded', function(){
+  var origFn = window.setLang;
+  if(origFn) window.setLang = function(lang){
+    origFn(lang);
+    syncMobileLang(lang);
+  };
+});
+</script>
+</body>
+</html>

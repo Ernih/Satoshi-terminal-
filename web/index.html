@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Jalibor is real-time urban intelligence infrastructure. Presence Mesh Consensus (PMC) tracks moving real-world entities through a distributed network of human and AI validation nodes.">
+<meta name="keywords" content="urban intelligence, presence mesh consensus, PMC, real-time tracking, distributed validation, smart city, DePIN">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jalibor.app">
+<meta property="og:title" content="Jalibor — Real-Time Urban Intelligence">
+<meta property="og:description" content="Real-world events need real-time consensus. Presence Mesh Consensus tracks moving entities through distributed human + AI validation nodes.">
+<meta property="og:image" content="https://jalibor.app/assets/og-image.png">
+<meta property="og:site_name" content="Jalibor">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@JaliborApp">
+<meta name="twitter:title" content="Jalibor — Real-Time Urban Intelligence">
+<meta name="twitter:description" content="Real-world events need real-time consensus. PMC tracks moving entities through distributed human + AI validation.">
+<meta name="twitter:image" content="https://jalibor.app/assets/og-image.png">
+<link rel="canonical" href="https://jalibor.app">
+<title>Jalibor — Real-Time Urban Intelligence & DePIN Protocol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--black:#000;--night:#060810;--surface:#0A0C12;--card:#0E1018;--teal:#41B4D3;--teal2:#6ECDE6;--teal3:#2A8FA8;--silver:#90A4AE;--white:#F0F4F8;--dim:rgba(65,180,211,.10);--brd:rgba(65,180,211,.18);--brd2:rgba(65,180,211,.08)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'Space Grotesk',sans-serif;overflow-x:hidden;cursor:none}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1;mix-blend-mode:overlay}
+#cur{position:fixed;width:8px;height:8px;background:var(--teal);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .15s,height .15s}
+#cur-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(65,180,211,.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .2s,height .2s,border-color .2s}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:22px 64px;display:flex;align-items:center;justify-content:space-between;transition:all .4s}
+nav.scrolled{padding:14px 64px;background:rgba(0,0,0,.8);backdrop-filter:blur(24px);border-bottom:1px solid var(--brd2)}
+.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px}
+.nav-logo .bor{color:var(--teal)}
+.nav-links{display:flex;gap:40px;list-style:none}
+.nav-links a{color:rgba(240,244,248,.45);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:transparent;border:1px solid var(--brd);color:var(--teal);padding:9px 24px;border-radius:3px;font-size:12px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:none;letter-spacing:1px;text-transform:uppercase;transition:all .25s}
+.nav-cta:hover{background:var(--teal);color:#000;box-shadow:0 0 30px rgba(65,180,211,.3)}
+
+
+
+.ticker-item .pulse{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:blink 2s ease infinite}
+.ticker-item .v{color:var(--teal);font-weight:600}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+section{position:relative;z-index:2}
+.inner{max-width:1200px;margin:0 auto;padding:0 64px}
+.tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--teal);text-transform:uppercase;display:block;margin-bottom:14px}
+.h-xl{font-family:'Syne',sans-serif;font-size:clamp(52px,7vw,96px);font-weight:800;line-height:.9;letter-spacing:-3px}
+.h-lg{font-family:'Syne',sans-serif;font-size:clamp(38px,5vw,64px);font-weight:800;line-height:.95;letter-spacing:-2px}
+.h-md{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:700;line-height:1.05;letter-spacing:-1px}
+.accent{color:var(--teal)}
+.dim{color:var(--silver);font-weight:300;line-height:1.75}
+/* HERO */
+#hero{min-height:100svh;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 64px 100px;overflow:hidden}
+#hero-logo{position:absolute;right:80px;top:50%;transform:translateY(-50%);z-index:2;pointer-events:none}
+.logo-wrap{width:460px;height:460px}
+.logo-wrap svg{width:100%;height:100%}
+.glow{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none}
+.g1{width:700px;height:700px;background:radial-gradient(circle,rgba(65,180,211,.18),transparent 70%);top:-200px;right:-200px;animation:mg1 8s ease-in-out infinite}
+.g2{width:500px;height:500px;background:radial-gradient(circle,rgba(65,180,211,.10),transparent 70%);bottom:-100px;left:-100px;animation:mg2 10s ease-in-out infinite}
+@keyframes mg1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-60px,40px) scale(1.15)}66%{transform:translate(40px,-30px) scale(.9)}}
+@keyframes mg2{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-60px) scale(1.2)}}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:rgba(65,180,211,.75);text-transform:uppercase;margin-bottom:28px;border:1px solid var(--brd2);border-radius:3px;padding:7px 14px;background:rgba(65,180,211,.05)}
+.hero-line{display:block;opacity:0;transform:translateY(100%);animation:slideUp .9s cubic-bezier(.16,1,.3,1) forwards}
+.hero-line:nth-child(1){animation-delay:.1s}
+.hero-line:nth-child(2){animation-delay:.22s}
+.hero-line:nth-child(3){animation-delay:.34s;color:rgba(240,244,248,.2)}
+@keyframes slideUp{to{opacity:1;transform:none}}
+@keyframes fadeIn{to{opacity:1}}
+.hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-top:48px;flex-wrap:wrap}
+.hero-desc{max-width:440px;font-size:16px;color:var(--silver);font-weight:300;line-height:1.75;opacity:0;animation:fadeIn .8s .55s forwards}
+.hero-acts{display:flex;gap:14px;opacity:0;animation:fadeIn .8s .7s forwards;flex-wrap:wrap}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--brd2);border-radius:4px;overflow:hidden;background:rgba(10,12,18,.7);backdrop-filter:blur(20px);margin-top:60px}
+.stat{padding:28px 24px;border-right:1px solid var(--brd2);opacity:0;animation:fadeIn .6s forwards}
+.stat:nth-child(1){animation-delay:.85s}.stat:nth-child(2){animation-delay:1s}.stat:nth-child(3){animation-delay:1.15s}.stat:nth-child(4){animation-delay:1.3s}
+.stat:last-child{border:none}
+.sv{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;display:block;margin-bottom:4px}
+.sl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px}
+/* BUTTONS */
+.bp{background:var(--teal);color:#000;border:none;padding:14px 36px;border-radius:3px;font-size:13px;font-weight:700;font-family:'Space Grotesk',sans-serif;cursor:none;letter-spacing:.5px;transition:all .25s}
+.bp:hover{background:var(--teal2);box-shadow:0 0 40px rgba(65,180,211,.45);transform:translateY(-2px)}
+.bs{background:transparent;color:var(--white);border:1px solid rgba(240,244,248,.18);padding:14px 36px;border-radius:3px;font-size:13px;font-weight:500;font-family:'Space Grotesk',sans-serif;cursor:none;letter-spacing:.3px;transition:all .25s}
+.bs:hover{border-color:var(--teal);color:var(--teal)}
+/* MARQUEE */
+.mq-wrap{overflow:hidden;padding:40px 0;border-top:1px solid var(--brd2);border-bottom:1px solid var(--brd2);background:var(--surface)}
+.mq-track{display:inline-flex;gap:60px;white-space:nowrap;animation:marquee 20s linear infinite}
+.mq-item{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:rgba(240,244,248,.05);letter-spacing:-2px;text-transform:uppercase;flex-shrink:0}
+.mq-item .hi{color:rgba(65,180,211,.2)}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+/* PROBLEM */
+#problem{padding:140px 0;overflow:hidden}
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center}
+.pvis{position:relative;height:520px}
+.cube-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.df{position:absolute;background:rgba(10,12,18,.92);border:1px solid var(--brd);border-radius:6px;padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;backdrop-filter:blur(10px);white-space:nowrap}
+.df1{top:14%;left:5%;animation:f1 6s ease-in-out infinite}
+.df2{top:34%;right:2%;animation:f2 7s ease-in-out infinite 1s}
+.df3{bottom:22%;left:8%;animation:f1 5.5s ease-in-out infinite 2s}
+.df4{top:62%;right:6%;animation:f2 8s ease-in-out infinite .5s}
+@keyframes f1{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-18px) rotate(1deg)}}
+@keyframes f2{0%,100%{transform:translateY(0) rotate(1deg)}50%{transform:translateY(-14px) rotate(-1deg)}}
+.pl{display:flex;flex-direction:column;gap:22px}
+.point{display:flex;gap:18px;align-items:flex-start;padding:22px;border:1px solid var(--brd2);border-radius:6px;background:rgba(14,16,24,.7);transition:all .3s;position:relative;overflow:hidden}
+.point::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--teal);transform:scaleY(0);transition:transform .3s;transform-origin:bottom}
+.point:hover{border-color:var(--brd);transform:translateX(8px)}.point:hover::after{transform:scaleY(1)}
+.pi{width:40px;height:40px;border-radius:6px;background:var(--dim);border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pt{font-size:15px;font-weight:600;color:var(--white);margin-bottom:5px}
+.pd{font-size:13px;color:var(--silver);line-height:1.65}
+/* HOW */
+#how{padding:140px 0;background:var(--surface);border-top:1px solid var(--brd2);border-bottom:1px solid var(--brd2)}
+.stg{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;margin-top:60px}
+.step{background:var(--card);padding:40px 28px;position:relative;transition:background .3s;cursor:none}
+.step::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(65,180,211,.06),transparent);opacity:0;transition:opacity .3s}
+.step:hover{background:rgba(65,180,211,.03)}.step:hover::before{opacity:1}
+.sn{font-family:'Syne',sans-serif;font-size:72px;font-weight:800;color:rgba(65,180,211,.06);line-height:1;display:block;margin-bottom:20px}
+.si{font-size:28px;display:block;margin-bottom:18px}
+.st{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;color:var(--white);margin-bottom:10px}
+.sd{font-size:13px;color:var(--silver);line-height:1.65}
+.sbar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--teal);transform:scaleX(0);transition:transform .4s;transform-origin:left}
+.step:hover .sbar{transform:scaleX(1)}
+/* FORMULA */
+#formula{padding:140px 0}
+.fl{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.cb{background:var(--card);border:1px solid var(--brd);border-radius:6px;overflow:hidden}
+.ch{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--brd2);background:rgba(65,180,211,.04)}
+.cd{width:10px;height:10px;border-radius:50%}
+.cfn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--silver);margin-left:8px}
+.cbody{padding:28px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2}
+.co{color:rgba(144,164,174,.4)}.cf{color:rgba(240,244,248,.5)}.cv{color:var(--teal)}.ck{color:var(--teal2)}
+.tt{display:flex;flex-direction:column;gap:6px}
+.tr{display:flex;align-items:center;gap:14px;padding:12px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card);transition:all .25s;position:relative;overflow:hidden}
+.tr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--teal);opacity:0;transition:opacity .25s}
+.tr:hover{border-color:var(--brd);background:rgba(65,180,211,.05)}.tr:hover::before{opacity:1}
+.tp{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--teal);min-width:58px}
+.tn{font-size:13px;font-weight:600;color:var(--white);flex:1}
+.tnd{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--silver)}
+/* TOKENOMICS */
+#tokenomics{padding:140px 0;background:var(--surface);border-top:1px solid var(--brd2);border-bottom:1px solid var(--brd2)}
+.tkg{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:64px}
+.ptab{display:flex;flex-direction:column;gap:1px;border:1px solid var(--brd2);border-radius:6px;overflow:hidden}
+.pr{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background:var(--card);border-bottom:1px solid var(--brd2);transition:background .2s}
+.pr:last-child{border:none}.pr:hover{background:rgba(65,180,211,.04)}
+.pk{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--silver);text-transform:uppercase;letter-spacing:.5px}
+.pv{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);font-weight:600;text-align:right}
+.dl{display:flex;flex-direction:column;gap:14px}
+.di{display:flex;align-items:flex-start;gap:16px}
+.dp{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--teal);min-width:60px;line-height:1.1}
+.din{flex:1}
+.dn{font-size:13px;font-weight:600;color:var(--white);margin-bottom:5px}
+.dbar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.dfill{height:100%;border-radius:2px;background:var(--teal);width:0;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+.ds{font-size:11px;color:var(--silver);font-family:'JetBrains Mono',monospace}
+/* ROADMAP */
+#roadmap{padding:140px 0}
+.rmh{text-align:center;max-width:640px;margin:0 auto 100px}
+.rmw{position:relative}
+.rms{position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--teal) 8%,var(--teal) 92%,transparent);transform:translateX(-50%)}
+.rmr{display:grid;grid-template-columns:1fr 80px 1fr;align-items:start;margin-bottom:64px;opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.rmr.vis{opacity:1;transform:none}
+.rmr:nth-child(odd) .rmc{grid-column:1;padding-right:50px;text-align:right}
+.rmr:nth-child(odd) .rmd{grid-column:2}
+.rmr:nth-child(odd) .rmg{grid-column:3}
+.rmr:nth-child(even) .rmg{grid-column:1}
+.rmr:nth-child(even) .rmd{grid-column:2}
+.rmr:nth-child(even) .rmc{grid-column:3;padding-left:50px;text-align:left}
+.rmd{display:flex;justify-content:center;padding-top:6px}
+.rmdn{width:16px;height:16px;border-radius:50%;border:2px solid var(--teal);background:var(--black);flex-shrink:0;transition:all .4s}
+.rmdn.live{background:var(--teal);box-shadow:0 0 20px rgba(65,180,211,.6)}
+.rmy{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;line-height:1;display:block;margin-bottom:4px}
+.rmph{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;color:var(--silver);text-transform:uppercase;margin-bottom:12px;display:block}
+.rmtit{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:10px}
+.rmbl{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.rmb{font-size:13px;color:var(--silver);display:flex;align-items:center;gap:7px}
+.rmb::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.rmr:nth-child(odd) .rmb{justify-content:flex-end}.rmr:nth-child(odd) .rmb::before{order:1}
+.rmbdg{display:inline-flex;align-items:center;gap:6px;background:var(--dim);border:1px solid var(--brd);border-radius:3px;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal)}
+/* ECOSYSTEM */
+#ecosystem{padding:140px 0;background:var(--surface);border-top:1px solid var(--brd2);border-bottom:1px solid var(--brd2)}
+.ecog{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;margin-top:60px}
+.ecoc{background:var(--card);padding:44px 32px;transition:background .3s;position:relative;overflow:hidden;cursor:none}
+.ecog2{position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(65,180,211,.14),transparent 70%);top:-60px;right:-60px;opacity:0;transition:opacity .4s;filter:blur(30px)}
+.ecoc:hover{background:rgba(65,180,211,.03)}.ecoc:hover .ecog2{opacity:1}
+.ecoico{font-size:32px;display:block;margin-bottom:22px}
+.ecot{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:12px}
+.ecod{font-size:13px;color:var(--silver);line-height:1.7}
+.ecotag{display:inline-block;margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);border:1px solid var(--brd);border-radius:3px;padding:3px 9px;letter-spacing:.5px}
+/* IDO */
+#ido{padding:160px 0;overflow:hidden;position:relative}
+.ido-gc{position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(65,180,211,.12),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);filter:blur(80px);pointer-events:none;animation:mg1 10s ease-in-out infinite}
+.idoi{text-align:center;max-width:820px;margin:0 auto;position:relative;z-index:2}
+.idobdg{display:inline-flex;align-items:center;gap:8px;background:rgba(204,48,48,.10);border:1px solid rgba(204,48,48,.28);border-radius:3px;padding:7px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#FF8888;letter-spacing:1.5px;margin-bottom:36px}
+.idobdg::before{content:'●';font-size:8px;animation:blink 1.2s infinite}
+.idostats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:52px 0;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden}
+.idostat{background:var(--card);padding:36px 24px;text-align:center}
+.idov{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;display:block;margin-bottom:6px}
+.idol{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px}
+/* FOOTER */
+footer{border-top:1px solid var(--brd2);background:var(--surface);padding:64px;position:relative;z-index:2}
+.fg{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px}
+.flogo{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:14px}
+.flogo .bor{color:var(--teal)}
+.fdesc{font-size:13px;color:var(--silver);line-height:1.7;max-width:280px}
+.fcol h5{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:2.5px;color:var(--teal);font-weight:600;margin-bottom:18px}
+.fcol a{display:block;color:rgba(144,164,174,.6);text-decoration:none;font-size:13px;margin-bottom:10px;transition:color .2s}
+.fcol a:hover{color:var(--white)}
+.fbot{max-width:1200px;margin:40px auto 0;padding-top:24px;border-top:1px solid var(--brd2);display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(144,164,174,.3);letter-spacing:.5px}
+/* REVEALS */
+.rv{opacity:0;transform:translateY(32px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.rvl{opacity:0;transform:translateX(-40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.rvr{opacity:0;transform:translateX(40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.rv.vis,.rvl.vis,.rvr.vis{opacity:1;transform:none}
+
+@media(max-width:960px){
+  nav{padding:14px 20px}
+  .nav-links,.nav-cta{display:none}
+  .nav-ham{display:flex}
+  .inner{padding:0 32px}
+  #hero{padding:0 32px 80px}
+  #hero-logo{display:none}
+  .h-xl{font-size:clamp(44px,8vw,72px);letter-spacing:-2px}
+  .h-lg{font-size:clamp(32px,5vw,52px)}
+  .fl,.tkg,.pg{grid-template-columns:1fr}
+  .stg{grid-template-columns:1fr 1fr}
+  .stats-bar,.ecog{grid-template-columns:1fr}
+  .fg{grid-template-columns:1fr 1fr;gap:32px}
+  .rms{display:none}
+  .rmr{grid-template-columns:24px 1fr;margin-bottom:32px;opacity:1;transform:none}
+  .rmr:nth-child(odd) .rmc,.rmr:nth-child(even) .rmc{grid-column:2;text-align:left;padding:0}
+  .rmr:nth-child(odd) .rmd,.rmr:nth-child(even) .rmd{grid-column:1}
+  .rmr:nth-child(odd) .rmg,.rmr:nth-child(even) .rmg{display:none}
+  section{padding:80px 0!important}
+}
+@media(max-width:768px){
+  .inner{padding:0 20px}
+  #hero{padding:0 20px 60px}
+  .h-xl{font-size:clamp(36px,9vw,56px);letter-spacing:-1.5px}
+  .h-lg{font-size:clamp(28px,6vw,44px)}
+  .stg{grid-template-columns:1fr}
+  .fg{grid-template-columns:1fr}
+  .fbot{flex-direction:column;gap:16px}
+  .hero-acts{flex-wrap:wrap}
+  section{padding:60px 0!important}
+}
+@media(max-width:480px){
+  .inner{padding:0 16px}
+  #hero{padding:0 16px 48px;min-height:100svh}
+  .h-xl{font-size:clamp(32px,10vw,48px);letter-spacing:-1px}
+  .bp,.bs{width:100%!important;text-align:center!important}
+  .stats-bar{grid-template-columns:1fr}
+  .modal-box{margin:16px;padding:24px 18px!important;max-height:88vh;overflow-y:auto}
+  section{padding:48px 0!important}
+  #pmc3d-wrap{height:340px!important}
+  #pmc-main-canvas{height:340px!important}
+}
+
+
+
+.nav-ham{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;z-index:201}
+.nav-ham span{display:block;width:22px;height:2px;background:var(--teal,#41B4D3);border-radius:2px;transition:all .3s}
+.nav-ham.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.nav-ham.open span:nth-child(2){opacity:0}
+.nav-ham.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mob-nav{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:200;transform:translateX(100%);transition:transform .35s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}
+.mob-nav.open{transform:translateX(0)}
+.mob-nav-inner{display:flex;flex-direction:column;justify-content:center;padding:80px 32px 40px;height:100%}
+.mob-nav-inner ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.mob-nav-inner ul li a{display:block;font-family:'Syne',sans-serif;font-size:clamp(26px,7vw,42px);font-weight:800;color:#F0F4F8;text-decoration:none;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);letter-spacing:-1px;transition:color .2s}
+.mob-nav-inner ul li a:hover{color:#41B4D3}
+.mob-nav-actions{margin-top:28px}
+.mob-nav-actions .bp{width:100%;text-align:center}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Jalibor",
+  "url": "https://jalibor.app",
+  "logo": "https://jalibor.app/assets/logo.png",
+  "description": "Real-time urban intelligence infrastructure. Presence Mesh Consensus protocol.",
+  "sameAs": [
+    "https://twitter.com/JaliborApp",
+    "https://t.me/jalibor"
+  ]
+}
+</script>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="bg-canvas"></canvas>
+
+<nav id="nav">
+  <div class="nav-logo">Jali<span class="bor">bor</span></div>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#how">Technology</a></li>
+    <li><a href="#formula">Consensus</a></li>
+    <li><a href="#ecosystem">Network</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#tokenomics">Token</a></li>
+    <li><a href="#network">Vision</a></li>
+  </ul>
+  <button class="nav-cta" onclick="jalOpen('jal-wp-modal')">Whitepaper</button>
+  <button class="nav-ham" onclick="toggleMobileNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div id="mobile-nav" class="mob-nav">
+  <div class="mob-nav-inner">
+    <ul>
+      <li><a href="#problem" onclick="closeMobileNav()">Problem</a></li>
+      <li><a href="#how" onclick="closeMobileNav()">Technology</a></li>
+      <li><a href="#formula" onclick="closeMobileNav()">Consensus</a></li>
+      <li><a href="#ecosystem" onclick="closeMobileNav()">Network</a></li>
+      <li><a href="#roadmap" onclick="closeMobileNav()">Roadmap</a></li>
+      <li><a href="#tokenomics" onclick="closeMobileNav()">Token</a></li>
+      <li><a href="#network" onclick="closeMobileNav()">Vision</a></li>
+    </ul>
+    <div class="mob-nav-actions">
+      <button class="bp" onclick="jalOpen('jal-wp-modal');closeMobileNav()">Whitepaper</button>
+    </div>
+  </div>
+</div>
+
+
+
+<section id="hero">
+  <div class="glow g1"></div>
+  <div class="glow g2"></div>
+  <div id="hero-logo">
+    <div class="logo-wrap">
+      <svg id="logosvg" viewBox="0 0 400 400">
+        <defs><radialGradient id="cg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#41B4D3" stop-opacity=".25"/><stop offset="100%" stop-color="#41B4D3" stop-opacity="0"/></radialGradient></defs>
+        <circle fill="url(#cg)" cx="200" cy="200" r="180"/>
+        <circle fill="none" stroke="rgba(65,180,211,.06)" stroke-width=".8" cx="200" cy="200" r="168"/>
+        <circle fill="none" stroke="rgba(65,180,211,.12)" stroke-width=".8" cx="200" cy="200" r="120"/>
+        <circle fill="none" stroke="rgba(65,180,211,.06)" stroke-width=".8" stroke-dasharray="3 9" cx="200" cy="200" r="62"/>
+        <g fill="none" stroke="rgba(65,180,211,.14)" stroke-width=".7">
+          <line x1="200" y1="200" x2="200" y2="80"/><line x1="200" y1="200" x2="285" y2="115"/>
+          <line x1="200" y1="200" x2="320" y2="200"/><line x1="200" y1="200" x2="285" y2="285"/>
+          <line x1="200" y1="200" x2="200" y2="320"/><line x1="200" y1="200" x2="115" y2="285"/>
+          <line x1="200" y1="200" x2="80" y2="200"/><line x1="200" y1="200" x2="115" y2="115"/>
+        </g>
+        <g id="elayer">
+          <g transform="translate(200,80) rotate(180)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(285,115) rotate(135)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(320,200) rotate(90)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(285,285) rotate(45)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(200,320) rotate(0)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(115,285) rotate(315)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(80,200) rotate(270)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+          <g transform="translate(115,115) rotate(225)"><ellipse fill="rgba(65,180,211,.06)" stroke="#41B4D3" stroke-width="1.5" cx="0" cy="0" rx="22" ry="10"/><circle fill="#41B4D3" cx="0" cy="5.5" r="4"/></g>
+        </g>
+        <circle cx="200" cy="200" r="38" fill="rgba(65,180,211,.06)"/>
+        <circle cx="200" cy="200" r="24" fill="rgba(65,180,211,.14)"/>
+        <circle cx="200" cy="200" r="14" fill="none" stroke="#41B4D3" stroke-width="1.8"/>
+        <circle cx="200" cy="200" r="9" fill="#41B4D3"/>
+      </svg>
+    </div>
+  </div>
+  <div>
+    <div class="hero-eyebrow"><span style="width:5px;height:5px;border-radius:50%;background:var(--teal);animation:blink 1.8s infinite;display:inline-block"></span>Urban Intelligence Infrastructure</div>
+    <h1 class="h-xl" style="overflow:hidden;margin-bottom:32px">
+      <span class="hero-line">Real-world events need</span>
+      <span class="hero-line accent">real-time consensus.</span>
+    </h1>
+    <div class="hero-bottom">
+      <p class="hero-desc">Jalibor provides the infrastructure layer for distributed validation and tracking of moving real-world events.</p>
+      <div class="hero-acts">
+        <button class="bp" onclick="jalOpen('jal-wp-modal')">Technical Overview</button>
+        <button class="bs" onclick="jalOpen('jal-demo-modal')">Request Demo →</button>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat"><span class="sv">&lt;800ms</span><span class="sl">Consensus latency</span></div>
+      <div class="stat"><span class="sv">PMC</span><span class="sl">Presence Mesh Consensus</span></div>
+      <div class="stat"><span class="sv">Human+AI</span><span class="sl">Hybrid node types</span></div>
+      <div class="stat"><span class="sv">$120B</span><span class="sl">Addressable market
+      </span></div>
+      <div class="REMOVE_THIS"e · Team alloc.</span></div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section id="pmc-3d" style="position:relative;z-index:2;background:#000;border-top:1px solid rgba(65,180,211,.10);border-bottom:1px solid rgba(65,180,211,.10)">
+  <div style="max-width:1200px;margin:0 auto;padding:40px 64px 32px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px">
+      <div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--teal);text-transform:uppercase;display:block;margin-bottom:10px">Live simulation — Presence Mesh Consensus</span>
+        <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-1.5px;color:var(--white)">Watch the <span style="color:var(--teal)">mesh activate</span></h2>
+      </div>
+      <p style="font-size:13px;color:var(--silver);max-width:340px;line-height:1.75;font-weight:300">A moving entity triggers the network. Nodes activate, consensus grows, trajectory is reconstructed — in real time across the distributed mesh.</p>
+    </div>
+  </div>
+
+  <style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+#pmc3d-wrap #pmc3d-hud{position:absolute;inset:0;z-index:10;pointer-events:none;font-family:'JetBrains Mono',monospace}
+
+/* -- NAV -- */
+#pmc3d-wrap #pmc3d-nav{position:absolute;top:0;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 36px;border-bottom:1px solid rgba(65,180,211,.07);background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent)}
+.logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px;color:#F0F4F8}
+.logo em{color:#41B4D3;font-style:normal}
+.nav-tag{font-size:9px;letter-spacing:2.5px;color:rgba(65,180,211,.55);text-transform:uppercase}
+.nav-time{font-size:10px;color:rgba(144,164,174,.5);letter-spacing:1px}
+
+/* -- PHASE PANEL left -- */
+#pmc3d-wrap #pmc3d-panel-l{position:absolute;left:36px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;max-width:180px}
+.ph-num{font-size:10px;letter-spacing:2.5px;color:rgba(65,180,211,.6);text-transform:uppercase}
+.ph-name{font-size:19px;font-weight:600;color:rgba(240,244,248,.85);line-height:1.3;letter-spacing:.1px}
+.ph-desc{font-size:10px;color:rgba(144,164,174,.4);line-height:1.5;margin-top:4px;letter-spacing:.3px}
+
+/* -- CONFIDENCE right -- */
+#pmc3d-wrap #pmc3d-panel-r{position:absolute;right:36px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:16px}
+.conf-wrap{position:relative;width:90px;height:90px}
+.conf-wrap svg{width:100%;height:100%}
+.conf-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.conf-pct{font-size:32px;font-weight:700;color:#41B4D3;line-height:1}
+.conf-unit{font-size:8px;color:rgba(144,164,174,.4);letter-spacing:1.5px}
+.side-metric{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.sm-label{font-size:9px;color:rgba(144,164,174,.45);letter-spacing:1.5px;text-transform:uppercase}
+.sm-val{font-size:24px;color:#41B4D3;font-weight:700;letter-spacing:-.5px}
+
+/* -- FEED top-right -- */
+#pmc3d-wrap #pmc3d-feed{position:absolute;right:36px;top:80px;display:flex;flex-direction:column;gap:5px;max-width:220px}
+.pmc3d-fe{opacity:0;transform:translateY(-4px);transition:opacity .5s,transform .5s;border-left:1px solid rgba(65,180,211,.25);padding:5px 10px}
+.pmc3d-fe.in{opacity:1;transform:none}
+.pmc3d-fe-tag{font-size:8px;color:rgba(65,180,211,.7);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px}
+.pmc3d-fe-txt{font-size:10px;color:rgba(144,164,174,.55);line-height:1.5;letter-spacing:.2px}
+
+/* -- BOTTOM BAR -- */
+#pmc3d-wrap #pmc3d-bar{position:absolute;bottom:0;left:0;right:0;height:56px;display:flex;align-items:center;gap:0;border-top:1px solid rgba(65,180,211,.07);background:linear-gradient(to top,rgba(0,0,0,.65),transparent)}
+.bm{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-right:1px solid rgba(65,180,211,.06)}
+.bm:last-child{border:none}
+.bm-l{font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.45);text-transform:uppercase}
+.bm-v{font-size:20px;font-weight:700;color:#41B4D3;letter-spacing:-.5px}
+
+/* -- PROGRESS -- */
+#pmc3d-wrap #pmc3d-prog{position:absolute;top:0;left:0;right:0;height:1px;background:rgba(65,180,211,.06)}
+#pmc3d-prog-f{height:1px;width:0;background:#41B4D3;transition:width .8s ease;box-shadow:0 0 6px rgba(65,180,211,.5)}
+
+/* -- PHASE TRANSITION FLASH -- */
+#pmc3d-wrap #pmc3d-flash{position:absolute;inset:0;background:rgba(65,180,211,.0);pointer-events:none;transition:background .15s}
+
+  </style>
+
+  <div id="pmc3d-wrap" style="position:relative;width:100%;height:clamp(340px,55vw,640px);overflow:hidden;background:#000">
+    <canvas id="pmc-main-canvas" style="display:block;width:100%;height:640px" style="max-height:clamp(340px,55vw,640px)"></canvas>
+    
+
+<div id="pmc3d-hud">
+  <div id="pmc3d-prog"><div id="pmc3d-prog-f"></div></div>
+  <div id="pmc3d-flash"></div>
+
+  <div id="pmc3d-nav">
+    <div class="logo">Jali<em>bor</em></div>
+    <div class="nav-tag">Presence Mesh Consensus * Live</div>
+    <div class="nav-time" id="pmc3d-nt">T+00:00</div>
+  </div>
+
+  <div id="pmc3d-panel-l">
+    <div class="ph-num" id="pmc3d-ph-n">Phase 01 * AMBIENT</div>
+    <div class="ph-name" id="pmc3d-ph-nm">Ambient city state</div>
+    <div class="ph-desc" id="pmc3d-ph-d">Distributed nodes in standby. Mesh dormant.</div>
+  </div>
+
+  <div id="pmc3d-panel-r">
+    <div class="conf-wrap" style="width:120px;height:120px">
+      <svg viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(65,180,211,.08)" stroke-width="3.5"/>
+        <circle id="pmc3d-ca" cx="60" cy="60" r="50" fill="none" stroke="#41B4D3" stroke-width="3.5"
+          stroke-dasharray="314.2" stroke-dashoffset="314.2"
+          stroke-linecap="round" transform="rotate(-90 60 60)"
+          style="transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)"/>
+      </svg>
+      <div class="conf-num"><span class="conf-pct" id="pmc3d-cp">0</span><span class="conf-unit">CONSENSUS</span></div>
+    </div>
+    <div class="side-metric"><div class="sm-label">Active nodes</div><div class="sm-val" id="pmc3d-m-an">0</div></div>
+    <div class="side-metric"><div class="sm-label">Validated</div><div class="sm-val" id="pmc3d-m-vn">0</div></div>
+    <div class="side-metric"><div class="sm-label">Mesh radius</div><div class="sm-val" id="pmc3d-m-mr">--</div></div>
+  </div>
+
+  <div id="pmc3d-feed"></div>
+
+  <div id="pmc3d-bar">
+    <div class="bm"><div class="bm-l">Latency</div><div class="bm-v" id="pmc3d-b-lat">--</div></div>
+    <div class="bm"><div class="bm-l">Protocol</div><div class="bm-v" style="font-size:10px;letter-spacing:.5px">PMC v2.4</div></div>
+    <div class="bm"><div class="bm-l">Node types</div><div class="bm-v" style="font-size:10px">HUMAN * AI</div></div>
+    <div class="bm"><div class="bm-l">Status</div><div class="bm-v" id="pmc3d-b-st" style="font-size:10px;letter-spacing:.5px">STANDBY</div></div>
+    <div class="bm"><div class="bm-l">Coverage</div><div class="bm-v" id="pmc3d-b-cov">--</div></div>
+  </div>
+</div>
+
+
+
+  </div>
+</section>
+<script>
+(function(){
+'use strict';
+
+var wrap = document.getElementById('pmc3d-wrap');
+var cv   = document.getElementById('pmc-main-canvas');
+if(!wrap || !cv || typeof THREE === 'undefined') return;
+
+var W = wrap.offsetWidth || window.innerWidth;
+var H = 640;
+cv.width = W; cv.height = H;
+cv.style.width='100%'; cv.style.height=H+'px';
+wrap.style.height=H+'px';
+
+var renderer = new THREE.WebGLRenderer({canvas:cv, antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+renderer.setSize(W, H);
+renderer.setClearColor(0x000000, 1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+window.addEventListener('resize', function(){
+  var nw = wrap.offsetWidth || window.innerWidth;
+  renderer.setSize(nw, H);
+  cam.aspect = nw / H;
+  cam.updateProjectionMatrix();
+});
+
+var scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000, 0.007);
+
+var cam = new THREE.PerspectiveCamera(52, W/H, 0.1, 400);
+
+// ── Camera ──────────────────────────────────────────────────────────
+var CAM_R_TRAVEL  = 14;
+var CAM_R_STOPPED = 26;
+var CAM_Y_TRAVEL  = 10;
+var CAM_Y_STOPPED = 18;
+var CAM_SPD_TRAVEL  = 0.18; // degrees per frame at 60fps
+var CAM_SPD_STOPPED = 0.35;
+
+var camAngle = 0.3;
+var camR = CAM_R_TRAVEL;
+var camY = CAM_Y_TRAVEL;
+var camSpeed = CAM_SPD_TRAVEL;
+var camTX = -20, camTZ = -12; // orbit center — matches PATH start
+
+function updateCam(){
+  cam.position.set(
+    camTX + Math.cos(camAngle) * camR,
+    camY,
+    camTZ + Math.sin(camAngle) * camR
+  );
+  cam.lookAt(camTX, 0, camTZ);
+}
+
+// ── Colors ──────────────────────────────────────────────────────────
+var C_TEAL  = 0x41B4D3;
+var C_TEAL2 = 0x6ECDE6;
+var C_RED   = 0xCC2020;
+
+// ── Ground ──────────────────────────────────────────────────────────
+scene.add(new THREE.Mesh(
+  new THREE.PlaneGeometry(120, 120),
+  new THREE.MeshBasicMaterial({color:0x010305})
+));
+
+// ── Grid ────────────────────────────────────────────────────────────
+var gMatA = new THREE.LineBasicMaterial({color:C_TEAL, transparent:true, opacity:.06});
+var gMatB = new THREE.LineBasicMaterial({color:C_TEAL, transparent:true, opacity:.025});
+[-48,-36,-24,-12,0,12,24,36,48].forEach(function(v){
+  scene.add(
+    new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-48,0,v),new THREE.Vector3(48,0,v)]), gMatA.clone()),
+    new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(v,0,-48),new THREE.Vector3(v,0,48)]), gMatA.clone())
+  );
+});
+[-42,-30,-18,-6,6,18,30,42].forEach(function(v){
+  scene.add(
+    new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-48,0,v),new THREE.Vector3(48,0,v)]), gMatB.clone()),
+    new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(v,0,-48),new THREE.Vector3(v,0,48)]), gMatB.clone())
+  );
+});
+
+// ── Buildings ───────────────────────────────────────────────────────
+var bldgs = [];
+[
+  [-18,-15,3,6,2.5],[-11,-15,2.5,9,2],[-4,-15,3.5,5,3],[4,-15,2.5,10,2.5],[11,-15,3,7,2.5],[17,-15,2,8,2],
+  [-18,-7,2.5,5,2], [-11,-7,3,11,3], [-4,-7,2.5,8,2.5],[4,-7,3.5,6,3],  [11,-7,2.5,9,2.5],[17,-7,3,6,2],
+  [-18,1,3,7,2.5],  [-11,1,2.5,5,2], [-4,1,3,10,3],    [4,1,2.5,7,2.5], [11,1,3,6,2],     [17,1,2.5,9,2],
+  [-18,9,2.5,6,2],  [-11,9,3,8,3],   [-4,9,2.5,5,2.5], [4,9,3,7,2.5],   [11,9,2.5,4,2],   [17,9,3,8,2.5],
+  [-18,17,3,5,2.5], [-11,17,2,9,2],  [-4,17,3.5,7,3],  [4,17,2.5,10,2.5],[11,17,3,6,2],   [17,17,2.5,8,2],
+].forEach(function(b){
+  var x=b[0],z=b[1],w=b[2],h=b[3],d=b[4];
+  var geo  = new THREE.BoxGeometry(w,h,d);
+  var mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color:0x030709}));
+  mesh.position.set(x, h/2, z);
+  var em = new THREE.LineBasicMaterial({color:C_TEAL, transparent:true, opacity:0});
+  var edge = new THREE.LineSegments(new THREE.EdgesGeometry(geo), em);
+  edge.position.copy(mesh.position);
+  scene.add(mesh, edge);
+  bldgs.push({em:em, x:x, z:z});
+});
+
+// ── Nodes ───────────────────────────────────────────────────────────
+var NL = [];
+function mkNode(x,z,type){
+  var ai  = (type==='ai');
+  var mat = new THREE.MeshBasicMaterial({color:C_TEAL, transparent:true, opacity:0});
+  var geo = ai ? new THREE.OctahedronGeometry(0.3,0) : new THREE.SphereGeometry(0.22,10,10);
+  var m   = new THREE.Mesh(geo, mat);
+  m.position.set(x, 0.32, z);
+  var rm   = new THREE.MeshBasicMaterial({color:C_TEAL, transparent:true, opacity:0, side:THREE.DoubleSide});
+  var ring = new THREE.Mesh(new THREE.RingGeometry(0.5,0.63,24), rm);
+  ring.rotation.x = -Math.PI/2;
+  ring.position.set(x, 0.03, z);
+  scene.add(m, ring);
+  NL.push({m:m, ring:ring, mat:mat, rm:rm, x:x, z:z, ai:ai, alpha:0, val:false, pulse:0});
+}
+// Zone A — sparse, near path start
+[[-15,-9,'h'],[-12,-8,'h'],[-9,-10,'h'],[-14,-6,'h'],[-11,-5,'h'],[-8,-7,'h']].forEach(function(a){mkNode(a[0],a[1],a[2]);});
+// Zone B — medium density mid-path
+[[-6,-5,'ai'],[-4,-7,'h'],[-2,-5,'ai'],[0,-7,'h'],[2,-5,'ai'],[-5,-2,'h'],[-3,-1,'ai'],[1,-3,'h']].forEach(function(a){mkNode(a[0],a[1],a[2]);});
+// Zone C — denser approaching destination
+[[3,-2,'ai'],[5,-4,'h'],[7,-3,'ai'],[4,0,'h'],[6,-1,'ai'],[8,0,'h'],[5,1,'ai']].forEach(function(a){mkNode(a[0],a[1],a[2]);});
+// Zone D — dense cluster at stop point (0,0)
+[
+  [-3,1,'h'],[0,0,'ai'],[3,1,'h'],[-2,3,'ai'],[1,2,'h'],[4,2,'ai'],
+  [-1,4,'h'],[2,4,'ai'],[5,3,'h'],[0,2,'ai'],[3,3,'h'],[6,2,'ai'],
+  [-4,0,'h'],[-2,-1,'ai'],[2,-1,'h'],[-3,4,'ai'],[4,4,'h'],[6,4,'ai'],
+  [-1,5,'h'],[2,5,'ai'],[4,5,'h'],[0,4,'ai'],[-4,3,'h'],[7,3,'ai'],
+  [-5,1,'h'],[8,2,'ai'],[-4,5,'h'],[7,5,'ai'],[5,6,'h'],[-2,6,'ai']
+].forEach(function(a){mkNode(a[0],a[1],a[2]);});
+// Zone E — outer ring, validates after stop
+[[-7,2,'h'],[-6,5,'ai'],[7,6,'h'],[8,5,'ai'],[-5,-2,'h'],[9,1,'ai'],
+ [-4,7,'h'],[0,7,'ai'],[4,7,'h'],[7,8,'ai'],[9,4,'h']].forEach(function(a){mkNode(a[0],a[1],a[2]);});
+
+// ── Entity (RED point) — starts invisible, fades in immediately ──────
+var entMat  = new THREE.MeshBasicMaterial({color:C_RED, transparent:true, opacity:0});
+var ent     = new THREE.Mesh(new THREE.SphereGeometry(0.95,20,20), entMat);
+ent.position.set(-20, 0.55, -12); // PATH start
+scene.add(ent);
+
+// Halos — teal (NOT red)
+var halos = [];
+[2.2, 3.4, 5.0].forEach(function(r, i){
+  var hm = new THREE.MeshBasicMaterial({color: i===0?C_TEAL2:C_TEAL, transparent:true, opacity:0, side:THREE.DoubleSide});
+  var h  = new THREE.Mesh(new THREE.RingGeometry(r-.08, r+.08, 48), hm);
+  h.rotation.x = -Math.PI/2;
+  h.position.set(-20, 0.07, -12);
+  scene.add(h);
+  halos.push({h:h, hm:hm, base:0.13-0.04*i});
+});
+
+// Beam
+var beamMat = new THREE.MeshBasicMaterial({color:C_TEAL, transparent:true, opacity:0});
+var beam    = new THREE.Mesh(new THREE.CylinderGeometry(0.025,0.025,12,6), beamMat);
+beam.position.set(-20, 6.1, -12);
+scene.add(beam);
+
+// Stop glow — appears when entity stops
+var sgm = new THREE.MeshBasicMaterial({color:C_TEAL, transparent:true, opacity:0, side:THREE.DoubleSide});
+var sglow = new THREE.Mesh(new THREE.CircleGeometry(9,64), sgm);
+sglow.rotation.x = -Math.PI/2;
+sglow.position.set(0, 0.01, 0);
+scene.add(sglow);
+
+function mkRing(r, col){
+  var pts = [];
+  for(var i=0;i<=96;i++){var a=i/96*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*r, 0.04, Math.sin(a)*r));}
+  var lm = new THREE.LineBasicMaterial({color:col||C_TEAL, transparent:true, opacity:0});
+  var l  = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lm);
+  scene.add(l);
+  return {l:l, lm:lm};
+}
+var sr1 = mkRing(9, C_TEAL);
+var sr2 = mkRing(13, C_TEAL2);
+var sr3 = mkRing(17, C_TEAL);
+
+// ── Trail ───────────────────────────────────────────────────────────
+var TLEN = 140;
+var tPos = new Float32Array(TLEN*3);
+var tGeo = new THREE.BufferGeometry();
+tGeo.setAttribute('position', new THREE.BufferAttribute(tPos, 3));
+var tMat = new THREE.LineBasicMaterial({color:C_TEAL, transparent:true, opacity:0.35});
+var tLine = new THREE.Line(tGeo, tMat);
+scene.add(tLine);
+var tPts = [];
+
+// ── Connections ─────────────────────────────────────────────────────
+var CONN = [];
+for(var ci=0; ci<80; ci++){
+  var cg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+  var cm = new THREE.LineBasicMaterial({color:C_TEAL, transparent:true, opacity:0});
+  var cl = new THREE.Line(cg, cm);
+  scene.add(cl);
+  CONN.push({l:cl, m:cm});
+}
+
+// ── Pulses ──────────────────────────────────────────────────────────
+var pulses = [];
+function spawnPulse(x,z,maxR,spd,col){
+  var mat  = new THREE.MeshBasicMaterial({color:col||C_TEAL, transparent:true, opacity:0.7, side:THREE.DoubleSide});
+  var mesh = new THREE.Mesh(new THREE.RingGeometry(0.08,0.18,32), mat);
+  mesh.rotation.x = -Math.PI/2;
+  mesh.position.set(x, 0.09, z);
+  scene.add(mesh);
+  pulses.push({mesh:mesh, mat:mat, r:0.08, maxR:maxR||4, spd:spd||0.06, dead:false});
+}
+
+// ── Particles ───────────────────────────────────────────────────────
+var PC  = 300;
+var pPo = new Float32Array(PC*3);
+var pVe = [];
+for(var pi=0; pi<PC; pi++){
+  pPo[pi*3]   = (Math.random()-0.5)*70;
+  pPo[pi*3+1] = Math.random()*22;
+  pPo[pi*3+2] = (Math.random()-0.5)*70;
+  pVe.push({x:(Math.random()-0.5)*0.008, y:0.002+Math.random()*0.003, z:(Math.random()-0.5)*0.008});
+}
+var pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPo, 3));
+var pMat = new THREE.PointsMaterial({color:C_TEAL, size:0.07, transparent:true, opacity:0.15});
+scene.add(new THREE.Points(pGeo, pMat));
+
+// ── Path (Catmull-Rom) ───────────────────────────────────────────────
+var PATH = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-20, 0, -12),
+  new THREE.Vector3(-14, 0, -10),
+  new THREE.Vector3(-9,  0, -8),
+  new THREE.Vector3(-5,  0, -5),
+  new THREE.Vector3(-1,  0, -3),
+  new THREE.Vector3( 2,  0, -1),
+  new THREE.Vector3( 0,  0,  0),
+], false, 'catmullrom', 0.5);
+
+// ── HUD ─────────────────────────────────────────────────────────────
+function hudSet(id, val){ var e=document.getElementById('pmc3d-'+id); if(e) e.textContent=val; }
+function setConf(p){
+  hudSet('cp', Math.round(p));
+  var e = document.getElementById('pmc3d-ca');
+  if(e) e.style.strokeDashoffset = 314.2*(1-p/100);
+}
+var PHASES = [
+  {tag:'01 · DETECTION', nm:'Event detected',          d:'Moving entity identified. Mesh activating.'},
+  {tag:'02 · ACTIVATION',nm:'Geographic activation',   d:'Nodes coming online. Radius expanding.'},
+  {tag:'03 · TRACKING',  nm:'Dynamic tracking active', d:'PMC consensus building. Trajectory live.'},
+  {tag:'04 · RESOLVED',  nm:'Consensus reached',       d:'Entity stopped. 94%+ consensus. Network aware.'},
+];
+function setPhase(i){ var p=PHASES[Math.min(i,3)]; hudSet('ph-n',p.tag); hudSet('ph-nm',p.nm); hudSet('ph-d',p.d); }
+var feedEl = document.getElementById('pmc3d-feed');
+function addFeed(tag, txt){
+  if(!feedEl) return;
+  var d = document.createElement('div');
+  d.className = 'pmc3d-fe';
+  d.innerHTML = '<div class="pmc3d-fe-tag">'+tag+'</div><div class="pmc3d-fe-txt">'+txt+'</div>';
+  feedEl.insertBefore(d, feedEl.firstChild);
+  setTimeout(function(){ d.classList.add('in'); }, 16);
+  while(feedEl.children.length > 5) feedEl.removeChild(feedEl.lastChild);
+}
+
+// ── SIMULATION STATE ────────────────────────────────────────────────
+// All mutable — reset between runs
+var pathT, conf, valCnt, stopped, stopAt, totT, ptmr, lastTS, feedDone;
+
+function resetState(){
+  pathT   = 0;
+  conf    = 0;
+  valCnt  = 0;
+  stopped = false;
+  stopAt  = 0;
+  totT    = 0;
+  ptmr    = 0;
+  lastTS  = -1; // sentinel — set properly on first frame
+  feedDone = {};
+
+  // Reset camera
+  camAngle = 0.3;
+  camR     = 14;
+  camY     = 10;
+  camSpeed = CAM_SPD_TRAVEL;
+  camTX    = -20;
+  camTZ    = -12;
+
+  // Reset entity — starts INVISIBLE, fades in during first frames
+  entMat.opacity = 1;
+  ent.position.set(-20, 0.55, -12);
+  halos.forEach(function(h){ h.hm.opacity=h.base*0.5; h.h.position.set(-20,0.07,-12); h.h.scale.set(1,1,1); });
+  beam.position.set(-20, 6.1, -12);
+  beamMat.opacity = 0.16;
+
+  // Reset nodes
+  NL.forEach(function(n){
+    n.alpha=0; n.val=false; n.pulse=0;
+    n.mat.opacity=0; n.rm.opacity=0;
+    n.m.scale.set(1,1,1);
+    n.m.position.y = 0.32;
+  });
+
+  // Reset trail
+  tPts.length = 0;
+  tGeo.setDrawRange(0, 0);
+  tGeo.attributes.position.needsUpdate = true;
+  tMat.opacity = 0;
+
+  // Reset connections
+  CONN.forEach(function(c){ c.m.opacity=0; });
+
+  // Reset pulses
+  pulses.forEach(function(p){ if(!p.dead){ p.dead=true; scene.remove(p.mesh); } });
+  pulses.length = 0;
+
+  // Reset stop glow
+  sgm.opacity   = 0;
+  sr1.lm.opacity = 0;
+  sr2.lm.opacity = 0;
+  sr3.lm.opacity = 0;
+
+  // Reset HUD feed
+  if(feedEl) feedEl.innerHTML = '';
+  setPhase(0);
+  addFeed('EVENT DETECTED', 'Entity NW-1200 heading NE — mesh activating');
+
+  // Reset buildings
+  bldgs.forEach(function(b){ b.em.opacity=0; });
+}
+
+// ── MAIN FRAME ──────────────────────────────────────────────────────
+function frame(now){
+  var dt = (lastTS < 0) ? 0.016 : Math.min((now - lastTS)/1000, 0.05);
+  lastTS = now;
+  if(dt <= 0) dt = 0.016;
+  totT  += dt;
+  ptmr  += dt;
+
+  // Current entity position
+  var ep = PATH.getPoint(Math.min(pathT, 1));
+
+
+
+
+  // ── MOVING PHASE ───────────────────────────────────────────────
+  if(!stopped){
+    // Speed slows progressively as confidence builds (80%+)
+    var sf = conf >= 80 ? Math.max(0.05, 1 - conf/104) : 1;
+    pathT  = Math.min(1, pathT + dt * 0.18 * sf);
+
+    // Camera expands outward as journey progresses
+    var targetR = 14 + pathT * 10;
+    camR += (targetR - camR) * dt * 1.5;
+    camY += ((10 + pathT * 6) - camY) * dt * 1.5;
+    // Camera orbit center follows entity position
+    camTX += (ep.x - camTX) * Math.min(1, dt * 3.0);
+    camTZ += (ep.z - camTZ) * Math.min(1, dt * 3.0);
+
+    // Activation radius grows with progress
+    var actR = 4 + pathT * 12;
+
+    NL.forEach(function(n){
+      var dx = n.x - ep.x, dz = n.z - ep.z;
+      var d  = Math.sqrt(dx*dx + dz*dz);
+      if(d < actR) n.alpha = Math.min(1, n.alpha + dt*2);
+      if(n.alpha > 0.12 && !n.val && d < actR*0.72 && Math.random() < (0.03 + pathT*0.16)){
+        n.val   = true;
+        n.pulse = 1;
+        valCnt++;
+        conf = Math.min(95, 100*(1 - Math.exp(-0.016*valCnt)));
+        spawnPulse(n.x, n.z, 0.9, 0.09);
+      }
+    });
+
+    // Phase transitions
+    if(pathT > 0.05 && !feedDone.f1){ feedDone.f1=1; setPhase(1); addFeed('MESH ACTIVATED', 'Nodes online — radius expanding'); }
+    if(pathT > 0.40 && !feedDone.f2){ feedDone.f2=1; setPhase(2); addFeed('TRACKING LIVE',  'PMC consensus '+Math.round(conf)+'% — trajectory reconstruction active'); }
+    if(pathT > 0.72 && !feedDone.f3){ feedDone.f3=1; addFeed('CONSENSUS FORMING', Math.round(conf)+'% — dense validation cluster ahead'); }
+
+    // Entity pulses while moving
+    if(ptmr > 0.22){
+      ptmr = 0;
+      spawnPulse(ep.x + (Math.random()-0.5)*1.5, ep.z + (Math.random()-0.5)*1.5, 2.5+pathT*3, 0.055);
+    }
+
+    // ── STOP ─────────────────────────────────────────────────────
+    if(conf >= 94 || pathT >= 1){
+      stopped = true;
+      stopAt  = totT;
+      setPhase(3);
+      addFeed('ENTITY STOPPED', valCnt+' nodes · '+Math.round(conf)+'% consensus · PMC resolved');
+      // Freeze camera orbit on entity's final position
+      camTX = ep.x;
+      camTZ = ep.z;
+      camSpeed = CAM_SPD_STOPPED;
+      camR = CAM_R_STOPPED;
+      camY = CAM_Y_STOPPED;
+      // Big burst
+      spawnPulse(ep.x, ep.z, 20, 0.018, C_TEAL);
+      spawnPulse(ep.x, ep.z, 12, 0.026, C_TEAL2);
+      spawnPulse(ep.x, ep.z,  7, 0.040, C_TEAL);
+    }
+  }
+
+  // ── STOPPED PHASE ───────────────────────────────────────────────
+  if(stopped){
+    // Keep validating remaining nodes
+    NL.forEach(function(n){
+      n.alpha = Math.min(1, n.alpha + dt*0.6);
+      if(!n.val && Math.random() < 0.01){ n.val=true; n.pulse=1; valCnt++; }
+    });
+    conf = Math.min(98, 100*(1 - Math.exp(-0.016*valCnt)));
+
+    // Stop glow breathes in
+    var si    = totT - stopAt;
+    var fade  = Math.min(1, si * 0.5);
+    var br    = (Math.sin(totT*1.3)+1)*0.5;
+    sgm.opacity    = fade*(0.045 + br*0.014);
+    sr1.lm.opacity = fade*(0.38  + br*0.10);
+    sr2.lm.opacity = fade*(0.18  + br*0.06);
+    sr3.lm.opacity = fade*(0.09  + br*0.04);
+
+    // Periodic pulses
+    if(ptmr > 0.65){ ptmr=0; spawnPulse(ep.x, ep.z, 3.5+Math.random()*4.5, 0.028, C_TEAL); }
+
+    // Tighten camera over time
+    camR += (CAM_R_STOPPED - camR) * dt * 0.5;
+    camY += (CAM_Y_STOPPED - camY) * dt * 0.5;
+  }
+
+  // ── ENTITY VISUALS ──────────────────────────────────────────────
+  ent.position.set(ep.x, 0.55, ep.z);
+  ent.rotation.y += dt * 2;
+
+  beam.position.set(ep.x, 6.1, ep.z);
+
+  var pk = (Math.sin(totT*2.5)+1)*0.5;
+  halos.forEach(function(h, i){
+    h.h.position.set(ep.x, 0.07, ep.z);
+    if(stopped){
+      var b = (Math.sin(totT*(1.1-i*0.25)+i)+1)*0.5;
+      h.h.scale.setScalar(1.8 + i*0.85 + b*0.12);
+      h.hm.opacity = (h.base*0.9 + b*0.09) - i*0.12;
+    } else {
+      h.hm.opacity = entMat.opacity*(h.base + pk*0.05);
+      h.h.scale.setScalar(1 + pk*0.06);
+    }
+  });
+
+  // Stop glow & rings follow entity
+  sglow.position.set(ep.x, 0.01, ep.z);
+  sr1.l.position.set(ep.x, 0, ep.z);
+  sr2.l.position.set(ep.x, 0, ep.z);
+  sr3.l.position.set(ep.x, 0, ep.z);
+
+  // ── TRAIL ────────────────────────────────────────────────────────
+  tPts.push(new THREE.Vector3(ep.x, 0.09, ep.z));
+  if(tPts.length > TLEN) tPts.shift();
+  var pa = tGeo.attributes.position.array;
+  for(var ti=0; ti<tPts.length; ti++){
+    pa[ti*3]=tPts[ti].x; pa[ti*3+1]=tPts[ti].y; pa[ti*3+2]=tPts[ti].z;
+  }
+  tGeo.setDrawRange(0, tPts.length);
+  tGeo.attributes.position.needsUpdate = true;
+  tMat.opacity = stopped ? 0.10 : entMat.opacity*0.35;
+
+  // ── NODES ────────────────────────────────────────────────────────
+  NL.forEach(function(n){
+    n.mat.opacity = n.alpha * (n.val ? 0.88 : 0.34);
+    n.rm.opacity  = n.alpha * (n.val ? 0.28 : 0.10);
+    if(n.pulse > 0){ n.m.scale.setScalar(1+n.pulse*0.9); n.pulse = Math.max(0, n.pulse-dt*3.5); }
+    else { n.m.scale.x += (1-n.m.scale.x)*dt*5; n.m.scale.y = n.m.scale.x; n.m.scale.z = n.m.scale.x; }
+    n.m.position.y = 0.32 + Math.sin(totT*1.4 + n.x*0.7 + n.z*0.5)*0.045;
+    if(n.ai && n.alpha > 0.2) n.m.rotation.y += dt*1.1;
+  });
+
+  // ── CONNECTIONS ──────────────────────────────────────────────────
+  var vN = NL.filter(function(n){ return n.val; });
+  CONN.forEach(function(cx, i){
+    if(i < vN.length){
+      var n  = vN[i];
+      var dx = n.x-ep.x, dz = n.z-ep.z;
+      var dd = Math.sqrt(dx*dx + dz*dz);
+      if(dd < 18){
+        var pa2 = cx.l.geometry.attributes.position;
+        pa2.array[0]=ep.x; pa2.array[1]=0.35; pa2.array[2]=ep.z;
+        pa2.array[3]=n.x;  pa2.array[4]=0.35; pa2.array[5]=n.z;
+        pa2.needsUpdate = true;
+        cx.m.opacity = (1-dd/18)*0.13*n.alpha;
+      } else cx.m.opacity = 0;
+    } else cx.m.opacity = 0;
+  });
+
+  // ── PULSES ───────────────────────────────────────────────────────
+  pulses.forEach(function(p){
+    if(p.dead) return;
+    p.r += p.spd;
+    p.mat.opacity = Math.max(0, (1-p.r/p.maxR)*0.65);
+    p.mesh.scale.setScalar(p.r/0.08);
+    if(p.r >= p.maxR){ p.dead=true; scene.remove(p.mesh); }
+  });
+
+  // ── PARTICLES ────────────────────────────────────────────────────
+  for(var ppi=0; ppi<PC; ppi++){
+    pPo[ppi*3]   += pVe[ppi].x;
+    pPo[ppi*3+1] += pVe[ppi].y;
+    pPo[ppi*3+2] += pVe[ppi].z;
+    if(pPo[ppi*3+1]>22) pPo[ppi*3+1]=0;
+    if(Math.abs(pPo[ppi*3])>34)   pVe[ppi].x*=-1;
+    if(Math.abs(pPo[ppi*3+2])>34) pVe[ppi].z*=-1;
+  }
+  pGeo.attributes.position.needsUpdate = true;
+  pMat.opacity = 0.1 + conf*0.002;
+
+  // ── BUILDINGS ────────────────────────────────────────────────────
+  // Buildings fade in from pathT=0.45, proximity glow always
+  var bldgBase = Math.max(0, Math.min(1, (pathT - 0.45) * 3.5));
+  bldgs.forEach(function(b){
+    var dx=b.x-ep.x, dz=b.z-ep.z, d=Math.sqrt(dx*dx+dz*dz);
+    var prox = stopped ? Math.max(0,(1-d/8))*0.28 : Math.max(0,(1-d/10))*0.22;
+    b.em.opacity = bldgBase * (0.06 + prox);
+  });
+
+  // ── CAMERA ORBIT (always spinning) ───────────────────────────────
+  camAngle += camSpeed/60; // divide by 60 to normalize to per-second rate
+  updateCam();
+
+  // ── HUD ──────────────────────────────────────────────────────────
+  var an = NL.filter(function(n){ return n.alpha>0.1; }).length;
+  setConf(conf);
+  hudSet('m-an', an);
+  hudSet('m-vn', NL.filter(function(n){ return n.val; }).length);
+  hudSet('m-mr', stopped ? Math.round(conf)+'%' : Math.round(3+pathT*200)+'m');
+  hudSet('b-st', stopped ? 'RESOLVED' : pathT>0.05 ? 'TRACKING' : 'DETECTING');
+  hudSet('b-cov', Math.round(pathT*100)+'%');
+  var ts2 = Math.floor(totT);
+  hudSet('nt', 'T+'+String(Math.floor(ts2/60)).padStart(2,'0')+':'+String(ts2%60).padStart(2,'0'));
+  var pf = document.getElementById('pmc3d-prog-f');
+  if(pf) pf.style.width = (Math.min(totT/22,1)*100)+'%';
+
+  renderer.render(scene, cam);
+}
+
+// ── LOOP CONTROLLER ─────────────────────────────────────────────────
+var _running = false;
+
+function startAnim(){
+  if(_running) return;
+  _running = true;
+  resetState();
+
+  (function tick(now){
+    if(!_running) return;
+    requestAnimationFrame(tick);
+    frame(now);
+    // Auto-restart 5 seconds after entity stops
+    if(stopped && totT - stopAt > 5){
+      _running = false;
+      setTimeout(startAnim, 800);
+    }
+  }(performance.now()));
+}
+
+// ── SCROLL TRIGGER ───────────────────────────────────────────────────
+var _pw = document.getElementById('pmc3d-wrap');
+if(_pw){
+  var _obs = new IntersectionObserver(function(entries){
+    if(entries[0].isIntersecting && !_running) startAnim();
+  }, {threshold: 0.20});
+  _obs.observe(_pw);
+} else {
+  startAnim();
+}
+
+})();
+
+</script>
+
+<section id="problem">
+  <div class="inner">
+    <div class="pg">
+      <div class="rvl">
+        <span class="tag">The Problem</span>
+        <h2 class="h-lg" style="margin-bottom:32px">No system tracks<br><span class="accent">what is moving.</span></h2>
+        <p class="dim" style="font-size:15px;margin-bottom:28px">Every city has cameras. Every citizen has a smartphone. Every business has sensors. But none of these are connected into a unified intelligence layer capable of tracking what is happening — as it happens. The result: 94% of cameras are unlinked, response times average 11 minutes, and moving threats are invisible to every system in existence.</p>
+        <div class="pl">
+          <div class="point">
+            <div class="pi">📷</div>
+            <div>
+              <div class="pt">Isolated surveillance infrastructure</div>
+              <p class="pd">Millions of cameras — public, private, municipal — operate as disconnected silos. No shared intelligence layer. No real-time correlation. No event tracking across feeds.</p>
+            </div>
+          </div>
+          <div class="point">
+            <div class="pi">⏱️</div>
+            <div>
+              <div class="pt">Reactive, not real-time</div>
+              <p class="pd">Emergency response averages 8–12 minutes after a call. By then, a moving entity — a vehicle, a suspect, an unfolding event — has traversed multiple city blocks. There is no system that tracks it.</p>
+            </div>
+          </div>
+          <div class="point">
+            <div class="pi">🧩</div>
+            <div>
+              <div class="pt">No collaborative sensing layer</div>
+              <p class="pd">Cities have cameras. Citizens have eyes. Businesses have sensors. Police have radios. But none of these are connected into a unified real-time intelligence layer capable of dynamic event reconstruction.</p>
+            </div>
+          </div>
+          <div class="point">
+            <div class="pi">🚫</div>
+            <div>
+              <div class="pt">Static systems for dynamic threats</div>
+              <p class="pd">Existing platforms — including Waze, Citizen, and municipal 311 systems — validate static, point-in-time events. They cannot track a moving entity across a city or reconstruct a trajectory through distributed witnesses.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pvis rvr">
+        <div class="cube-wrap">
+          <svg width="300" height="300" viewBox="0 0 300 300">
+            <ellipse fill="none" stroke="rgba(65,180,211,.14)" stroke-width="1" cx="150" cy="150" rx="130" ry="44" style="transform-origin:150px 150px;animation:ox 8s linear infinite"/>
+            <ellipse fill="none" stroke="rgba(65,180,211,.10)" stroke-width="1" cx="150" cy="150" rx="44" ry="130" style="transform-origin:150px 150px;animation:oy 10s linear infinite"/>
+            <circle fill="rgba(65,180,211,.06)" cx="150" cy="150" r="35"/>
+            <circle fill="rgba(65,180,211,.14)" cx="150" cy="150" r="22"/>
+            <circle fill="#41B4D3" cx="150" cy="150" r="10"/>
+          </svg>
+        </div>
+        <div class="df df1"><div style="color:rgba(144,164,174,.5);font-size:10px;margin-bottom:4px">AVG RESPONSE TIME</div><div style="color:#41B4D3;font-size:18px;font-weight:700">11 min</div></div>
+        <div class="df df2"><div style="color:rgba(144,164,174,.5);font-size:10px;margin-bottom:4px">CAMERAS UNLINKED</div><div style="color:#41B4D3;font-size:18px;font-weight:700">94%</div></div>
+        <div class="df df3"><div style="color:rgba(144,164,174,.5);font-size:10px;margin-bottom:4px">EVENTS UNRESOLVED</div><div style="color:#41B4D3;font-size:18px;font-weight:700">67%</div></div>
+        <div class="df df4"><div style="color:rgba(144,164,174,.5);font-size:10px;margin-bottom:4px">TRACKING COVERAGE</div><div style="color:#41B4D3;font-size:18px;font-weight:700">0%</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<section id="how">
+  <div class="inner">
+    <div class="rv" style="text-align:center;max-width:640px;margin:0 auto">
+      <span class="tag">How Jalibor Works</span>
+      <h2 class="h-lg">Distributed tracking of<br><span class="accent">moving real-world entities</span></h2>
+      <p class="dim" style="margin-top:16px;font-size:15px">Jalibor uses Presence Mesh Consensus to validate and track real-world events in real time. Unlike platforms that report static events, Jalibor continuously reconstructs the trajectory of moving entities — through a distributed mesh of human observers and AI systems.</p>
+    </div>
+    <div class="stg rv" style="transition-delay:.1s">
+      <div class="step">
+        <span class="sn">01</span>
+        <span class="si">📍</span>
+        <div class="st">Event reported</div>
+        <p class="sd">A node — human or AI — detects an event and submits a georeferenced, timestamped report. Single-source confidence: low.</p>
+        <div class="sbar"></div>
+      </div>
+      <div class="step">
+        <span class="sn">02</span>
+        <span class="si">⬡</span>
+        <div class="st">Mesh activated</div>
+        <p class="sd">The geographic mesh surrounding the event is instantly alerted. Nearby human nodes and AI cameras enter a heightened validation state.</p>
+        <div class="sbar"></div>
+      </div>
+      <div class="step">
+        <span class="sn">03</span>
+        <span class="si">👁</span>
+        <div class="st">Distributed validation</div>
+        <p class="sd">Independent nodes confirm, deny, or extend the event with new observations. Spatial and temporal coherence is verified. Consensus builds.</p>
+        <div class="sbar"></div>
+      </div>
+      <div class="step">
+        <span class="sn">04</span>
+        <span class="si">◎</span>
+        <div class="st">Dynamic reconstruction</div>
+        <p class="sd">The consensus engine reconstructs the entity's trajectory in real time. A moving motorcycle, a suspect route — tracked across the city through the distributed mesh.</p>
+        <div class="sbar"></div>
+      </div>
+    </div>
+    <!-- Node types row -->
+    <div class="rv" style="margin-top:3px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;transition-delay:.2s">
+      <div style="background:var(--card);padding:24px 20px;text-align:center">
+        <div style="font-size:24px;margin-bottom:10px">📱</div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px">Human nodes</div>
+        <div style="font-size:12px;color:var(--silver);line-height:1.6">Citizens, businesses, security personnel with smartphones</div>
+      </div>
+      <div style="background:var(--card);padding:24px 20px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="font-size:24px;margin-bottom:10px">📷</div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px">AI camera nodes</div>
+        <div style="font-size:12px;color:var(--silver);line-height:1.6">Connected cameras providing autonomous visual validation</div>
+      </div>
+      <div style="background:var(--card);padding:24px 20px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="font-size:24px;margin-bottom:10px">🏢</div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px">Business nodes</div>
+        <div style="font-size:12px;color:var(--silver);line-height:1.6">Retail, logistics, buildings with sensor and camera infrastructure</div>
+      </div>
+      <div style="background:var(--card);padding:24px 20px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="font-size:24px;margin-bottom:10px">🛰️</div>
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px">Future IoT nodes</div>
+        <div style="font-size:12px;color:var(--silver);line-height:1.6">Connected vehicles, public sensors, smart city infrastructure</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="formula">
+  <div class="inner">
+    <!-- DYNAMIC TRACKING ENGINE -->
+    <div class="fl" style="margin-bottom:100px">
+      <div class="rvl">
+        <span class="tag">Dynamic Tracking Engine</span>
+        <h2 class="h-md" style="margin-bottom:20px">Not reporting.<br><span class="accent">Tracking.</span></h2>
+        <p class="dim" style="font-size:14px;margin-bottom:24px">Current urban platforms focus on isolated event reporting. Jalibor enables distributed real-time tracking and validation of moving real-world entities across city environments.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">
+          <div style="padding:16px;border:1px solid var(--brd2);border-radius:6px;background:rgba(204,48,48,.04);border-color:rgba(204,48,48,.15)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(204,48,48,.7);letter-spacing:1px;margin-bottom:8px">LEGACY SYSTEMS</div>
+            <div style="font-size:12px;color:var(--silver);line-height:1.7">Point-in-time reports · Static location · No trajectory · No cross-validation · Siloed data</div>
+          </div>
+          <div style="padding:16px;border:1px solid var(--brd);border-radius:6px;background:rgba(65,180,211,.04)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:8px">JALIBOR PMC</div>
+            <div style="font-size:12px;color:var(--silver);line-height:1.7">Real-time trajectory · Moving entity tracking · Distributed witness mesh · AI-human consensus · Confidence scoring</div>
+          </div>
+        </div>
+        <div class="cb">
+          <div class="ch"><div class="cd" style="background:#FF5F57"></div><div class="cd" style="background:#FEBC2E"></div><div class="cd" style="background:#28C840"></div><span class="cfn">tracking_engine.ts</span></div>
+          <div class="cbody">
+            <div><span class="co">// PMC — Presence Mesh Consensus</span></div>
+            <div><span class="ck">event</span> <span class="cf">detected</span>(<span class="cv">entity</span>, <span class="cv">geo</span>) {</div>
+            <div>&nbsp;&nbsp;<span class="cv">mesh</span>.activate(<span class="cv">geo</span>.radius(<span class="ck">800m</span>));</div>
+            <div>&nbsp;&nbsp;<span class="cv">nodes</span>.forEach(<span class="cv">n</span> =&gt; <span class="cv">n</span>.alert(<span class="cv">entity</span>));</div>
+            <div>&nbsp;&nbsp;<span class="ck">while</span> (<span class="cv">confidence</span> &lt; <span class="ck">0.85</span>) {</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cv">consensus</span>.update(<span class="cv">validations</span>);</div>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cv">trajectory</span>.reconstruct();</div>
+            <div>&nbsp;&nbsp;}</div>
+            <div>} <span class="co">// latency: &lt;800ms</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="rvr">
+        <span class="tag">AI-Assisted Validation — Future Layer</span>
+        <h2 class="h-md" style="margin-bottom:20px">Human + AI <span class="accent">cooperative sensing</span></h2>
+        <p class="dim" style="font-size:14px;margin-bottom:24px">In regulated enterprise and public safety deployments, AI-enabled cameras can serve as optional validation nodes — contributing structured observations to the consensus engine. Edge processing only. No raw video transmitted. Privacy-compliant by design.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card);transition:all .25s" onmouseenter="this.style.borderColor='rgba(65,180,211,.3)'" onmouseleave="this.style.borderColor='rgba(65,180,211,.08)'">
+            <span style="font-size:18px">🔴</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px">Visual entity detection</div>
+              <div style="font-size:12px;color:var(--silver)">Camera detects: red motorcycle, 2 riders, heading NE at 40km/h</div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);margin-left:auto">NODE_ACTIVE</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card);transition:all .25s" onmouseenter="this.style.borderColor='rgba(65,180,211,.3)'" onmouseleave="this.style.borderColor='rgba(65,180,211,.08)'">
+            <span style="font-size:18px">📐</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px">Spatial-temporal coherence</div>
+              <div style="font-size:12px;color:var(--silver)">Cross-validates direction, speed, timestamp against mesh event</div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);margin-left:auto">VALIDATED</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card);transition:all .25s" onmouseenter="this.style.borderColor='rgba(65,180,211,.3)'" onmouseleave="this.style.borderColor='rgba(65,180,211,.08)'">
+            <span style="font-size:18px">🧠</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px">Consensus contribution</div>
+              <div style="font-size:12px;color:var(--silver)">AI node contributes +0.18 to confidence. Trajectory updated.</div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);margin-left:auto">CONSENSUS+</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid rgba(65,180,211,.25);border-radius:5px;background:rgba(65,180,211,.06)">
+            <span style="font-size:18px">✦</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--teal2);margin-bottom:2px">Route reconstruction complete</div>
+              <div style="font-size:12px;color:var(--silver)">4 cameras + 3 human nodes → 94% confidence trajectory over 2.3km</div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal2);margin-left:auto">94%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANTI-FRAUD ARCHITECTURE -->
+    <div class="rv" style="text-align:center;max-width:560px;margin:0 auto 48px">
+      <span class="tag">Trust Architecture</span>
+      <h2 class="h-md">Distributed <span class="accent">anti-fraud</span></h2>
+      <p class="dim" style="margin-top:12px;font-size:14px">False reports become structurally difficult. Not through moderation — through math. Consensus requires independent corroboration across spatial and temporal dimensions simultaneously.</p>
+    </div>
+    <div class="rv" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden">
+      <div style="background:var(--card);padding:28px 24px">
+        <div style="font-size:22px;margin-bottom:14px">🔀</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px">Multi-node requirement</div>
+        <p style="font-size:12px;color:var(--silver);line-height:1.65">A single report never achieves high confidence. Independent nodes — with no knowledge of each other — must corroborate independently.</p>
+      </div>
+      <div style="background:var(--card);padding:28px 24px;border-left:1px solid var(--brd2)">
+        <div style="font-size:22px;margin-bottom:14px">📍</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px">Spatial coherence check</div>
+        <p style="font-size:12px;color:var(--silver);line-height:1.65">Validations must be geographically consistent with the event's reported location. Nodes outside the plausible radius are penalized.</p>
+      </div>
+      <div style="background:var(--card);padding:28px 24px;border-left:1px solid var(--brd2)">
+        <div style="font-size:22px;margin-bottom:14px">⏱️</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px">Temporal coherence check</div>
+        <p style="font-size:12px;color:var(--silver);line-height:1.65">Reports must be temporally consistent with a plausible entity trajectory. Retroactive or impossibly-timed reports reduce the submitter's trust score.</p>
+      </div>
+      <div style="background:var(--card);padding:28px 24px;border-left:1px solid var(--brd2)">
+        <div style="font-size:22px;margin-bottom:14px">🤖</div>
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px">AI visual arbitration</div>
+        <p style="font-size:12px;color:var(--silver);line-height:1.65">AI camera nodes provide independent visual verification. Contradictions between human reports and AI observations reduce confidence and flag the discrepancy.</p>
+      </div>
+    </div>
+
+    <!-- TRUST SCORE TABLE -->
+    <div class="fl" style="margin-top:80px">
+      <div class="rvl">
+        <span class="tag">Confidence Engine</span>
+        <h2 class="h-md" style="margin-bottom:28px">Confidence <span class="accent">levels</span></h2>
+        <div class="tt">
+          <div class="tr"><span class="tp">0–14%</span><span class="tn">Unverified report</span><span class="tnd">0–1 node</span></div>
+          <div class="tr"><span class="tp">15–29%</span><span class="tn">Initial signal</span><span class="tnd">2–4 nodes</span></div>
+          <div class="tr"><span class="tp">30–49%</span><span class="tn">Possible — alert state</span><span class="tnd">5–9 nodes</span></div>
+          <div class="tr"><span class="tp">50–64%</span><span class="tn">Probable — mesh active</span><span class="tnd">10–19 nodes</span></div>
+          <div class="tr" style="border-color:rgba(65,180,211,.3)"><span class="tp">65–79%</span><span class="tn">Confirmed — broadcast</span><span class="tnd">20–39 nodes</span></div>
+          <div class="tr" style="border-color:rgba(65,180,211,.38)"><span class="tp">80–89%</span><span class="tn">Verified — trajectory live</span><span class="tnd">40–74 nodes</span></div>
+          <div class="tr" style="border-color:rgba(65,180,211,.5);background:rgba(65,180,211,.06)"><span class="tp" style="color:var(--teal2)">90–100%</span><span class="tn" style="color:var(--teal2)">Strongly validated</span><span class="tnd">75+ nodes</span></div>
+        </div>
+      </div>
+      <div class="rvr">
+        <span class="tag">Proof of Presence</span>
+        <h2 class="h-md" style="margin-bottom:28px">Reward <span class="accent">formula</span></h2>
+        <div class="cb">
+          <div class="ch"><div class="cd" style="background:#FF5F57"></div><div class="cd" style="background:#FEBC2E"></div><div class="cd" style="background:#28C840"></div><span class="cfn">validation_engine.sol</span></div>
+          <div class="cbody">
+            <div><span class="co">// JALI emission — Proof of Presence Validation</span></div>
+            <div><span class="ck">reward</span> = <span class="cv">base_rate</span></div>
+            <div>&nbsp;&nbsp;× <span class="cv">trust_mult</span>     <span class="co">// ×0.5 → ×2.5</span></div>
+            <div>&nbsp;&nbsp;× <span class="cv">urgency_factor</span>  <span class="co">// event severity</span></div>
+            <div>&nbsp;&nbsp;× <span class="cv">freshness_decay</span> <span class="co">// e^(−0.012t)</span></div>
+            <div>&nbsp;&nbsp;× <span class="cv">stake_mult</span>      <span class="co">// staking bonus</span></div>
+            <div><span class="co">// No emission without verified presence</span></div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:16px;border:1px solid var(--brd2);border-radius:6px;background:rgba(65,180,211,.04)">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);margin-bottom:8px;letter-spacing:1px">ANTI-GAMING GUARANTEES</div>
+          <div style="font-size:12px;color:var(--silver);line-height:1.8">GPS proximity required · FIDO2 biometrics · Device fingerprinting · Trust score history · Spatial-temporal coherence validation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ecosystem">
+  <div class="inner">
+    <div class="rv" style="text-align:center;max-width:640px;margin:0 auto">
+      <span class="tag">Network Participants</span>
+      <h2 class="h-lg">The <span class="accent">mesh</span> is everyone</h2>
+      <p class="dim" style="margin-top:16px;font-size:15px">Jalibor's network effect compounds with every node that joins. The more participants, the stronger the consensus, the faster the validation, the broader the geographic coverage. Infrastructure that scales with adoption.</p>
+    </div>
+    <div class="ecog">
+      <div class="ecoc"><div class="ecog2"></div>
+        <span class="ecoico">🏙️</span>
+        <div class="ecot">Citizens</div>
+        <p class="ecod">Primary validation nodes. Report events, validate sightings, and track moving entities through the city mesh. Their verified presence is the foundation of PMC.</p>
+        <span class="ecotag">Human Node Layer</span>
+      </div>
+      <div class="ecoc"><div class="ecog2"></div>
+        <span class="ecoico">📷</span>
+        <div class="ecot">AI Cameras</div>
+        <p class="ecod">Connected cameras — residential, commercial, municipal — operating as autonomous AI validation nodes. Visual entity detection, direction tracking, and confidence contribution without human intervention.</p>
+        <span class="ecotag">Autonomous Node Layer</span>
+      </div>
+      <div class="ecoc"><div class="ecog2"></div>
+        <span class="ecoico">🏛️</span>
+        <div class="ecot">Municipalities</div>
+        <p class="ecod">Real-time urban event intelligence via API. Situational awareness dashboards, dynamic threat tracking, and inter-agency event sharing. From reactive to predictive.</p>
+        <span class="ecotag">Command & Control API</span>
+      </div>
+      <div class="ecoc"><div class="ecog2"></div>
+        <span class="ecoico">🚔</span>
+        <div class="ecot">Security Services</div>
+        <p class="ecod">Police, private security, and rapid response teams integrate PMC data for real-time situational awareness. Moving entity tracking. Trajectory prediction. Coordinated response.</p>
+        <span class="ecotag">Response Integration</span>
+      </div>
+      <div class="ecoc"><div class="ecog2"></div>
+        <span class="ecoico">🏢</span>
+        <div class="ecot">Enterprises</div>
+        <p class="ecod">Logistics, insurance, retail and real estate operators integrate urban intelligence to reduce operational risk, protect assets, and optimize coverage in high-density urban areas.</p>
+        <span class="ecotag">Enterprise Intelligence API</span>
+      </div>
+      <div class="ecoc"><div class="ecog2"></div>
+        <span class="ecoico">🛰️</span>
+        <div class="ecot">Future: IoT & Vehicles</div>
+        <p class="ecod">Connected vehicles, smart city sensors, public infrastructure nodes joining the mesh. As the IoT ecosystem expands, Jalibor's coverage and resolution increase automatically.</p>
+        <span class="ecotag">Next-Gen Node Layer</span>
+      </div>
+    </div>
+
+    <!-- NETWORK EFFECTS CALLOUT -->
+    <div class="rv" style="margin-top:3px;padding:40px;border:1px solid var(--brd2);border-radius:6px;background:rgba(65,180,211,.03);display:flex;gap:60px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px">
+        <span class="tag" style="margin-bottom:10px">Network Effects</span>
+        <h3 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--white);margin-bottom:12px">Every node <span class="accent">strengthens every other node</span></h3>
+        <p style="font-size:14px;color:var(--silver);line-height:1.7">Like Uber with drivers or Waze with users — but the network effect here compounds geometrically. More nodes means stronger consensus, faster validation, better tracking, and wider geographic coverage. The system becomes exponentially more accurate with scale.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0">
+        <div style="text-align:center;padding:20px;border:1px solid var(--brd2);border-radius:6px;background:var(--card)">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--teal)">2×</div>
+          <div style="font-size:11px;color:var(--silver);margin-top:4px">Nodes = 4× validation speed</div>
+        </div>
+        <div style="text-align:center;padding:20px;border:1px solid var(--brd2);border-radius:6px;background:var(--card)">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--teal)">10×</div>
+          <div style="font-size:11px;color:var(--silver);margin-top:4px">Nodes = 30× coverage area</div>
+        </div>
+        <div style="text-align:center;padding:20px;border:1px solid var(--brd2);border-radius:6px;background:var(--card)">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--teal)">100×</div>
+          <div style="font-size:11px;color:var(--silver);margin-top:4px">Nodes = near-total urban visibility</div>
+        </div>
+        <div style="text-align:center;padding:20px;border:1px solid rgba(65,180,211,.3);border-radius:6px;background:rgba(65,180,211,.06)">
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--teal2)">∞</div>
+          <div style="font-size:11px;color:var(--silver);margin-top:4px">Scale unlocks AI self-training</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="inner">
+    <div class="rmh rv">
+      <span class="tag">Vision 2026–2036</span>
+      <h2 class="h-lg">Road<span class="accent">map</span></h2>
+      <p class="dim" style="margin-top:16px;font-size:15px">A decade to build the largest distributed urban intelligence network — from Latin America to the world.</p>
+    </div>
+    <div class="rmw">
+      <div class="rms"></div>
+      <div class="rmr"><div class="rmc"><span class="rmy">2026</span><span class="rmph">Phase 0–1 · Foundation & Protocol Launch</span><div class="rmtit">Protocol genesis</div><div class="rmbl"><div class="rmb">Mobile app MVP + WhatsApp bot</div><div class="rmb">Private beta 500 users — CDMX</div><div class="rmb">Smart contract audit (CertiK) — protocol live</div><div class="rmb">Foundation + Operating Company structure</div><div class="rmb">JALI earned only via Proof of Presence Validation</div></div><span class="rmbdg">🎯 10K active contributors</span></div><div class="rmd"><div class="rmdn live"></div></div><div class="rmg"></div></div>
+      <div class="rmr"><div class="rmg"></div><div class="rmd"><div class="rmdn"></div></div><div class="rmc"><span class="rmy">2027</span><span class="rmph">Phase 2 · LATAM Expansion</span><div class="rmtit">Regional growth</div><div class="rmbl"><div class="rmb">Expansion to Bogotá, Lima, Buenos Aires</div><div class="rmb">Integration with 15 municipalities</div><div class="rmb">First B2B API integrations — enterprise partnerships</div><div class="rmb">B2B API — logistics and insurance companies</div><div class="rmb">First DEX liquidity — community-provided only</div></div><span class="rmbdg">🎯 500K contributors · 3 countries</span></div></div>
+      <div class="rmr"><div class="rmc"><span class="rmy">2028</span><span class="rmph">Phase 3 · Mass Scale</span><div class="rmtit">CEX listing</div><div class="rmbl"><div class="rmb">Binance / OKX listing</div><div class="rmb">1 million active users</div><div class="rmb">Live B2B data marketplace</div><div class="rmb">Expansion to 8 LATAM countries</div></div><span class="rmbdg">🎯 1M users · 8 countries</span></div><div class="rmd"><div class="rmdn"></div></div><div class="rmg"></div></div>
+      <div class="rmr"><div class="rmg"></div><div class="rmd"><div class="rmdn"></div></div><div class="rmc"><span class="rmy">2030</span><span class="rmph">Phase 4–5 · Global</span><div class="rmtit">From LATAM to the world</div><div class="rmbl"><div class="rmb">Expansion to Sub-Saharan Africa</div><div class="rmb">Smart cities platform integration</div><div class="rmb">JALI as global civic reputation standard</div><div class="rmb">UN-Habitat partnership</div></div><span class="rmbdg">🎯 20M users · 30+ countries</span></div></div>
+      <div class="rmr"><div class="rmc"><span class="rmy">2032</span><span class="rmph">Phase 6 · Global Network</span><div class="rmtit">Urban intelligence protocol</div><div class="rmbl"><div class="rmb">50M+ users on global network</div><div class="rmb">JALI top 100 by market cap</div><div class="rmb">Multi-chain interoperability</div><div class="rmb">IoT urban system integration</div></div><span class="rmbdg">🎯 50M users · 60+ countries</span></div><div class="rmd"><div class="rmdn"></div></div><div class="rmg"></div></div>
+      <div class="rmr"><div class="rmg"></div><div class="rmd"><div class="rmdn" style="border-color:rgba(65,180,211,.35)"></div></div><div class="rmc"><span class="rmy">2036</span><span class="rmph">Phase 7 · Maturity</span><div class="rmtit">World's largest civic network</div><div class="rmbl"><div class="rmb">100M+ active contributing citizens</div><div class="rmb">JALI integrated in digital identity</div><div class="rmb">Trust score as global civic standard</div><div class="rmb">Fully community-governed protocol</div></div><span class="rmbdg">🎯 100M+ users · 100+ countries</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="network">
+  <div class="ido-gc"></div>
+  <div class="inner">
+    <!-- MARKET OPPORTUNITY -->
+    <div style="text-align:center;max-width:700px;margin:0 auto 80px" class="rv">
+      <span class="tag">Market Opportunity</span>
+      <h2 class="h-lg" style="margin-bottom:20px">A <span class="accent">$120B market</span><br>with no infrastructure layer</h2>
+      <p class="dim" style="font-size:15px">The global urban security and smart city intelligence market is valued at $120B and growing at 14% CAGR. Every city, every municipality, every government security agency needs real-time situational awareness. None have a distributed, consensus-validated intelligence layer. Until now.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden;margin-bottom:80px" class="rv">
+      <div style="background:var(--card);padding:36px 28px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;margin-bottom:6px">$120B</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px">Urban intelligence market</div>
+      </div>
+      <div style="background:var(--card);padding:36px 28px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;margin-bottom:6px">1B+</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px">Urban surveillance cameras globally</div>
+      </div>
+      <div style="background:var(--card);padding:36px 28px;text-align:center;border-left:1px solid var(--brd2)">
+        <div style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;margin-bottom:6px">0%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px">Connected to a real-time consensus layer</div>
+      </div>
+    </div>
+
+    <!-- DEPIN INCENTIVE LAYER -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-bottom:80px">
+      <div class="rvl">
+        <span class="tag">Decentralized Incentive Layer — Future</span>
+        <h2 class="h-md" style="margin-bottom:20px">DePIN for <span class="accent">urban intelligence</span></h2>
+        <p class="dim" style="font-size:14px;margin-bottom:24px">As the network scales, Jalibor introduces a decentralized incentive layer for infrastructure contributors. Modeled on Helium and Hivemapper — but for urban intelligence, not connectivity or mapping.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+            <span style="font-size:13px;color:var(--silver)"><strong style="color:var(--white)">Camera node operators</strong> — earn JALI for validated event contributions from connected cameras</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+            <span style="font-size:13px;color:var(--silver)"><strong style="color:var(--white)">Human validators</strong> — earn JALI for high-trust physical presence validation</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:1px solid var(--brd2);border-radius:5px;background:var(--card)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+            <span style="font-size:13px;color:var(--silver)"><strong style="color:var(--white)">Infrastructure providers</strong> — earn JALI for sustained uptime and mesh reliability</span>
+          </div>
+          <div style="padding:14px 18px;border:1px solid rgba(65,180,211,.2);border-radius:5px;background:rgba(65,180,211,.04);margin-top:4px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:6px">DEPIN POSITIONING</div>
+            <p style="font-size:12px;color:var(--silver);line-height:1.7">Infrastructure-first. Not crypto-first. JALI's incentive layer exists to accelerate network growth — not to create speculative instruments. The protocol's value is the network's intelligence, not the token's price.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rvr">
+        <span class="tag">Vision</span>
+        <h2 class="h-md" style="margin-bottom:20px">The operating system for <span class="accent">urban reality</span></h2>
+        <p class="dim" style="font-size:14px;margin-bottom:24px">Ten years from now, every city will have a real-time intelligence layer. Every camera will be a node. Every vehicle will contribute to the mesh. Every moving threat will be tracked from the moment it appears to the moment it is resolved.</p>
+        <div style="display:flex;flex-direction:column;gap:2px;border:1px solid var(--brd2);border-radius:6px;overflow:hidden">
+          <div style="background:var(--card);padding:20px 24px;border-bottom:1px solid var(--brd2)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:6px">2026 — GENESIS</div>
+            <p style="font-size:13px;color:var(--silver);line-height:1.6">CDMX. 10,000 nodes. PMC protocol live. First municipal API integrations.</p>
+          </div>
+          <div style="background:var(--card);padding:20px 24px;border-bottom:1px solid var(--brd2)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:6px">2028 — LATAM SCALE</div>
+            <p style="font-size:13px;color:var(--silver);line-height:1.6">1M nodes. AI camera integration live. 8 cities. Smart city platform partnerships.</p>
+          </div>
+          <div style="background:var(--card);padding:20px 24px;border-bottom:1px solid var(--brd2)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);letter-spacing:1px;margin-bottom:6px">2030 — GLOBAL MESH</div>
+            <p style="font-size:13px;color:var(--silver);line-height:1.6">20M nodes. 30 cities. UN-Habitat integration. IoT and vehicle node layer live.</p>
+          </div>
+          <div style="background:rgba(65,180,211,.04);padding:20px 24px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal2);letter-spacing:1px;margin-bottom:6px">2036 — URBAN OS</div>
+            <p style="font-size:13px;color:var(--silver);line-height:1.6">100M+ nodes. The world's largest distributed urban intelligence network. Real-time consensus for every city on Earth.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINAL CTA -->
+    <div class="idoi rv" style="position:relative;z-index:2;padding-top:0">
+      <div class="idobdg">REAL-TIME URBAN INTELLIGENCE · DISTRIBUTED VALIDATION · PRESENCE MESH CONSENSUS</div>
+      <h2 class="h-xl" style="letter-spacing:-3px">Deploy the <span class="accent">layer</span></h2>
+      <p style="font-size:16px;color:var(--silver);margin:24px auto 0;max-width:520px;line-height:1.75;font-weight:300">Jalibor is real-time urban intelligence infrastructure — built for cities, enterprises, and public safety. The network grows stronger with every node that joins. Contact us to discuss municipal API access, enterprise deployment, or technical partnerships.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:52px 0;background:var(--brd2);border:1px solid var(--brd2);border-radius:6px;overflow:hidden">
+        <div style="background:var(--card);padding:36px 24px;text-align:center"><span style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;display:block;margin-bottom:6px">0</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px">Pre-mine / Team tokens</span></div>
+        <div style="background:var(--card);padding:36px 24px;text-align:center;border-left:1px solid var(--brd2)"><span style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;display:block;margin-bottom:6px">Proof of Presence Validation</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px">Only emission mechanism</span></div>
+        <div style="background:var(--card);padding:36px 24px;text-align:center;border-left:1px solid var(--brd2)"><span style="font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--teal);letter-spacing:-1.5px;display:block;margin-bottom:6px">DePIN</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--silver);text-transform:uppercase;letter-spacing:1.5px">Incentive layer model</span></div>
+      </div>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+        <button class="bp" style="font-size:14px;padding:16px 44px" onclick="jalOpen('jal-demo-modal')">Request Demo</button>
+        <button class="bs" style="font-size:14px;padding:16px 44px" onclick="jalOpen('jal-wp-modal')">Technical Whitepaper</button>
+      </div>
+      <p style="margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(144,164,174,.3);letter-spacing:.5px">jalibor.app · technical@jalibor.app · Urban Intelligence Infrastructure · 2026</p>
+    </div>
+  </div>
+</section>
+
+<section id="tokenomics" style="padding:100px 0;background:var(--surface);border-top:1px solid var(--brd2)">
+  <div class="inner">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;max-width:1000px;margin:0 auto">
+      <div class="rvl">
+        <span class="tag" style="margin-bottom:14px">Incentive infrastructure — optional layer</span>
+        <h2 class="h-lg" style="font-size:clamp(32px,4vw,52px);margin-bottom:20px">Distributed <span class="accent">participation rewards</span></h2>
+        <p class="dim" style="font-size:15px;line-height:1.75;margin-bottom:28px">As the Jalibor network scales, a decentralized incentive layer rewards meaningful infrastructure contribution. Modeled on DePIN networks like Helium and Hivemapper — built for urban intelligence, not connectivity or mapping.</p>
+        <p class="dim" style="font-size:14px;line-height:1.75">The incentive layer is secondary infrastructure. The mission is real-time urban intelligence. Rewards exist to accelerate network growth and incentivize reliable participation — not as a financial instrument.</p>
+      </div>
+      <div class="rvr">
+        <div style="display:flex;flex-direction:column;gap:2px;border:1px solid var(--brd2);border-radius:6px;overflow:hidden">
+          <div style="background:var(--card);padding:20px 24px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px;margin-bottom:10px">WHO EARNS REWARDS</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0"></div><span style="font-size:13px;color:var(--white);font-weight:500">Active validation nodes</span></div>
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0"></div><span style="font-size:13px;color:var(--white);font-weight:500">AI camera infrastructure providers</span></div>
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0"></div><span style="font-size:13px;color:var(--white);font-weight:500">Geographic coverage operators</span></div>
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0"></div><span style="font-size:13px;color:var(--white);font-weight:500">High-quality verification contributors</span></div>
+              <div style="display:flex;align-items:center;gap:12px"><div style="width:6px;height:6px;border-radius:50%;background:rgba(65,180,211,.4);flex-shrink:0"></div><span style="font-size:13px;color:var(--silver)">Protocol development team</span></div>
+            </div>
+          </div>
+          <div style="background:var(--card);padding:20px 24px;border-top:1px solid var(--brd2)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--teal);letter-spacing:2px;margin-bottom:10px">REWARD MECHANISM</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(65,180,211,.04);border:1px solid var(--brd2);border-radius:5px">
+                <span style="font-size:12px;color:var(--silver)">Emission source</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal)">Proof of Presence Validation only</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(65,180,211,.04);border:1px solid var(--brd2);border-radius:5px">
+                <span style="font-size:12px;color:var(--silver)">Model</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal)">DePIN · activity-based</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(65,180,211,.04);border:1px solid var(--brd2);border-radius:5px">
+                <span style="font-size:12px;color:var(--silver)">Pre-sale / token sale</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal)">None</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(65,180,211,.04);border:1px solid var(--brd2);border-radius:5px">
+                <span style="font-size:12px;color:var(--silver)">Purpose</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--teal)">Network growth · not speculation</span>
+              </div>
+            </div>
+          </div>
+          <div style="background:rgba(65,180,211,.03);padding:16px 24px;border-top:1px solid var(--brd2)">
+            <p style="font-size:12px;color:rgba(144,164,174,.6);line-height:1.7;font-family:'JetBrains Mono',monospace;letter-spacing:.3px">JALI tokens are infrastructure rewards. Not financial instruments. Rewards exist only when participants contribute value to the network.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<footer>
+  <div class="fg">
+    <div><div class="flogo">Jali<span class="bor">bor</span></div><p class="fdesc">Real-time urban intelligence infrastructure. Presence Mesh Consensus protocol. Human + AI cooperative sensing network.</p></div>
+    <div class="fcol"><h5>Protocol</h5><a href="#" onclick="jalOpen('jal-wp-modal');return false">Whitepaper</a><a href="https://bscscan.com" target="_blank" rel="noopener">Smart Contract</a><a href="https://jalibor.app/security" target="_blank" rel="noopener">Audit</a><a href="https://jalibor.app/docs" target="_blank" rel="noopener">Protocol Docs</a></div>
+    <div class="fcol"><h5>Resources</h5><a href="https://jalibor.app/docs" target="_blank" rel="noopener">Documentation</a><a href="https://jalibor.app/api" target="_blank" rel="noopener">API Reference</a><a href="https://jalibor.app/blog" target="_blank" rel="noopener">Blog</a><a href="https://jalibor.app/media" target="_blank" rel="noopener">Media Kit</a></div>
+    <div class="fcol"><h5>Community</h5><a href="https://t.me/jalibor" target="_blank" rel="noopener">Telegram</a><a href="https://twitter.com/JaliborApp" target="_blank" rel="noopener">Twitter / X</a><a href="https://discord.gg/jalibor" target="_blank" rel="noopener">Discord</a><a href="https://wa.me/jalibor" target="_blank" rel="noopener">WhatsApp</a></div>
+  </div>
+  <div class="fbot"><span>© 2026 Jalibor. All rights reserved.</span><span>jalibor.app · token@jalibor.app</span></div>
+</footer>
+
+
+
+
+<script>
+// CURSOR
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+if(cur){document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';});}
+// REVEAL
+const rvObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');}});},{threshold:0.12});
+document.querySelectorAll('.rv,.rvl,.rvr').forEach(el=>rvObs.observe(el));
+</script>
+
+<!-- ═══════════════ JALIBOR MODALS ═══════════════ -->
+<div id="jal-overlay" onclick="jalClose()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;backdrop-filter:blur(6px)"></div>
+
+<!-- WHITEPAPER MODAL -->
+<div id="jal-wp-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9001;width:min(520px,92vw);background:#0A0C14;border:1px solid rgba(65,180,211,.25);border-radius:8px;padding:44px;font-family:'JetBrains Mono',monospace">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px">
+    <div>
+      <div style="font-size:9px;letter-spacing:3px;color:rgba(65,180,211,.6);text-transform:uppercase;margin-bottom:8px">Technical Document</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#F0F4F8;letter-spacing:-.5px;margin:0">PMC Whitepaper</h2>
+    </div>
+    <button onclick="jalClose()" style="background:none;border:none;color:rgba(144,164,174,.5);font-size:20px;cursor:pointer;line-height:1;padding:4px">&#x2715;</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid rgba(65,180,211,.12);border-radius:5px;background:rgba(65,180,211,.04)">
+      <span style="font-size:20px">📄</span>
+      <div>
+        <div style="font-size:13px;color:#F0F4F8;font-weight:600;margin-bottom:2px">Jalibor Technical Whitepaper v3.0</div>
+        <div style="font-size:11px;color:rgba(144,164,174,.6)">Presence Mesh Consensus Protocol  ·  2026  ·  EN</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div style="text-align:center;padding:12px;border:1px solid rgba(65,180,211,.10);border-radius:4px"><div style="font-size:14px;font-weight:700;color:#41B4D3">10</div><div style="font-size:9px;color:rgba(144,164,174,.5);letter-spacing:1px;margin-top:2px">SECTIONS</div></div>
+      <div style="text-align:center;padding:12px;border:1px solid rgba(65,180,211,.10);border-radius:4px"><div style="font-size:14px;font-weight:700;color:#41B4D3">PMC</div><div style="font-size:9px;color:rgba(144,164,174,.5);letter-spacing:1px;margin-top:2px">PROTOCOL</div></div>
+      <div style="text-align:center;padding:12px;border:1px solid rgba(65,180,211,.10);border-radius:4px"><div style="font-size:14px;font-weight:700;color:#41B4D3">.docx</div><div style="font-size:9px;color:rgba(144,164,174,.5);letter-spacing:1px;margin-top:2px">FORMAT</div></div>
+    </div>
+  </div>
+  <a id="jal-wp-dl" href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,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" download="Jalibor-Whitepaper-v3-EN.docx" style="display:block;text-align:center;padding:14px;background:#41B4D3;color:#000;font-weight:700;font-size:13px;letter-spacing:1px;border-radius:5px;text-decoration:none;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">DOWNLOAD WHITEPAPER →</a>
+  <p style="text-align:center;margin-top:12px;font-size:10px;color:rgba(144,164,174,.35);letter-spacing:.5px">CONFIDENTIAL  ·  FOR QUALIFIED READERS ONLY</p>
+</div>
+
+<!-- DEMO REQUEST MODAL -->
+<div id="jal-demo-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9001;width:min(520px,92vw);background:#0A0C14;border:1px solid rgba(65,180,211,.25);border-radius:8px;padding:44px;font-family:'JetBrains Mono',monospace">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px">
+    <div>
+      <div style="font-size:9px;letter-spacing:3px;color:rgba(65,180,211,.6);text-transform:uppercase;margin-bottom:8px">Live Demo</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#F0F4F8;letter-spacing:-.5px;margin:0">Request a Demo</h2>
+    </div>
+    <button onclick="jalClose()" style="background:none;border:none;color:rgba(144,164,174,.5);font-size:20px;cursor:pointer;line-height:1;padding:4px">&#x2715;</button>
+  </div>
+  <p style="font-size:13px;color:rgba(144,164,174,.6);margin-bottom:24px;line-height:1.6">See Presence Mesh Consensus live. We work with municipalities, enterprise security teams, and smart city operators.</p>
+
+  <div id="jal-form-wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">First name</label>
+        <input id="jf-fname" type="text" placeholder="Jane" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+      </div>
+      <div>
+        <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Last name</label>
+        <input id="jf-lname" type="text" placeholder="Smith" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Work email</label>
+      <input id="jf-email" type="email" placeholder="jane@city.gov" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Organization</label>
+      <input id="jf-org" type="text" placeholder="City of Austin / Acme Corp" style="width:100%;padding:11px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:9px;letter-spacing:1.5px;color:rgba(144,164,174,.5);text-transform:uppercase;margin-bottom:6px">Use case</label>
+      <select id="jf-usecase" style="width:100%;padding:11px 14px;background:#0A0C14;border:1px solid rgba(65,180,211,.18);border-radius:4px;color:#F0F4F8;font-family:inherit;font-size:13px;outline:none;box-sizing:border-box;cursor:pointer" onfocus="this.style.borderColor='rgba(65,180,211,.5)'" onblur="this.style.borderColor='rgba(65,180,211,.18)'">
+        <option value="" style="background:#0A0C14">Select use case...</option>
+        <option value="municipal" style="background:#0A0C14">Municipal / Government</option>
+        <option value="enterprise" style="background:#0A0C14">Enterprise Security</option>
+        <option value="logistics" style="background:#0A0C14">Logistics / Transportation</option>
+        <option value="insurance" style="background:#0A0C14">Insurance</option>
+        <option value="smartcity" style="background:#0A0C14">Smart City Platform</option>
+        <option value="investor" style="background:#0A0C14">Investor / Partner</option>
+        <option value="other" style="background:#0A0C14">Other</option>
+      </select>
+    </div>
+    <button onclick="jalSubmitDemo()" style="width:100%;padding:14px;background:#41B4D3;color:#000;font-weight:700;font-size:13px;letter-spacing:1px;border:none;border-radius:5px;cursor:pointer;transition:opacity .2s;font-family:inherit" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">REQUEST DEMO →</button>
+    <p style="text-align:center;margin-top:12px;font-size:10px;color:rgba(144,164,174,.35);letter-spacing:.5px">We respond within 24 hours. No spam.</p>
+  </div>
+
+  <div id="jal-form-success" style="display:none;text-align:center;padding:20px 0">
+    <div style="font-size:36px;margin-bottom:16px">✓</div>
+    <div style="font-size:16px;font-weight:700;color:#41B4D3;margin-bottom:8px">Request received</div>
+    <div style="font-size:13px;color:rgba(144,164,174,.6);line-height:1.6">We will contact you within 24 hours to schedule your demo.</div>
+  </div>
+</div>
+
+<script>
+function jalOpen(id){
+  document.getElementById('jal-overlay').style.display='block';
+  document.getElementById(id).style.display='block';
+  document.body.style.overflow='hidden';
+}
+function jalClose(){
+  ['jal-overlay','jal-wp-modal','jal-demo-modal'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') jalClose(); });
+function jalSubmitDemo(){
+  var fname=document.getElementById('jf-fname').value.trim();
+  var email=document.getElementById('jf-email').value.trim();
+  var org=document.getElementById('jf-org').value.trim();
+  if(!fname||!email||!org){
+    alert('Please fill in name, email, and organization.');
+    return;
+  }
+  if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){
+    alert('Please enter a valid email address.');
+    return;
+  }
+  document.getElementById('jal-form-wrap').style.display='none';
+  document.getElementById('jal-form-success').style.display='block';
+}
+</script>
+
+
+<script>
+function toggleMobileNav(){
+  var nav=document.getElementById('mobile-nav');
+  var ham=document.querySelector('.nav-ham');
+  nav.classList.toggle('open');
+  ham.classList.toggle('open');
+  document.body.style.overflow=nav.classList.contains('open')?'hidden':'';
+}
+function closeMobileNav(){
+  var nav=document.getElementById('mobile-nav');
+  var ham=document.querySelector('.nav-ham');
+  nav.classList.remove('open');
+  ham.classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMobileNav();});
+</script>
+<script>setTimeout(function(){document.querySelectorAll('.rmr').forEach(function(el){el.classList.add('vis');});},300);</script>
+</body>
+</html>
